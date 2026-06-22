@@ -1,0 +1,15 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "AudioStorage__blobServiceUri": "",
+    "Cosmos__Endpoint": "",
+    "Cosmos__Database": "transcrib",
+    "Cosmos__Container": "jobs",
+    "Storage__BlobEndpoint": "",
+    "Speech__Endpoint": "",
+    "Speech__Key": "",
+    "Speech__Language": "en-US"
+  }
+}

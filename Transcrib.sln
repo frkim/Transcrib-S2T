@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7047592E-B54B-4531-9695-08A63AFB9D54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transcrib.Shared", "src\shared\Transcrib.Shared.csproj", "{DD89D984-973C-43E9-A2D4-B63334AD5502}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transcrib.Api", "src\api\Transcrib.Api.csproj", "{8493F492-2D4D-44DF-8D67-61B61B575B26}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transcrib.Functions", "src\functions\Transcrib.Functions.csproj", "{BB99D8DC-87D3-4330-8F18-7677F8B4CD48}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{735307D6-D743-44E9-BC8D-D328CBA40355}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transcrib.TestSupport", "tests\Transcrib.TestSupport\Transcrib.TestSupport.csproj", "{F7C30DB6-E1C9-4259-A7AA-87DA509332EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transcrib.Api.Tests", "tests\Transcrib.Api.Tests\Transcrib.Api.Tests.csproj", "{52D2C3E5-0B82-44F7-B08A-73D493504A96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transcrib.Functions.Tests", "tests\Transcrib.Functions.Tests\Transcrib.Functions.Tests.csproj", "{7115A9C5-FA16-4CC4-928E-B2F8E3BCA766}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DD89D984-973C-43E9-A2D4-B63334AD5502}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD89D984-973C-43E9-A2D4-B63334AD5502}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD89D984-973C-43E9-A2D4-B63334AD5502}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD89D984-973C-43E9-A2D4-B63334AD5502}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8493F492-2D4D-44DF-8D67-61B61B575B26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8493F492-2D4D-44DF-8D67-61B61B575B26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8493F492-2D4D-44DF-8D67-61B61B575B26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8493F492-2D4D-44DF-8D67-61B61B575B26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB99D8DC-87D3-4330-8F18-7677F8B4CD48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB99D8DC-87D3-4330-8F18-7677F8B4CD48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB99D8DC-87D3-4330-8F18-7677F8B4CD48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB99D8DC-87D3-4330-8F18-7677F8B4CD48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7C30DB6-E1C9-4259-A7AA-87DA509332EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7C30DB6-E1C9-4259-A7AA-87DA509332EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7C30DB6-E1C9-4259-A7AA-87DA509332EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7C30DB6-E1C9-4259-A7AA-87DA509332EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52D2C3E5-0B82-44F7-B08A-73D493504A96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52D2C3E5-0B82-44F7-B08A-73D493504A96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52D2C3E5-0B82-44F7-B08A-73D493504A96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52D2C3E5-0B82-44F7-B08A-73D493504A96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7115A9C5-FA16-4CC4-928E-B2F8E3BCA766}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7115A9C5-FA16-4CC4-928E-B2F8E3BCA766}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7115A9C5-FA16-4CC4-928E-B2F8E3BCA766}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7115A9C5-FA16-4CC4-928E-B2F8E3BCA766}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DD89D984-973C-43E9-A2D4-B63334AD5502} = {7047592E-B54B-4531-9695-08A63AFB9D54}
+		{8493F492-2D4D-44DF-8D67-61B61B575B26} = {7047592E-B54B-4531-9695-08A63AFB9D54}
+		{BB99D8DC-87D3-4330-8F18-7677F8B4CD48} = {7047592E-B54B-4531-9695-08A63AFB9D54}
+		{F7C30DB6-E1C9-4259-A7AA-87DA509332EA} = {735307D6-D743-44E9-BC8D-D328CBA40355}
+		{52D2C3E5-0B82-44F7-B08A-73D493504A96} = {735307D6-D743-44E9-BC8D-D328CBA40355}
+		{7115A9C5-FA16-4CC4-928E-B2F8E3BCA766} = {735307D6-D743-44E9-BC8D-D328CBA40355}
+	EndGlobalSection
+EndGlobal
