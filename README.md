@@ -97,8 +97,8 @@ L'authentification **Entra ID** est activée automatiquement dès que la section
 
 ## Déploiement
 
-Prérequis : [Azure Developer CLI (`azd`)](https://aka.ms/azd), .NET 8 SDK,
-Node.js 22, Docker.
+Prérequis : [Azure Developer CLI (`azd`)](https://aka.ms/azd), .NET 10 SDK,
+Node.js 24, Docker.
 
 ```bash
 azd auth login
