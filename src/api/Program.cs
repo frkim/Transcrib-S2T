@@ -126,6 +126,27 @@ jobs.MapGet("/{id}/transcript", async (string id, JobService service, Cancellati
         : Results.File(transcript.Value.Content, transcript.Value.ContentType, transcript.Value.FileName);
 });
 
+// PATCH /internal/jobs/{id}/status — used by the Logic Apps workflows (transcription
+// + purge) to update job status. Secured by Entra ID like the rest of the API.
+var internalJobs = app.MapGroup("/internal/jobs");
+if (azureAdConfigured)
+{
+    internalJobs.RequireAuthorization();
+}
+
+internalJobs.MapPatch("/{id}/status", async (string id, JobStatusUpdate update, JobService service, CancellationToken ct) =>
+{
+    if (string.IsNullOrWhiteSpace(update.Status))
+    {
+        return Results.BadRequest(new { error = "status is required." });
+    }
+
+    var job = await service.UpdateStatusAsync(id, update.Status, update.TranscriptBlobUrl, update.Error, ct);
+    return job is null ? Results.NotFound() : Results.Ok(job);
+});
+
 app.Run();
+
+public record JobStatusUpdate(string Status, string? TranscriptBlobUrl, string? Error);
 
 public partial class Program { }

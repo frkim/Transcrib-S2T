@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: transcrib-s2t
+metadata:
+  template: transcrib-s2t@0.0.1
+
+infra:
+  provider: bicep
+  path: infra
+  module: main
+
+services:
+  api:
+    project: ./src/api
+    language: dotnet
+    host: containerapp
+    docker:
+      path: ../Dockerfile
+      context: ..
+
+  functions:
+    project: ./src/functions
+    language: dotnet
+    host: function
+
+  logic-apps:
+    project: ./src/logic-apps
+    language: js
+    host: function
+
+  frontend:
+    project: ./src/frontend
+    language: ts
+    host: containerapp
+    docker:
+      path: ./Dockerfile
+      context: .

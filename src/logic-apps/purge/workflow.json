@@ -1,0 +1,110 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "triggers": {
+      "Daily_recurrence": {
+        "type": "Recurrence",
+        "recurrence": {
+          "frequency": "Day",
+          "interval": 1
+        }
+      }
+    },
+    "actions": {
+      "List_audio_blobs": {
+        "type": "ServiceProvider",
+        "inputs": {
+          "parameters": {
+            "containerName": "audio"
+          },
+          "serviceProviderConfiguration": {
+            "connectionName": "AzureBlob",
+            "operationId": "listBlobs",
+            "serviceProviderId": "/serviceProviders/AzureBlob"
+          }
+        },
+        "runAfter": {}
+      },
+      "For_each_audio_blob": {
+        "type": "Foreach",
+        "foreach": "@body('List_audio_blobs')",
+        "actions": {
+          "Condition_older_than_one_day": {
+            "type": "If",
+            "expression": {
+              "less": [
+                "@item()?['LastModified']",
+                "@addDays(utcNow(), -1)"
+              ]
+            },
+            "actions": {
+              "Delete_audio_blob": {
+                "type": "ServiceProvider",
+                "inputs": {
+                  "parameters": {
+                    "containerName": "audio",
+                    "blobName": "@item()?['Name']"
+                  },
+                  "serviceProviderConfiguration": {
+                    "connectionName": "AzureBlob",
+                    "operationId": "deleteBlob",
+                    "serviceProviderId": "/serviceProviders/AzureBlob"
+                  }
+                },
+                "runAfter": {}
+              },
+              "Delete_transcript_blob": {
+                "type": "ServiceProvider",
+                "inputs": {
+                  "parameters": {
+                    "containerName": "transcripts",
+                    "blobName": "@{first(split(item()?['Name'], '.'))}.txt"
+                  },
+                  "serviceProviderConfiguration": {
+                    "connectionName": "AzureBlob",
+                    "operationId": "deleteBlob",
+                    "serviceProviderId": "/serviceProviders/AzureBlob"
+                  }
+                },
+                "runAfter": {
+                  "Delete_audio_blob": [
+                    "Succeeded",
+                    "Failed"
+                  ]
+                }
+              },
+              "Mark_job_purged": {
+                "type": "Http",
+                "inputs": {
+                  "method": "PATCH",
+                  "uri": "@{appsetting('Api__BaseUrl')}/internal/jobs/@{first(split(item()?['Name'], '.'))}/status",
+                  "body": {
+                    "status": "Purged"
+                  },
+                  "authentication": {
+                    "type": "ManagedServiceIdentity"
+                  }
+                },
+                "runAfter": {
+                  "Delete_transcript_blob": [
+                    "Succeeded",
+                    "Failed"
+                  ]
+                }
+              }
+            },
+            "runAfter": {}
+          }
+        },
+        "runAfter": {
+          "List_audio_blobs": [
+            "Succeeded"
+          ]
+        }
+      }
+    }
+  },
+  "kind": "Stateful"
+}

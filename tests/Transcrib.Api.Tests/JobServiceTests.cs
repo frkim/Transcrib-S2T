@@ -87,4 +87,30 @@ public class JobServiceTests
 
         Assert.Null(transcript);
     }
+
+    [Fact]
+    public async Task UpdateStatusAsync_UpdatesStatusAndTranscriptUrl()
+    {
+        var service = CreateService(out _, out _);
+        var created = (await service.CreateJobsAsync(new[] { Mp3() })).Created.Single();
+
+        var updated = await service.UpdateStatusAsync(
+            created.Id,
+            JobStatus.Completed,
+            "https://example/transcripts/x.txt");
+
+        Assert.NotNull(updated);
+        Assert.Equal(JobStatus.Completed, updated!.Status);
+        Assert.Equal("https://example/transcripts/x.txt", updated.TranscriptBlobUrl);
+    }
+
+    [Fact]
+    public async Task UpdateStatusAsync_UnknownJob_ReturnsNull()
+    {
+        var service = CreateService(out _, out _);
+
+        var updated = await service.UpdateStatusAsync("missing", JobStatus.Purged);
+
+        Assert.Null(updated);
+    }
 }

@@ -78,6 +78,31 @@ public class JobService
     public Task<TranscriptionJob?> GetJobAsync(string id, CancellationToken cancellationToken = default)
         => _jobs.GetAsync(id, cancellationToken);
 
+    public async Task<TranscriptionJob?> UpdateStatusAsync(
+        string id,
+        string status,
+        string? transcriptBlobUrl = null,
+        string? error = null,
+        CancellationToken cancellationToken = default)
+    {
+        var job = await _jobs.GetAsync(id, cancellationToken);
+        if (job is null)
+        {
+            return null;
+        }
+
+        job.Status = status;
+        if (transcriptBlobUrl is not null)
+        {
+            job.TranscriptBlobUrl = transcriptBlobUrl;
+        }
+        job.Error = error;
+
+        var updated = await _jobs.UpsertAsync(job, cancellationToken);
+        _logger.LogInformation("Job {JobId} status updated to {Status}", id, status);
+        return updated;
+    }
+
     public async Task<(Stream Content, string ContentType, string FileName)?> GetTranscriptAsync(string id, CancellationToken cancellationToken = default)
     {
         var job = await _jobs.GetAsync(id, cancellationToken);
