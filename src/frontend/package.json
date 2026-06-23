@@ -16,7 +16,6 @@
     "@mui/icons-material": "^9.1.1",
     "@mui/material": "^9.1.2",
     "@mui/material-nextjs": "^9.1.1",
-    "frontend": "file:",
     "next": "^16.2.9",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
