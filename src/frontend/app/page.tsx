@@ -1,8 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import AppBar from "@mui/material/AppBar";
+import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import GraphicEqIcon from "@mui/icons-material/GraphicEq";
 import type { TranscriptionJob } from "@/lib/types";
-import { listJobs } from "@/lib/api";
+import { deleteJob, listJobs } from "@/lib/api";
 import UploadForm from "@/components/UploadForm";
 import JobList from "@/components/JobList";
 
@@ -37,21 +46,59 @@ export default function Home() {
     };
   }, [reloadToken]);
 
+  const handleDelete = useCallback(async (jobId: string) => {
+    try {
+      await deleteJob(jobId);
+      setJobs((current) => current.filter((job) => job.id !== jobId));
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete job.");
+    }
+  }, []);
+
   return (
-    <main style={{ maxWidth: 800, margin: "2rem auto", padding: "0 1rem" }}>
-      <h1>Transcrib-S2T</h1>
-      <p>Upload one or more MP3 files to generate speech-to-text transcripts.</p>
+    <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
+      <AppBar position="static" elevation={0}>
+        <Toolbar>
+          <GraphicEqIcon sx={{ mr: 1.5 }} />
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Transcrib-S2T
+          </Typography>
+        </Toolbar>
+      </AppBar>
 
-      <section>
-        <h2>Upload</h2>
-        <UploadForm onUploaded={() => setReloadToken((t) => t + 1)} />
-      </section>
+      <Container maxWidth="md" sx={{ py: 4 }}>
+        <Stack spacing={4}>
+          <Box>
+            <Typography variant="h1" gutterBottom>
+              Speech-to-Text Transcription
+            </Typography>
+            <Typography color="text.secondary">
+              Upload one or more MP3 files to generate speech-to-text
+              transcripts.
+            </Typography>
+          </Box>
 
-      <section>
-        <h2>Jobs</h2>
-        {error && <p role="alert">{error}</p>}
-        <JobList jobs={jobs} />
-      </section>
-    </main>
+          <Paper variant="outlined" sx={{ p: 3 }}>
+            <Typography variant="h2" gutterBottom>
+              Upload
+            </Typography>
+            <UploadForm onUploaded={() => setReloadToken((t) => t + 1)} />
+          </Paper>
+
+          <Box>
+            <Typography variant="h2" gutterBottom>
+              Jobs
+            </Typography>
+            {error && (
+              <Alert severity="error" role="alert" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
+            <JobList jobs={jobs} onDelete={handleDelete} />
+          </Box>
+        </Stack>
+      </Container>
+    </Box>
   );
 }

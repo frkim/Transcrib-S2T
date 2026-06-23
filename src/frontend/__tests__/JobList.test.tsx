@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import JobList from "@/components/JobList";
 import type { TranscriptionJob } from "@/lib/types";
 
@@ -36,5 +37,25 @@ describe("JobList", () => {
     const links = screen.getAllByRole("link", { name: /download/i });
     expect(links).toHaveLength(1);
     expect(links[0]).toHaveAttribute("href", expect.stringContaining("/jobs/2/transcript"));
+  });
+
+  it("shows a processing indicator for processing jobs", () => {
+    render(<JobList jobs={[job({ id: "1", status: "Processing" })]} />);
+    expect(screen.getByLabelText(/processing/i)).toBeInTheDocument();
+  });
+
+  it("calls onDelete when the delete button is clicked", async () => {
+    const onDelete = jest.fn();
+    render(
+      <JobList
+        jobs={[job({ id: "42", fileName: "talk.mp3" })]}
+        onDelete={onDelete}
+      />
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /delete talk.mp3/i })
+    );
+    expect(onDelete).toHaveBeenCalledWith("42");
   });
 });
