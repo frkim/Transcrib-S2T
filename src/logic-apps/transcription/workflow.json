@@ -12,7 +12,7 @@
           },
           "serviceProviderConfiguration": {
             "connectionName": "AzureBlob",
-            "operationId": "whenABlobIsAdded",
+            "operationId": "whenABlobIsAddedOrModified",
             "serviceProviderId": "/serviceProviders/AzureBlob"
           }
         },
