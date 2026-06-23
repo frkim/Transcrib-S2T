@@ -37,3 +37,5 @@ services:
       path: ./Dockerfile
       context: .
       remoteBuild: true
+      buildArgs:
+        - NEXT_PUBLIC_API_BASE_URL=${SERVICE_API_ENDPOINT_URL}

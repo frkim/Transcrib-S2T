@@ -149,6 +149,22 @@ module api 'modules/api.bicep' = {
   }
 }
 
+module frontend 'modules/frontend.bicep' = {
+  name: 'frontend'
+  scope: resourceGroup
+  params: {
+    location: location
+    tags: tags
+    containerAppName: 'ca-web-${resourceToken}'
+    environmentId: containerAppsEnv.outputs.environmentId
+    registryLoginServer: registry.outputs.loginServer
+    identityId: identity.outputs.identityId
+    identityClientId: identity.outputs.identityClientId
+    applicationInsightsConnectionString: monitoring.outputs.applicationInsightsConnectionString
+    apiBaseUrl: api.outputs.apiUri
+  }
+}
+
 module functions 'modules/functions.bicep' = {
   name: 'functions'
   scope: resourceGroup
@@ -197,6 +213,8 @@ output AZURE_RESOURCE_GROUP string = resourceGroup.name
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = registry.outputs.loginServer
 output SERVICE_API_ENDPOINT_URL string = api.outputs.apiUri
 output SERVICE_API_NAME string = api.outputs.apiName
+output SERVICE_FRONTEND_ENDPOINT_URL string = frontend.outputs.frontendUri
+output SERVICE_FRONTEND_NAME string = frontend.outputs.frontendName
 output SERVICE_FUNCTIONS_NAME string = functions.outputs.functionAppName
 output SERVICE_LOGIC_APPS_NAME string = logicApps.outputs.logicAppName
 output COSMOS_ENDPOINT string = cosmos.outputs.endpoint
