@@ -121,4 +121,33 @@ public class JobService
         var transcriptFileName = Path.GetFileNameWithoutExtension(job.FileName) + ".txt";
         return (download.Value.Content, download.Value.ContentType, transcriptFileName);
     }
+
+    /// <summary>
+    /// Deletes a job and its associated audio/transcript blobs. Returns
+    /// <c>false</c> when no job exists for the supplied id.
+    /// </summary>
+    public async Task<bool> DeleteJobAsync(string id, CancellationToken cancellationToken = default)
+    {
+        var job = await _jobs.GetAsync(id, cancellationToken);
+        if (job is null)
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrEmpty(job.AudioBlobUrl))
+        {
+            var audioBlobName = new Uri(job.AudioBlobUrl).Segments.Last();
+            await _blobs.DeleteAudioAsync(audioBlobName, cancellationToken);
+        }
+
+        if (!string.IsNullOrEmpty(job.TranscriptBlobUrl))
+        {
+            var transcriptBlobName = new Uri(job.TranscriptBlobUrl).Segments.Last();
+            await _blobs.DeleteTranscriptAsync(transcriptBlobName, cancellationToken);
+        }
+
+        var deleted = await _jobs.DeleteAsync(id, cancellationToken);
+        _logger.LogInformation("Deleted transcription job {JobId}", id);
+        return deleted;
+    }
 }

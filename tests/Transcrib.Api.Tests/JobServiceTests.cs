@@ -113,4 +113,34 @@ public class JobServiceTests
 
         Assert.Null(updated);
     }
+
+    [Fact]
+    public async Task DeleteJobAsync_RemovesJobAndBlobs()
+    {
+        var service = CreateService(out var jobs, out var blobs);
+        var created = (await service.CreateJobsAsync(new[] { Mp3() })).Created.Single();
+
+        // Simulate a completed transcript so both blobs exist.
+        blobs.Transcripts[$"{created.Id}.txt"] = "transcript text";
+        created.TranscriptBlobUrl = $"https://example.blob.core.windows.net/transcripts/{created.Id}.txt";
+        created.Status = JobStatus.Completed;
+        await jobs.UpsertAsync(created);
+
+        var deleted = await service.DeleteJobAsync(created.Id);
+
+        Assert.True(deleted);
+        Assert.Null(await jobs.GetAsync(created.Id));
+        Assert.False(blobs.Audio.ContainsKey($"{created.Id}.mp3"));
+        Assert.False(blobs.Transcripts.ContainsKey($"{created.Id}.txt"));
+    }
+
+    [Fact]
+    public async Task DeleteJobAsync_UnknownJob_ReturnsFalse()
+    {
+        var service = CreateService(out _, out _);
+
+        var deleted = await service.DeleteJobAsync("missing");
+
+        Assert.False(deleted);
+    }
 }

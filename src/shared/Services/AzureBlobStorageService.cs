@@ -60,4 +60,18 @@ public class AzureBlobStorageService : IBlobStorageService
         var contentType = response.Value.Details.ContentType ?? "text/plain";
         return (response.Value.Content, contentType);
     }
+
+    public async Task DeleteAudioAsync(string blobName, CancellationToken cancellationToken = default)
+    {
+        var container = _client.GetBlobContainerClient(BlobContainers.Audio);
+        var blob = container.GetBlobClient(blobName);
+        await blob.DeleteIfExistsAsync(cancellationToken: cancellationToken);
+    }
+
+    public async Task DeleteTranscriptAsync(string blobName, CancellationToken cancellationToken = default)
+    {
+        var container = _client.GetBlobContainerClient(BlobContainers.Transcripts);
+        var blob = container.GetBlobClient(blobName);
+        await blob.DeleteIfExistsAsync(cancellationToken: cancellationToken);
+    }
 }

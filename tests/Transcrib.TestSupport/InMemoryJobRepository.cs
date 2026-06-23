@@ -29,4 +29,7 @@ public class InMemoryJobRepository : IJobRepository
         _store[job.Id] = job;
         return Task.FromResult(job);
     }
+
+    public Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
+        => Task.FromResult(_store.Remove(id));
 }

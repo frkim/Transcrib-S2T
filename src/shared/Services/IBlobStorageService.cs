@@ -13,4 +13,8 @@ public interface IBlobStorageService
     Task<BlobUploadResult> UploadTranscriptAsync(string blobName, string content, CancellationToken cancellationToken = default);
 
     Task<(Stream Content, string ContentType)?> DownloadTranscriptAsync(string blobName, CancellationToken cancellationToken = default);
+
+    Task DeleteAudioAsync(string blobName, CancellationToken cancellationToken = default);
+
+    Task DeleteTranscriptAsync(string blobName, CancellationToken cancellationToken = default);
 }

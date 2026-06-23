@@ -16,4 +16,6 @@ public interface IJobRepository
     Task<IReadOnlyList<TranscriptionJob>> ListAsync(CancellationToken cancellationToken = default);
 
     Task<TranscriptionJob> UpsertAsync(TranscriptionJob job, CancellationToken cancellationToken = default);
+
+    Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default);
 }

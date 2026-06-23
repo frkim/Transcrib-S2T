@@ -90,6 +90,7 @@ Les **deux approches** de transcription (Functions *Pro Code* et Logic Apps
 | `GET` | `/jobs` | Liste des jobs. |
 | `GET` | `/jobs/{id}` | Détail d'un job. |
 | `GET` | `/jobs/{id}/transcript` | Téléchargement du transcript. |
+| `DELETE` | `/jobs/{id}` | Suppression d'un job et de ses blobs (audio + transcript). |
 | `PATCH` | `/internal/jobs/{id}/status` | Mise à jour de statut (utilisée par les Logic Apps). |
 
 L'authentification **Entra ID** est activée automatiquement dès que la section
