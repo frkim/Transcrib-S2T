@@ -58,7 +58,7 @@ resource blobRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01'
 ]
 
 // Storage Queue Data Contributor role (required by the blob trigger for scan/poison queues).
-var queueContributorRoleId = '974c5e8b-45b9-4585-a649-bb74284b6c0d'
+var queueContributorRoleId = '974c5e8b-45b9-4653-ba55-5f855dd0fb88'
 
 resource queueRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
   for principalId in contributorPrincipalIds: {
