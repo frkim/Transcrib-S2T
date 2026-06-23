@@ -21,7 +21,7 @@ public class TranscribeFunction
 
     [Function(nameof(TranscribeFunction))]
     public async Task Run(
-        [BlobTrigger("audio/{name}", Connection = "AudioStorage")] Stream audio,
+        [BlobTrigger("audio/{name}", Source = BlobTriggerSource.EventGrid, Connection = "AudioStorage")] Stream audio,
         string name,
         CancellationToken cancellationToken)
     {

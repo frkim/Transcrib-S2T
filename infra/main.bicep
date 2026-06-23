@@ -187,6 +187,19 @@ module functions 'modules/functions.bicep' = {
   }
 }
 
+module eventGrid 'modules/eventgrid.bicep' = {
+  name: 'event-grid'
+  scope: resourceGroup
+  params: {
+    location: location
+    tags: tags
+    systemTopicName: 'evgt-${resourceToken}'
+    storageAccountId: storage.outputs.storageAccountId
+    functionAppName: functions.outputs.functionAppName
+    functionAppHostName: functions.outputs.functionAppHostName
+  }
+}
+
 module logicApps 'modules/logicapps.bicep' = {
   name: 'logic-apps'
   scope: resourceGroup

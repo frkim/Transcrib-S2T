@@ -57,6 +57,21 @@ resource blobRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01'
   }
 ]
 
+// Storage Queue Data Contributor role (required by the blob trigger for scan/poison queues).
+var queueContributorRoleId = '974c5e8b-45b9-4585-a649-bb74284b6c0d'
+
+resource queueRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
+  for principalId in contributorPrincipalIds: {
+    name: guid(storageAccount.id, principalId, queueContributorRoleId)
+    scope: storageAccount
+    properties: {
+      principalId: principalId
+      roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', queueContributorRoleId)
+      principalType: 'ServicePrincipal'
+    }
+  }
+]
+
 output storageAccountName string = storageAccount.name
 output blobEndpoint string = storageAccount.properties.primaryEndpoints.blob
 output storageAccountId string = storageAccount.id

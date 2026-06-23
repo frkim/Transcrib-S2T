@@ -1,22 +1,26 @@
+using System.Net.Http.Headers;
 using System.Text;
-using Microsoft.CognitiveServices.Speech;
-using Microsoft.CognitiveServices.Speech.Audio;
-using Microsoft.CognitiveServices.Speech.Transcription;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
 namespace Transcrib.Functions.Services;
 
 /// <summary>
-/// Azure AI Speech implementation of <see cref="ITranscriptionService"/>.
-/// Uses <see cref="ConversationTranscriber"/> so speaker diarization is enabled
-/// and reflected in the transcript (each line prefixed by its speaker id).
+/// Azure AI Speech implementation of <see cref="ITranscriptionService"/> using the
+/// synchronous Fast Transcription REST API. The service decodes compressed audio
+/// (MP3, etc.) server-side, so no local GStreamer/codec is required on the host.
+/// Diarization is enabled so each phrase is attributed to a speaker.
 /// </summary>
 public class AzureSpeechTranscriptionService : ITranscriptionService
 {
+    private const string ApiVersion = "2024-11-15";
+    private const int MaxSpeakers = 10;
+
     private readonly string _endpoint;
     private readonly string _key;
     private readonly string _language;
     private readonly ILogger<AzureSpeechTranscriptionService> _logger;
+    private readonly HttpClient _httpClient;
 
     public AzureSpeechTranscriptionService(string endpoint, string key, string language, ILogger<AzureSpeechTranscriptionService> logger)
     {
@@ -24,56 +28,88 @@ public class AzureSpeechTranscriptionService : ITranscriptionService
         _key = key;
         _language = language;
         _logger = logger;
+        _httpClient = new HttpClient { Timeout = TimeSpan.FromMinutes(5) };
     }
 
     public async Task<TranscriptionResult> TranscribeAsync(Stream audio, string fileName, CancellationToken cancellationToken = default)
     {
-        var speechConfig = SpeechConfig.FromEndpoint(new Uri(_endpoint), _key);
-        speechConfig.SpeechRecognitionLanguage = _language;
+        // Buffer the audio so it can be sent as a multipart form part.
+        using var buffer = new MemoryStream();
+        await audio.CopyToAsync(buffer, cancellationToken);
+        var audioBytes = buffer.ToArray();
 
-        // MP3 compressed input (decoded via GStreamer on the Functions host).
-        using var pushStream = AudioInputStream.CreatePushStream(
-            AudioStreamFormat.GetCompressedFormat(AudioStreamContainerFormat.MP3));
-        using var audioConfig = AudioConfig.FromStreamInput(pushStream);
-        using var transcriber = new ConversationTranscriber(speechConfig, audioConfig);
+        var requestUri = $"{_endpoint.TrimEnd('/')}/speechtotext/transcriptions:transcribe?api-version={ApiVersion}";
+
+        var definition = JsonSerializer.Serialize(new
+        {
+            locales = new[] { _language },
+            diarization = new { maxSpeakers = MaxSpeakers, enabled = true },
+        });
+
+        using var form = new MultipartFormDataContent();
+
+        var audioContent = new ByteArrayContent(audioBytes);
+        audioContent.Headers.ContentType = new MediaTypeHeaderValue("audio/mpeg");
+        form.Add(audioContent, "audio", string.IsNullOrWhiteSpace(fileName) ? "audio.mp3" : fileName);
+
+        var definitionContent = new StringContent(definition, Encoding.UTF8);
+        form.Add(definitionContent, "definition");
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, requestUri) { Content = form };
+        request.Headers.Add("Ocp-Apim-Subscription-Key", _key);
+
+        using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        var payload = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogError("Fast transcription failed: {Status} {Body}", (int)response.StatusCode, payload);
+            throw new InvalidOperationException($"Fast transcription returned {(int)response.StatusCode}: {payload}");
+        }
+
+        return new TranscriptionResult(BuildTranscript(payload));
+    }
+
+    /// <summary>
+    /// Builds a human-readable transcript from the Fast Transcription response,
+    /// attributing each phrase to its diarized speaker.
+    /// </summary>
+    private static string BuildTranscript(string payload)
+    {
+        using var doc = JsonDocument.Parse(payload);
+        var root = doc.RootElement;
 
         var transcript = new StringBuilder();
-        var stop = new TaskCompletionSource<bool>();
 
-        transcriber.Transcribed += (_, e) =>
+        if (root.TryGetProperty("phrases", out var phrases) && phrases.ValueKind == JsonValueKind.Array && phrases.GetArrayLength() > 0)
         {
-            if (e.Result.Reason == ResultReason.RecognizedSpeech && !string.IsNullOrWhiteSpace(e.Result.Text))
+            foreach (var phrase in phrases.EnumerateArray())
             {
-                var speaker = string.IsNullOrEmpty(e.Result.SpeakerId) ? "Unknown" : e.Result.SpeakerId;
-                transcript.AppendLine($"Speaker {speaker}: {e.Result.Text}");
+                var text = phrase.TryGetProperty("text", out var t) ? t.GetString() : null;
+                if (string.IsNullOrWhiteSpace(text))
+                {
+                    continue;
+                }
+
+                var speaker = phrase.TryGetProperty("speaker", out var s) && s.ValueKind == JsonValueKind.Number
+                    ? s.GetInt32().ToString()
+                    : "Unknown";
+
+                transcript.AppendLine($"Speaker {speaker}: {text}");
             }
-        };
-        transcriber.Canceled += (_, e) =>
+        }
+        else if (root.TryGetProperty("combinedPhrases", out var combined) && combined.ValueKind == JsonValueKind.Array)
         {
-            if (e.Reason == CancellationReason.Error)
+            // Fallback: no per-speaker phrases, use the combined text.
+            foreach (var item in combined.EnumerateArray())
             {
-                _logger.LogError("Speech transcription error: {Code} {Details}", e.ErrorCode, e.ErrorDetails);
+                if (item.TryGetProperty("text", out var t) && !string.IsNullOrWhiteSpace(t.GetString()))
+                {
+                    transcript.AppendLine(t.GetString());
+                }
             }
-            stop.TrySetResult(true);
-        };
-        transcriber.SessionStopped += (_, _) => stop.TrySetResult(true);
-
-        // Feed the MP3 bytes into the push stream.
-        var buffer = new byte[4096];
-        int read;
-        while ((read = await audio.ReadAsync(buffer, cancellationToken)) > 0)
-        {
-            pushStream.Write(buffer, read);
         }
-        pushStream.Close();
 
-        await transcriber.StartTranscribingAsync().ConfigureAwait(false);
-        await using (cancellationToken.Register(() => stop.TrySetCanceled()))
-        {
-            await stop.Task.ConfigureAwait(false);
-        }
-        await transcriber.StopTranscribingAsync().ConfigureAwait(false);
-
-        return new TranscriptionResult(transcript.ToString().TrimEnd());
+        return transcript.ToString().TrimEnd();
     }
 }

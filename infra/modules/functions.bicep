@@ -61,6 +61,9 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
     siteConfig: {
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
+      // .NET isolated worker requires a 64-bit process; the .NET 10 runtime stack must be selected explicitly.
+      use32BitWorkerProcess: false
+      netFrameworkVersion: 'v10.0'
       appSettings: [
         { name: 'AzureWebJobsStorage', value: storageConnectionString }
         { name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING', value: storageConnectionString }
@@ -71,6 +74,7 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
         { name: 'AZURE_CLIENT_ID', value: identityClientId }
         // Identity-based blob trigger connection for the shared data storage.
         { name: 'AudioStorage__blobServiceUri', value: dataBlobEndpoint }
+        { name: 'AudioStorage__queueServiceUri', value: replace(dataBlobEndpoint, '.blob.', '.queue.') }
         { name: 'AudioStorage__credential', value: 'managedidentity' }
         { name: 'AudioStorage__clientId', value: identityClientId }
         { name: 'Cosmos__Endpoint', value: cosmosEndpoint }
@@ -87,3 +91,4 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
 
 output functionAppName string = functionApp.name
 output functionAppHostName string = functionApp.properties.defaultHostName
+output functionAppId string = functionApp.id
