@@ -17,6 +17,7 @@ services:
     docker:
       path: ../Dockerfile
       context: ..
+      remoteBuild: true
 
   functions:
     project: ./src/functions
@@ -35,3 +36,4 @@ services:
     docker:
       path: ./Dockerfile
       context: .
+      remoteBuild: true

@@ -1,0 +1,11 @@
+# Reduce the api build context (context = src/) sent to the Docker daemon.
+**/bin
+**/obj
+**/.vs
+frontend
+logic-apps
+functions/bin
+functions/obj
+shared/bin
+shared/obj
+**/*.user
