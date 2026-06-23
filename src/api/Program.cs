@@ -126,6 +126,13 @@ jobs.MapGet("/{id}/transcript", async (string id, JobService service, Cancellati
         : Results.File(transcript.Value.Content, transcript.Value.ContentType, transcript.Value.FileName);
 });
 
+// DELETE /jobs/{id} — remove a job and its associated audio/transcript blobs.
+jobs.MapDelete("/{id}", async (string id, JobService service, CancellationToken ct) =>
+{
+    var deleted = await service.DeleteJobAsync(id, ct);
+    return deleted ? Results.NoContent() : Results.NotFound();
+});
+
 // PATCH /internal/jobs/{id}/status — used by the Logic Apps workflows (transcription
 // + purge) to update job status. Secured by Entra ID like the rest of the API.
 var internalJobs = app.MapGroup("/internal/jobs");

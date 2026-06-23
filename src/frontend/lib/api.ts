@@ -38,3 +38,11 @@ export async function uploadJobs(files: File[]): Promise<void> {
 export function transcriptUrl(jobId: string): string {
   return url(`/jobs/${jobId}/transcript`);
 }
+
+/** Deletes a transcription job and its associated blobs. */
+export async function deleteJob(jobId: string): Promise<void> {
+  const response = await fetch(url(`/jobs/${jobId}`), { method: "DELETE" });
+  if (!response.ok) {
+    throw new Error(`Failed to delete job (${response.status})`);
+  }
+}

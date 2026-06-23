@@ -34,4 +34,16 @@ public class InMemoryBlobStorageService : IBlobStorageService
         var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(text));
         return Task.FromResult<(Stream, string)?>((stream, "text/plain"));
     }
+
+    public Task DeleteAudioAsync(string blobName, CancellationToken cancellationToken = default)
+    {
+        Audio.Remove(blobName);
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteTranscriptAsync(string blobName, CancellationToken cancellationToken = default)
+    {
+        Transcripts.Remove(blobName);
+        return Task.CompletedTask;
+    }
 }

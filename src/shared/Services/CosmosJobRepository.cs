@@ -57,4 +57,17 @@ public class CosmosJobRepository : IJobRepository
         var response = await _container.UpsertItemAsync(job, new PartitionKey(job.Id), cancellationToken: cancellationToken);
         return response.Resource;
     }
+
+    public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await _container.DeleteItemAsync<TranscriptionJob>(id, new PartitionKey(id), cancellationToken: cancellationToken);
+            return true;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return false;
+        }
+    }
 }
