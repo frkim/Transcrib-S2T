@@ -4,142 +4,124 @@
     "contentVersion": "1.0.0.0",
     "parameters": {},
     "triggers": {
-      "When_a_blob_is_added": {
-        "type": "ServiceProvider",
+      "When_Event_Grid_event_received": {
+        "type": "Request",
+        "kind": "Http",
         "inputs": {
-          "parameters": {
-            "path": "audio"
-          },
-          "serviceProviderConfiguration": {
-            "connectionName": "AzureBlob",
-            "operationId": "whenABlobIsAddedOrModified",
-            "serviceProviderId": "/serviceProviders/AzureBlob"
-          }
-        },
-        "splitOn": "@triggerOutputs()?['body']"
+          "method": "POST"
+        }
       }
     },
     "actions": {
-      "Init_jobId": {
-        "type": "InitializeVariable",
-        "inputs": {
-          "variables": [
-            {
-              "name": "jobId",
-              "type": "string",
-              "value": "@{first(split(triggerBody()?['Name'], '.'))}"
-            }
+      "Check_event_type": {
+        "type": "If",
+        "expression": {
+          "equals": [
+            "@triggerBody()?[0]?['eventType']",
+            "Microsoft.EventGrid.SubscriptionValidationEvent"
           ]
+        },
+        "actions": {
+          "Respond_validation": {
+            "type": "Response",
+            "kind": "Http",
+            "inputs": {
+              "statusCode": 200,
+              "body": {
+                "validationResponse": "@triggerBody()?[0]?['data']?['validationCode']"
+              }
+            }
+          }
+        },
+        "else": {
+          "actions": {
+            "Get_audio_blob": {
+              "type": "Http",
+              "inputs": {
+                "method": "GET",
+                "uri": "@{triggerBody()?[0]?['data']?['url']}",
+                "headers": {
+                  "x-ms-version": "2021-08-06"
+                },
+                "authentication": {
+                  "type": "ManagedServiceIdentity",
+                  "identity": "@parameters('managedIdentityResourceId')",
+                  "audience": "https://storage.azure.com"
+                }
+              },
+              "runAfter": {}
+            },
+            "Transcribe_with_Azure_AI_Speech": {
+              "type": "Http",
+              "inputs": {
+                "method": "POST",
+                "uri": "@{parameters('speechEndpoint')}speechtotext/transcriptions:transcribe?api-version=2024-11-15",
+                "body": {
+                  "$content-type": "multipart/form-data",
+                  "$multipart": [
+                    {
+                      "headers": {
+                        "Content-Disposition": "form-data; name=\"audio\"; filename=\"@{last(split(triggerBody()?[0]?['data']?['url'], '/'))}\"",
+                        "Content-Type": "audio/mpeg"
+                      },
+                      "body": "@body('Get_audio_blob')"
+                    },
+                    {
+                      "headers": {
+                        "Content-Disposition": "form-data; name=\"definition\"",
+                        "Content-Type": "application/json"
+                      },
+                      "body": "{\"locales\":[\"@{parameters('speechLanguage')}\"],\"diarization\":{\"maxSpeakers\":10,\"enabled\":true}}"
+                    }
+                  ]
+                },
+                "authentication": {
+                  "type": "ManagedServiceIdentity",
+                  "identity": "@parameters('managedIdentityResourceId')",
+                  "audience": "https://cognitiveservices.azure.com"
+                }
+              },
+              "runAfter": {
+                "Get_audio_blob": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Build_transcript": {
+              "type": "Compose",
+              "inputs": "@if(greater(length(coalesce(body('Transcribe_with_Azure_AI_Speech')?['combinedPhrases'], json('[]'))), 0), body('Transcribe_with_Azure_AI_Speech')?['combinedPhrases'][0]?['text'], '')",
+              "runAfter": {
+                "Transcribe_with_Azure_AI_Speech": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Write_transcript_blob": {
+              "type": "Http",
+              "inputs": {
+                "method": "PUT",
+                "uri": "@{parameters('blobServiceUri')}transcripts-auto/@{first(split(last(split(triggerBody()?[0]?['data']?['url'], '/')), '.'))}.txt",
+                "headers": {
+                  "x-ms-blob-type": "BlockBlob",
+                  "x-ms-version": "2021-08-06",
+                  "Content-Type": "text/plain; charset=utf-8"
+                },
+                "body": "@outputs('Build_transcript')",
+                "authentication": {
+                  "type": "ManagedServiceIdentity",
+                  "identity": "@parameters('managedIdentityResourceId')",
+                  "audience": "https://storage.azure.com"
+                }
+              },
+              "runAfter": {
+                "Build_transcript": [
+                  "Succeeded"
+                ]
+              }
+            }
+          }
         },
         "runAfter": {}
-      },
-      "Set_Processing": {
-        "type": "Http",
-        "inputs": {
-          "method": "PATCH",
-          "uri": "@{appsetting('Api__BaseUrl')}/internal/jobs/@{variables('jobId')}/status",
-          "body": {
-            "status": "Processing"
-          },
-          "authentication": {
-            "type": "ManagedServiceIdentity"
-          }
-        },
-        "runAfter": {
-          "Init_jobId": [
-            "Succeeded"
-          ]
-        }
-      },
-      "Transcribe_with_Azure_AI_Speech": {
-        "type": "Http",
-        "inputs": {
-          "method": "POST",
-          "uri": "@{appsetting('Speech__Endpoint')}speechtotext/v3.2/transcriptions",
-          "headers": {
-            "Content-Type": "application/json",
-            "Ocp-Apim-Subscription-Key": "@appsetting('Speech__Key')"
-          },
-          "body": {
-            "displayName": "@variables('jobId')",
-            "locale": "@appsetting('Speech__Language')",
-            "contentUrls": [
-              "@triggerBody()?['Path']"
-            ],
-            "properties": {
-              "diarizationEnabled": true,
-              "wordLevelTimestampsEnabled": false
-            }
-          }
-        },
-        "runAfter": {
-          "Set_Processing": [
-            "Succeeded"
-          ]
-        }
-      },
-      "Write_transcript_blob": {
-        "type": "ServiceProvider",
-        "inputs": {
-          "parameters": {
-            "containerName": "transcripts",
-            "blobName": "@{variables('jobId')}.txt",
-            "content": "@body('Transcribe_with_Azure_AI_Speech')"
-          },
-          "serviceProviderConfiguration": {
-            "connectionName": "AzureBlob",
-            "operationId": "uploadBlob",
-            "serviceProviderId": "/serviceProviders/AzureBlob"
-          }
-        },
-        "runAfter": {
-          "Transcribe_with_Azure_AI_Speech": [
-            "Succeeded"
-          ]
-        }
-      },
-      "Set_Completed": {
-        "type": "Http",
-        "inputs": {
-          "method": "PATCH",
-          "uri": "@{appsetting('Api__BaseUrl')}/internal/jobs/@{variables('jobId')}/status",
-          "body": {
-            "status": "Completed",
-            "transcriptBlobUrl": "@{appsetting('Storage__BlobEndpoint')}transcripts/@{variables('jobId')}.txt"
-          },
-          "authentication": {
-            "type": "ManagedServiceIdentity"
-          }
-        },
-        "runAfter": {
-          "Write_transcript_blob": [
-            "Succeeded"
-          ]
-        }
-      },
-      "Set_Failed": {
-        "type": "Http",
-        "inputs": {
-          "method": "PATCH",
-          "uri": "@{appsetting('Api__BaseUrl')}/internal/jobs/@{variables('jobId')}/status",
-          "body": {
-            "status": "Failed",
-            "error": "Transcription workflow failed."
-          },
-          "authentication": {
-            "type": "ManagedServiceIdentity"
-          }
-        },
-        "runAfter": {
-          "Transcribe_with_Azure_AI_Speech": [
-            "Failed",
-            "TimedOut"
-          ],
-          "Write_transcript_blob": [
-            "Failed",
-            "TimedOut"
-          ]
-        }
       }
     }
   },

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.43.8.12551",
-      "templateHash": "14417958211005619903"
+      "templateHash": "8967248220749849724"
     }
   },
   "parameters": {
@@ -390,7 +390,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.43.8.12551",
-              "templateHash": "2783244512883944553"
+              "templateHash": "1466059586302957863"
             }
           },
           "parameters": {
@@ -415,7 +415,8 @@
             }
           },
           "variables": {
-            "blobContributorRoleId": "ba92f5b4-2d11-453d-a403-e96b0029c9fe"
+            "blobContributorRoleId": "ba92f5b4-2d11-453d-a403-e96b0029c9fe",
+            "queueContributorRoleId": "974c5e8b-45b9-4653-ba55-5f855dd0fb88"
           },
           "resources": [
             {
@@ -465,6 +466,28 @@
               ]
             },
             {
+              "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+              "apiVersion": "2023-05-01",
+              "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', 'audio-auto')]",
+              "properties": {
+                "publicAccess": "None"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]"
+              ]
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+              "apiVersion": "2023-05-01",
+              "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', 'transcripts-auto')]",
+              "properties": {
+                "publicAccess": "None"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]"
+              ]
+            },
+            {
               "copy": {
                 "name": "blobRoleAssignment",
                 "count": "[length(parameters('contributorPrincipalIds'))]"
@@ -476,6 +499,24 @@
               "properties": {
                 "principalId": "[parameters('contributorPrincipalIds')[copyIndex()]]",
                 "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('blobContributorRoleId'))]",
+                "principalType": "ServicePrincipal"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+              ]
+            },
+            {
+              "copy": {
+                "name": "queueRoleAssignment",
+                "count": "[length(parameters('contributorPrincipalIds'))]"
+              },
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
+              "name": "[guid(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), parameters('contributorPrincipalIds')[copyIndex()], variables('queueContributorRoleId'))]",
+              "properties": {
+                "principalId": "[parameters('contributorPrincipalIds')[copyIndex()]]",
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('queueContributorRoleId'))]",
                 "principalType": "ServicePrincipal"
               },
               "dependsOn": [
@@ -1498,7 +1539,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.43.8.12551",
-              "templateHash": "4838863106509637080"
+              "templateHash": "7584227705571515081"
             }
           },
           "parameters": {
@@ -1600,6 +1641,8 @@
                 "siteConfig": {
                   "ftpsState": "Disabled",
                   "minTlsVersion": "1.2",
+                  "use32BitWorkerProcess": false,
+                  "netFrameworkVersion": "v10.0",
                   "appSettings": [
                     {
                       "name": "AzureWebJobsStorage",
@@ -1632,6 +1675,10 @@
                     {
                       "name": "AudioStorage__blobServiceUri",
                       "value": "[parameters('dataBlobEndpoint')]"
+                    },
+                    {
+                      "name": "AudioStorage__queueServiceUri",
+                      "value": "[replace(parameters('dataBlobEndpoint'), '.blob.', '.queue.')]"
                     },
                     {
                       "name": "AudioStorage__credential",
@@ -1686,6 +1733,10 @@
             "functionAppHostName": {
               "type": "string",
               "value": "[reference(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '2023-12-01').defaultHostName]"
+            },
+            "functionAppId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
             }
           }
         }
@@ -1697,6 +1748,139 @@
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'monitoring')]",
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('{0}-rg', parameters('environmentName')))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'speech')]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'storage')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "event-grid",
+      "resourceGroup": "[format('{0}-rg', parameters('environmentName'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "tags": {
+            "value": "[variables('tags')]"
+          },
+          "systemTopicName": {
+            "value": "[format('evgt-{0}', variables('resourceToken'))]"
+          },
+          "storageAccountId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'storage'), '2025-04-01').outputs.storageAccountId.value]"
+          },
+          "functionAppName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'functions'), '2025-04-01').outputs.functionAppName.value]"
+          },
+          "functionAppHostName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'functions'), '2025-04-01').outputs.functionAppHostName.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.43.8.12551",
+              "templateHash": "13452224890255447021"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "Event Grid system topic + subscription routing BlobCreated events on the audio container to the transcription function via the blobs extension webhook (low-latency trigger)."
+              }
+            },
+            "tags": {
+              "type": "object"
+            },
+            "systemTopicName": {
+              "type": "string"
+            },
+            "storageAccountId": {
+              "type": "string"
+            },
+            "functionAppName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the Function App hosting the Event Grid blob trigger."
+              }
+            },
+            "functionAppHostName": {
+              "type": "string",
+              "metadata": {
+                "description": "Default host name (e.g. func-xxx.azurewebsites.net) of the Function App."
+              }
+            },
+            "functionName": {
+              "type": "string",
+              "defaultValue": "TranscribeFunction",
+              "metadata": {
+                "description": "Name of the function that handles the Event Grid blob trigger."
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.EventGrid/systemTopics",
+              "apiVersion": "2024-06-01-preview",
+              "name": "[parameters('systemTopicName')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "properties": {
+                "source": "[parameters('storageAccountId')]",
+                "topicType": "Microsoft.Storage.StorageAccounts"
+              }
+            },
+            {
+              "type": "Microsoft.EventGrid/systemTopics/eventSubscriptions",
+              "apiVersion": "2024-06-01-preview",
+              "name": "[format('{0}/{1}', parameters('systemTopicName'), 'audio-mp3-created')]",
+              "properties": {
+                "destination": {
+                  "endpointType": "WebHook",
+                  "properties": {
+                    "endpointUrl": "[format('https://{0}/runtime/webhooks/blobs?functionName=Host.Functions.{1}&code={2}', parameters('functionAppHostName'), parameters('functionName'), listKeys(resourceId('Microsoft.Web/sites/host', parameters('functionAppName'), 'default'), '2023-12-01').systemKeys.blobs_extension)]",
+                    "maxEventsPerBatch": 1,
+                    "preferredBatchSizeInKilobytes": 64
+                  }
+                },
+                "filter": {
+                  "includedEventTypes": [
+                    "Microsoft.Storage.BlobCreated"
+                  ],
+                  "subjectBeginsWith": "/blobServices/default/containers/audio/blobs/",
+                  "subjectEndsWith": ".mp3"
+                },
+                "eventDeliverySchema": "EventGridSchema",
+                "retryPolicy": {
+                  "maxDeliveryAttempts": 30,
+                  "eventTimeToLiveInMinutes": 1440
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.EventGrid/systemTopics', parameters('systemTopicName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "systemTopicName": {
+              "type": "string",
+              "value": "[parameters('systemTopicName')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'functions')]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('{0}-rg', parameters('environmentName')))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'storage')]"
       ]
     },
@@ -1758,7 +1942,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.43.8.12551",
-              "templateHash": "824262158215008279"
+              "templateHash": "1369938573703230646"
             }
           },
           "parameters": {
@@ -1887,6 +2071,10 @@
                       "value": "[parameters('identityClientId')]"
                     },
                     {
+                      "name": "MSI_RESOURCE_ID",
+                      "value": "[parameters('identityId')]"
+                    },
+                    {
                       "name": "AzureBlob__blobServiceUri",
                       "value": "[parameters('dataBlobEndpoint')]"
                     },
@@ -1983,6 +2171,14 @@
       "type": "string",
       "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'frontend'), '2025-04-01').outputs.frontendName.value]"
     },
+    "AZURE_LOGIC_APP_NAME": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'logic-apps'), '2025-04-01').outputs.logicAppName.value]"
+    },
+    "AZURE_EVENTGRID_SYSTEM_TOPIC": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'event-grid'), '2025-04-01').outputs.systemTopicName.value]"
+    },
     "SERVICE_FUNCTIONS_NAME": {
       "type": "string",
       "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'functions'), '2025-04-01').outputs.functionAppName.value]"
@@ -2010,6 +2206,14 @@
     "APPLICATIONINSIGHTS_CONNECTION_STRING": {
       "type": "string",
       "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'monitoring'), '2025-04-01').outputs.applicationInsightsConnectionString.value]"
+    },
+    "AZURE_MANAGED_IDENTITY_RESOURCE_ID": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'identity'), '2025-04-01').outputs.identityId.value]"
+    },
+    "SPEECH_LANGUAGE": {
+      "type": "string",
+      "value": "[parameters('speechLanguage')]"
     }
   }
 }

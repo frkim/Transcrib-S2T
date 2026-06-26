@@ -42,6 +42,24 @@ resource transcriptsContainer 'Microsoft.Storage/storageAccounts/blobServices/co
   }
 }
 
+// Auto containers consumed by the low-code Logic App workflow: dropping an MP3
+// into 'audio-auto' triggers transcription and writes the result to 'transcripts-auto'.
+resource audioAutoContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
+  parent: blobService
+  name: 'audio-auto'
+  properties: {
+    publicAccess: 'None'
+  }
+}
+
+resource transcriptsAutoContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
+  parent: blobService
+  name: 'transcripts-auto'
+  properties: {
+    publicAccess: 'None'
+  }
+}
+
 // Storage Blob Data Contributor role.
 var blobContributorRoleId = 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
 

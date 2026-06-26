@@ -28,6 +28,21 @@ services:
     project: ./src/logic-apps
     language: js
     host: function
+    hooks:
+      prepackage:
+        windows:
+          shell: pwsh
+          run: ../../infra/scripts/gen-logicapp-parameters.ps1
+        posix:
+          shell: sh
+          run: ../../infra/scripts/gen-logicapp-parameters.sh
+      postdeploy:
+        windows:
+          shell: pwsh
+          run: ../../infra/scripts/wire-eventgrid.ps1
+        posix:
+          shell: sh
+          run: ../../infra/scripts/wire-eventgrid.sh
 
   frontend:
     project: ./src/frontend

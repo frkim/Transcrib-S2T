@@ -66,6 +66,9 @@ resource logicApp 'Microsoft.Web/sites@2023-12-01' = {
         { name: 'APP_KIND', value: 'workflowApp' }
         { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', value: applicationInsightsConnectionString }
         { name: 'AZURE_CLIENT_ID', value: identityClientId }
+        // Resource ID of the user-assigned identity, consumed by workflow parameters
+        // for ManagedServiceIdentity authentication on built-in HTTP actions.
+        { name: 'MSI_RESOURCE_ID', value: identityId }
         // Built-in AzureBlob service provider connection (managed identity).
         { name: 'AzureBlob__blobServiceUri', value: dataBlobEndpoint }
         { name: 'AzureBlob__credential', value: 'managedidentity' }
