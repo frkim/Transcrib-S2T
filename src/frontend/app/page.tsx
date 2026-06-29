@@ -37,9 +37,10 @@ export default function Home() {
       }
     }
 
-    // Initial load plus periodic polling so statuses update over time.
+    // Initial load plus periodic polling so statuses (and live durations)
+    // update quickly after an upload.
     void load();
-    const timer = setInterval(() => void load(), 5000);
+    const timer = setInterval(() => void load(), 2000);
     return () => {
       active = false;
       clearInterval(timer);

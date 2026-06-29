@@ -17,7 +17,12 @@ import Typography from "@mui/material/Typography";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import DownloadIcon from "@mui/icons-material/Download";
 import type { JobStatus, TranscriptionJob } from "@/lib/types";
-import { canDownloadTranscript, statusLabel } from "@/lib/jobs";
+import {
+  canDownloadTranscript,
+  formatDuration,
+  jobDurationMs,
+  statusLabel,
+} from "@/lib/jobs";
 import { transcriptUrl } from "@/lib/api";
 
 interface JobListProps {
@@ -68,6 +73,30 @@ function StatusCell({ status }: { status: JobStatus }) {
   );
 }
 
+function DurationCell({ job }: { job: TranscriptionJob }) {
+  const ms = jobDurationMs(job);
+  if (ms === null) {
+    return (
+      <Typography component="span" color="text.secondary">
+        —
+      </Typography>
+    );
+  }
+
+  const isLive = job.status === "Processing";
+  return (
+    <Typography
+      component="span"
+      color={job.status === "Completed" ? "text.primary" : "text.secondary"}
+      sx={{ fontVariantNumeric: "tabular-nums", fontStyle: isLive ? "italic" : "normal" }}
+      data-testid={`duration-${job.id}`}
+    >
+      {formatDuration(ms)}
+      {isLive ? "…" : ""}
+    </Typography>
+  );
+}
+
 export default function JobList({ jobs, onDelete }: JobListProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -97,6 +126,7 @@ export default function JobList({ jobs, onDelete }: JobListProps) {
             <TableCell>File</TableCell>
             <TableCell>Status</TableCell>
             <TableCell>Created</TableCell>
+            <TableCell>Duration</TableCell>
             <TableCell>Transcript</TableCell>
             <TableCell align="right">Actions</TableCell>
           </TableRow>
@@ -109,6 +139,9 @@ export default function JobList({ jobs, onDelete }: JobListProps) {
                 <StatusCell status={job.status} />
               </TableCell>
               <TableCell>{new Date(job.createdAt).toLocaleString()}</TableCell>
+              <TableCell>
+                <DurationCell job={job} />
+              </TableCell>
               <TableCell>
                 {canDownloadTranscript(job.status) ? (
                   <Tooltip title="Download transcript">

@@ -44,3 +44,40 @@ export function statusLabel(status: JobStatus): string {
 export function canDownloadTranscript(status: JobStatus): boolean {
   return status === "Completed";
 }
+
+/**
+ * Processing time in milliseconds between the upload (createdAt) and the moment
+ * the transcript became available (updatedAt). For jobs still processing it
+ * returns the live elapsed time since upload. Returns null when not applicable.
+ */
+export function jobDurationMs(
+  job: { status: JobStatus; createdAt: string; updatedAt: string },
+  now: number = Date.now()
+): number | null {
+  const start = new Date(job.createdAt).getTime();
+  if (Number.isNaN(start)) {
+    return null;
+  }
+  switch (job.status) {
+    case "Completed":
+    case "Failed": {
+      const end = new Date(job.updatedAt).getTime();
+      return Number.isNaN(end) ? null : Math.max(0, end - start);
+    }
+    case "Processing":
+      return Math.max(0, now - start);
+    default:
+      return null;
+  }
+}
+
+/** Formats a millisecond duration compactly, e.g. "12 s" or "1 min 05 s". */
+export function formatDuration(ms: number): string {
+  const totalSeconds = Math.round(ms / 1000);
+  if (totalSeconds < 60) {
+    return `${totalSeconds} s`;
+  }
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes} min ${seconds.toString().padStart(2, "0")} s`;
+}

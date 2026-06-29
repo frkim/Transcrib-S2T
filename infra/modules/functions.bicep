@@ -15,7 +15,12 @@ param speechEndpoint string
 param keyVaultUri string
 param speechLanguage string = 'en-US'
 
-// Dedicated storage account for the Functions runtime.
+// Always-ready instances kept warm to eliminate cold starts on the blob
+// (Event Grid) trigger. 0 = pure pay-per-use (cold starts); >=1 = warm baseline.
+@description('Number of always-ready instances for the blob trigger scale group.')
+param alwaysReadyInstanceCount int = 1
+
+// Dedicated storage account for the Functions runtime and deployment package.
 resource functionStorage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: functionStorageName
   location: location
@@ -30,15 +35,33 @@ resource functionStorage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   }
 }
 
+resource functionStorageBlob 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' = {
+  parent: functionStorage
+  name: 'default'
+}
+
+// Flex Consumption runs the app from a deployment package stored in this container.
+resource deploymentContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
+  parent: functionStorageBlob
+  name: 'deployment'
+  properties: {
+    publicAccess: 'None'
+  }
+}
+
+// Flex Consumption plan (Linux). Enables always-ready instances to mitigate cold starts.
 resource hostingPlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: hostingPlanName
   location: location
   tags: tags
+  kind: 'functionapp'
   sku: {
-    name: 'Y1'
-    tier: 'Dynamic'
+    name: 'FC1'
+    tier: 'FlexConsumption'
   }
-  properties: {}
+  properties: {
+    reserved: true
+  }
 }
 
 var storageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${functionStorage.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${functionStorage.listKeys().keys[0].value}'
@@ -47,7 +70,7 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
   name: functionAppName
   location: location
   tags: union(tags, { 'azd-service-name': 'functions' })
-  kind: 'functionapp'
+  kind: 'functionapp,linux'
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
@@ -58,18 +81,39 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
     serverFarmId: hostingPlan.id
     httpsOnly: true
     keyVaultReferenceIdentity: identityId
+    functionAppConfig: {
+      deployment: {
+        storage: {
+          type: 'blobContainer'
+          value: '${functionStorage.properties.primaryEndpoints.blob}${deploymentContainer.name}'
+          authentication: {
+            type: 'StorageAccountConnectionString'
+            storageAccountConnectionStringName: 'DEPLOYMENT_STORAGE_CONNECTION_STRING'
+          }
+        }
+      }
+      runtime: {
+        name: 'dotnet-isolated'
+        version: '10.0'
+      }
+      scaleAndConcurrency: {
+        // 'blob' is the per-function scale group for Event Grid blob triggers.
+        alwaysReady: [
+          {
+            name: 'blob'
+            instanceCount: alwaysReadyInstanceCount
+          }
+        ]
+        instanceMemoryMB: 2048
+        maximumInstanceCount: 40
+      }
+    }
     siteConfig: {
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
-      // .NET isolated worker requires a 64-bit process; the .NET 10 runtime stack must be selected explicitly.
-      use32BitWorkerProcess: false
-      netFrameworkVersion: 'v10.0'
       appSettings: [
         { name: 'AzureWebJobsStorage', value: storageConnectionString }
-        { name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING', value: storageConnectionString }
-        { name: 'WEBSITE_CONTENTSHARE', value: toLower(functionAppName) }
-        { name: 'FUNCTIONS_EXTENSION_VERSION', value: '~4' }
-        { name: 'FUNCTIONS_WORKER_RUNTIME', value: 'dotnet-isolated' }
+        { name: 'DEPLOYMENT_STORAGE_CONNECTION_STRING', value: storageConnectionString }
         { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', value: applicationInsightsConnectionString }
         { name: 'AZURE_CLIENT_ID', value: identityClientId }
         // Identity-based blob trigger connection for the shared data storage.
