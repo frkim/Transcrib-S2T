@@ -46,6 +46,16 @@ les fichiers de plus d'un jour sont purgés quotidiennement.
 Les **deux approches** de transcription (Functions *Pro Code* et Logic Apps
 *Low Code*) sont fonctionnellement équivalentes et partagent les mêmes contrats.
 
+## Aperçu du frontend
+
+![Capture d'écran du frontend Transcrib-S2T avec des jobs d'exemple](docs/images/frontend-example.png)
+
+Exemple affiché dans l'interface web :
+
+- `reunion-client.mp3` → statut `Completed`, transcript téléchargeable
+- `interview-produit.mp3` → statut `Processing`
+- `point-support.mp3` → statut `Failed`
+
 ## Contrats partagés
 
 - **Conteneurs Blob** : `audio` (sources MP3, nommées `{jobId}.mp3`),
@@ -131,6 +141,15 @@ npm test
 
 Configurer `src/frontend/.env.local` avec `NEXT_PUBLIC_API_BASE_URL` pointant
 vers l'API.
+
+## Exemple de parcours utilisateur
+
+1. Déposer un fichier MP3, par exemple `reunion-client.mp3`, depuis le frontend.
+2. Le backend crée le job Cosmos DB avec le statut initial `Processing`.
+3. Le pipeline Azure Functions ou Logic Apps génère le transcript puis dépose
+   le résultat dans le conteneur Blob `transcripts`.
+4. Dès que le statut passe à `Completed`, le frontend propose le téléchargement
+   du transcript texte associé.
 
 ## Tests & CI
 
