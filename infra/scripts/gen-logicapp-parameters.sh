@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Renders src/logic-apps/parameters.json from parameters.json.template using the
 # concrete values provisioned by Bicep (exposed by azd as environment variables).
 # The Logic Apps Standard runtime does NOT evaluate @appsetting() inside parameters.json,
