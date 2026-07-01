@@ -15,7 +15,7 @@
       "value": "${AZURE_AD_CLIENT_ID=}"
     },
     "speechLanguage": {
-      "value": "${SPEECH_LANGUAGE=en-US}"
+      "value": "${SPEECH_LANGUAGE=fr-FR}"
     }
   }
 }

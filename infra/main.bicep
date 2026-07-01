@@ -16,7 +16,7 @@ param azureAdTenantId string = ''
 param azureAdClientId string = ''
 
 @description('Speech recognition language.')
-param speechLanguage string = 'en-US'
+param speechLanguage string = 'fr-FR'
 
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 var tags = {

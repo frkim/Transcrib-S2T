@@ -51,7 +51,7 @@ builder.Services.AddSingleton<ITranscriptionService>(sp =>
         ?? throw new InvalidOperationException("Speech endpoint is not configured.");
     var key = configuration["Speech__Key"] ?? configuration["Speech:Key"]
         ?? throw new InvalidOperationException("Speech key is not configured.");
-    var language = configuration["Speech__Language"] ?? configuration["Speech:Language"] ?? "en-US";
+    var language = configuration["Speech__Language"] ?? configuration["Speech:Language"] ?? "fr-FR";
     var logger = sp.GetRequiredService<ILogger<AzureSpeechTranscriptionService>>();
     return new AzureSpeechTranscriptionService(endpoint, key, language, logger);
 });

@@ -122,7 +122,7 @@ les Logic Apps et le frontend. Variables optionnelles :
 ```bash
 azd env set AZURE_AD_TENANT_ID <tenant-id>
 azd env set AZURE_AD_CLIENT_ID <client-id>
-azd env set SPEECH_LANGUAGE en-US
+azd env set SPEECH_LANGUAGE fr-FR
 ```
 
 ## Développement local

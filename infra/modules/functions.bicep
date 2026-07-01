@@ -13,7 +13,7 @@ param cosmosDatabase string
 param cosmosContainer string
 param speechEndpoint string
 param keyVaultUri string
-param speechLanguage string = 'en-US'
+param speechLanguage string = 'fr-FR'
 
 // Dedicated storage account for the Functions runtime.
 resource functionStorage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
