@@ -40,7 +40,7 @@
     },
     "speechLanguage": {
       "type": "string",
-      "defaultValue": "en-US",
+      "defaultValue": "fr-FR",
       "metadata": {
         "description": "Speech recognition language."
       }
@@ -1118,7 +1118,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.43.8.12551",
-              "templateHash": "5667722325267253490"
+              "templateHash": "14198244496770068794"
             }
           },
           "parameters": {
@@ -1271,7 +1271,7 @@
                     }
                   ],
                   "scale": {
-                    "minReplicas": 1,
+                    "minReplicas": 0,
                     "maxReplicas": 3
                   }
                 }
@@ -1346,7 +1346,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.43.8.12551",
-              "templateHash": "13333416213528413040"
+              "templateHash": "11030900169937447362"
             }
           },
           "parameters": {
@@ -1447,7 +1447,7 @@
                     }
                   ],
                   "scale": {
-                    "minReplicas": 1,
+                    "minReplicas": 0,
                     "maxReplicas": 3
                   }
                 }
@@ -1590,7 +1590,7 @@
             },
             "speechLanguage": {
               "type": "string",
-              "defaultValue": "en-US"
+              "defaultValue": "fr-FR"
             },
             "alwaysReadyInstanceCount": {
               "type": "int",
@@ -1943,23 +1943,14 @@
           "tags": {
             "value": "[variables('tags')]"
           },
-          "logicAppName": {
-            "value": "[format('logic-{0}', variables('resourceToken'))]"
+          "transcriptionWorkflowName": {
+            "value": "[format('logic-transcription-{0}', variables('resourceToken'))]"
           },
-          "hostingPlanName": {
-            "value": "[format('plan-logic-{0}', variables('resourceToken'))]"
-          },
-          "logicStorageName": {
-            "value": "[format('stlogic{0}', variables('resourceToken'))]"
+          "purgeWorkflowName": {
+            "value": "[format('logic-purge-{0}', variables('resourceToken'))]"
           },
           "identityId": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'identity'), '2025-04-01').outputs.identityId.value]"
-          },
-          "identityClientId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'identity'), '2025-04-01').outputs.identityClientId.value]"
-          },
-          "applicationInsightsConnectionString": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'monitoring'), '2025-04-01').outputs.applicationInsightsConnectionString.value]"
           },
           "dataBlobEndpoint": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'storage'), '2025-04-01').outputs.blobEndpoint.value]"
@@ -1969,9 +1960,6 @@
           },
           "speechEndpoint": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'speech'), '2025-04-01').outputs.speechEndpoint.value]"
-          },
-          "keyVaultUri": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'keyvault'), '2025-04-01').outputs.keyVaultUri.value]"
           },
           "speechLanguage": {
             "value": "[parameters('speechLanguage')]"
@@ -1984,35 +1972,26 @@
             "_generator": {
               "name": "bicep",
               "version": "0.43.8.12551",
-              "templateHash": "1369938573703230646"
+              "templateHash": "7008425043732847143"
             }
           },
           "parameters": {
             "location": {
               "type": "string",
               "metadata": {
-                "description": "Logic App Standard hosting the low-code transcription and daily purge workflows."
+                "description": "Consumption Logic Apps hosting the low-code transcription and daily purge workflows. Consumption billing is pay-per-action, eliminating the fixed WorkflowStandard (WS1) plan cost."
               }
             },
             "tags": {
               "type": "object"
             },
-            "logicAppName": {
+            "transcriptionWorkflowName": {
               "type": "string"
             },
-            "hostingPlanName": {
-              "type": "string"
-            },
-            "logicStorageName": {
+            "purgeWorkflowName": {
               "type": "string"
             },
             "identityId": {
-              "type": "string"
-            },
-            "identityClientId": {
-              "type": "string"
-            },
-            "applicationInsightsConnectionString": {
               "type": "string"
             },
             "dataBlobEndpoint": {
@@ -2024,147 +2003,346 @@
             "speechEndpoint": {
               "type": "string"
             },
-            "keyVaultUri": {
-              "type": "string"
-            },
             "speechLanguage": {
               "type": "string",
-              "defaultValue": "en-US"
+              "defaultValue": "fr-FR"
+            }
+          },
+          "variables": {
+            "$fxv#0": {
+              "definition": {
+                "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                "contentVersion": "1.0.0.0",
+                "parameters": {
+                  "speechEndpoint": {
+                    "type": "String"
+                  },
+                  "speechLanguage": {
+                    "type": "String",
+                    "defaultValue": "fr-FR"
+                  },
+                  "blobServiceUri": {
+                    "type": "String"
+                  },
+                  "managedIdentityResourceId": {
+                    "type": "String"
+                  }
+                },
+                "triggers": {
+                  "When_Event_Grid_event_received": {
+                    "type": "Request",
+                    "kind": "Http",
+                    "inputs": {
+                      "method": "POST"
+                    }
+                  }
+                },
+                "actions": {
+                  "Check_event_type": {
+                    "type": "If",
+                    "expression": {
+                      "equals": [
+                        "@triggerBody()?[0]?['eventType']",
+                        "Microsoft.EventGrid.SubscriptionValidationEvent"
+                      ]
+                    },
+                    "actions": {
+                      "Respond_validation": {
+                        "type": "Response",
+                        "kind": "Http",
+                        "inputs": {
+                          "statusCode": 200,
+                          "body": {
+                            "validationResponse": "@triggerBody()?[0]?['data']?['validationCode']"
+                          }
+                        }
+                      }
+                    },
+                    "else": {
+                      "actions": {
+                        "Get_audio_blob": {
+                          "type": "Http",
+                          "inputs": {
+                            "method": "GET",
+                            "uri": "@{triggerBody()?[0]?['data']?['url']}",
+                            "headers": {
+                              "x-ms-version": "2021-08-06"
+                            },
+                            "authentication": {
+                              "type": "ManagedServiceIdentity",
+                              "identity": "@parameters('managedIdentityResourceId')",
+                              "audience": "https://storage.azure.com"
+                            }
+                          },
+                          "runAfter": {}
+                        },
+                        "Transcribe_with_Azure_AI_Speech": {
+                          "type": "Http",
+                          "inputs": {
+                            "method": "POST",
+                            "uri": "@{parameters('speechEndpoint')}speechtotext/transcriptions:transcribe?api-version=2024-11-15",
+                            "body": {
+                              "$content-type": "multipart/form-data",
+                              "$multipart": [
+                                {
+                                  "headers": {
+                                    "Content-Disposition": "form-data; name=\"audio\"; filename=\"@{last(split(triggerBody()?[0]?['data']?['url'], '/'))}\"",
+                                    "Content-Type": "audio/mpeg"
+                                  },
+                                  "body": "@body('Get_audio_blob')"
+                                },
+                                {
+                                  "headers": {
+                                    "Content-Disposition": "form-data; name=\"definition\"",
+                                    "Content-Type": "application/json"
+                                  },
+                                  "body": "{\"locales\":[\"@{parameters('speechLanguage')}\"],\"diarization\":{\"maxSpeakers\":10,\"enabled\":true}}"
+                                }
+                              ]
+                            },
+                            "authentication": {
+                              "type": "ManagedServiceIdentity",
+                              "identity": "@parameters('managedIdentityResourceId')",
+                              "audience": "https://cognitiveservices.azure.com"
+                            }
+                          },
+                          "runAfter": {
+                            "Get_audio_blob": [
+                              "Succeeded"
+                            ]
+                          }
+                        },
+                        "Build_transcript": {
+                          "type": "Compose",
+                          "inputs": "@if(greater(length(coalesce(body('Transcribe_with_Azure_AI_Speech')?['combinedPhrases'], json('[]'))), 0), body('Transcribe_with_Azure_AI_Speech')?['combinedPhrases'][0]?['text'], '')",
+                          "runAfter": {
+                            "Transcribe_with_Azure_AI_Speech": [
+                              "Succeeded"
+                            ]
+                          }
+                        },
+                        "Write_transcript_blob": {
+                          "type": "Http",
+                          "inputs": {
+                            "method": "PUT",
+                            "uri": "@{parameters('blobServiceUri')}transcripts-auto/@{first(split(last(split(triggerBody()?[0]?['data']?['url'], '/')), '.'))}.txt",
+                            "headers": {
+                              "x-ms-blob-type": "BlockBlob",
+                              "x-ms-version": "2021-08-06",
+                              "Content-Type": "text/plain; charset=utf-8"
+                            },
+                            "body": "@outputs('Build_transcript')",
+                            "authentication": {
+                              "type": "ManagedServiceIdentity",
+                              "identity": "@parameters('managedIdentityResourceId')",
+                              "audience": "https://storage.azure.com"
+                            }
+                          },
+                          "runAfter": {
+                            "Build_transcript": [
+                              "Succeeded"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "runAfter": {}
+                  }
+                }
+              },
+              "kind": "Stateful"
+            },
+            "$fxv#1": {
+              "definition": {
+                "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                "contentVersion": "1.0.0.0",
+                "parameters": {
+                  "blobServiceUri": {
+                    "type": "String"
+                  },
+                  "apiBaseUrl": {
+                    "type": "String"
+                  },
+                  "managedIdentityResourceId": {
+                    "type": "String"
+                  }
+                },
+                "triggers": {
+                  "Daily_recurrence": {
+                    "type": "Recurrence",
+                    "recurrence": {
+                      "frequency": "Day",
+                      "interval": 1
+                    }
+                  }
+                },
+                "actions": {
+                  "List_audio_blobs": {
+                    "type": "Http",
+                    "inputs": {
+                      "method": "GET",
+                      "uri": "@{parameters('blobServiceUri')}audio?restype=container&comp=list",
+                      "headers": {
+                        "x-ms-version": "2021-08-06"
+                      },
+                      "authentication": {
+                        "type": "ManagedServiceIdentity",
+                        "identity": "@parameters('managedIdentityResourceId')",
+                        "audience": "https://storage.azure.com"
+                      }
+                    },
+                    "runAfter": {}
+                  },
+                  "For_each_audio_blob": {
+                    "type": "Foreach",
+                    "foreach": "@xpath(xml(body('List_audio_blobs')), '//*[local-name()=\"Blob\"]')",
+                    "actions": {
+                      "Condition_older_than_one_day": {
+                        "type": "If",
+                        "expression": {
+                          "less": [
+                            "@ticks(xpath(xml(item()), 'string(//*[local-name()=\"Last-Modified\"])'))",
+                            "@ticks(addDays(utcNow(), -1))"
+                          ]
+                        },
+                        "actions": {
+                          "Delete_audio_blob": {
+                            "type": "Http",
+                            "inputs": {
+                              "method": "DELETE",
+                              "uri": "@{parameters('blobServiceUri')}audio/@{xpath(xml(item()), 'string(//*[local-name()=\"Name\"])')}",
+                              "headers": {
+                                "x-ms-version": "2021-08-06"
+                              },
+                              "authentication": {
+                                "type": "ManagedServiceIdentity",
+                                "identity": "@parameters('managedIdentityResourceId')",
+                                "audience": "https://storage.azure.com"
+                              }
+                            },
+                            "runAfter": {}
+                          },
+                          "Delete_transcript_blob": {
+                            "type": "Http",
+                            "inputs": {
+                              "method": "DELETE",
+                              "uri": "@{parameters('blobServiceUri')}transcripts/@{first(split(xpath(xml(item()), 'string(//*[local-name()=\"Name\"])'), '.'))}.txt",
+                              "headers": {
+                                "x-ms-version": "2021-08-06"
+                              },
+                              "authentication": {
+                                "type": "ManagedServiceIdentity",
+                                "identity": "@parameters('managedIdentityResourceId')",
+                                "audience": "https://storage.azure.com"
+                              }
+                            },
+                            "runAfter": {
+                              "Delete_audio_blob": [
+                                "Succeeded",
+                                "Failed"
+                              ]
+                            }
+                          },
+                          "Mark_job_purged": {
+                            "type": "Http",
+                            "inputs": {
+                              "method": "PATCH",
+                              "uri": "@{parameters('apiBaseUrl')}/internal/jobs/@{first(split(xpath(xml(item()), 'string(//*[local-name()=\"Name\"])'), '.'))}/status",
+                              "body": {
+                                "status": "Purged"
+                              },
+                              "authentication": {
+                                "type": "ManagedServiceIdentity",
+                                "identity": "@parameters('managedIdentityResourceId')"
+                              }
+                            },
+                            "runAfter": {
+                              "Delete_transcript_blob": [
+                                "Succeeded",
+                                "Failed"
+                              ]
+                            }
+                          }
+                        },
+                        "runAfter": {}
+                      }
+                    },
+                    "runAfter": {
+                      "List_audio_blobs": [
+                        "Succeeded"
+                      ]
+                    }
+                  }
+                }
+              },
+              "kind": "Stateful"
+            },
+            "workflowIdentity": {
+              "type": "UserAssigned",
+              "userAssignedIdentities": {
+                "[format('{0}', parameters('identityId'))]": {}
+              }
             }
           },
           "resources": [
             {
-              "type": "Microsoft.Storage/storageAccounts",
-              "apiVersion": "2023-05-01",
-              "name": "[parameters('logicStorageName')]",
+              "type": "Microsoft.Logic/workflows",
+              "apiVersion": "2019-05-01",
+              "name": "[parameters('transcriptionWorkflowName')]",
               "location": "[parameters('location')]",
               "tags": "[parameters('tags')]",
-              "sku": {
-                "name": "Standard_LRS"
-              },
-              "kind": "StorageV2",
+              "identity": "[variables('workflowIdentity')]",
               "properties": {
-                "minimumTlsVersion": "TLS1_2",
-                "supportsHttpsTrafficOnly": true
+                "state": "Enabled",
+                "definition": "[variables('$fxv#0').definition]",
+                "parameters": {
+                  "speechEndpoint": {
+                    "value": "[parameters('speechEndpoint')]"
+                  },
+                  "speechLanguage": {
+                    "value": "[parameters('speechLanguage')]"
+                  },
+                  "blobServiceUri": {
+                    "value": "[parameters('dataBlobEndpoint')]"
+                  },
+                  "managedIdentityResourceId": {
+                    "value": "[parameters('identityId')]"
+                  }
+                }
               }
             },
             {
-              "type": "Microsoft.Web/serverfarms",
-              "apiVersion": "2023-12-01",
-              "name": "[parameters('hostingPlanName')]",
+              "type": "Microsoft.Logic/workflows",
+              "apiVersion": "2019-05-01",
+              "name": "[parameters('purgeWorkflowName')]",
               "location": "[parameters('location')]",
               "tags": "[parameters('tags')]",
-              "sku": {
-                "name": "WS1",
-                "tier": "WorkflowStandard"
-              }
-            },
-            {
-              "type": "Microsoft.Web/sites",
-              "apiVersion": "2023-12-01",
-              "name": "[parameters('logicAppName')]",
-              "location": "[parameters('location')]",
-              "tags": "[union(parameters('tags'), createObject('azd-service-name', 'logic-apps'))]",
-              "kind": "functionapp,workflowapp",
-              "identity": {
-                "type": "UserAssigned",
-                "userAssignedIdentities": {
-                  "[format('{0}', parameters('identityId'))]": {}
-                }
-              },
+              "identity": "[variables('workflowIdentity')]",
               "properties": {
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
-                "httpsOnly": true,
-                "keyVaultReferenceIdentity": "[parameters('identityId')]",
-                "siteConfig": {
-                  "ftpsState": "Disabled",
-                  "minTlsVersion": "1.2",
-                  "appSettings": [
-                    {
-                      "name": "AzureWebJobsStorage",
-                      "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', parameters('logicStorageName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('logicStorageName')), '2023-05-01').keys[0].value)]"
-                    },
-                    {
-                      "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                      "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', parameters('logicStorageName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('logicStorageName')), '2023-05-01').keys[0].value)]"
-                    },
-                    {
-                      "name": "WEBSITE_CONTENTSHARE",
-                      "value": "[toLower(parameters('logicAppName'))]"
-                    },
-                    {
-                      "name": "FUNCTIONS_EXTENSION_VERSION",
-                      "value": "~4"
-                    },
-                    {
-                      "name": "FUNCTIONS_WORKER_RUNTIME",
-                      "value": "node"
-                    },
-                    {
-                      "name": "APP_KIND",
-                      "value": "workflowApp"
-                    },
-                    {
-                      "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                      "value": "[parameters('applicationInsightsConnectionString')]"
-                    },
-                    {
-                      "name": "AZURE_CLIENT_ID",
-                      "value": "[parameters('identityClientId')]"
-                    },
-                    {
-                      "name": "MSI_RESOURCE_ID",
-                      "value": "[parameters('identityId')]"
-                    },
-                    {
-                      "name": "AzureBlob__blobServiceUri",
-                      "value": "[parameters('dataBlobEndpoint')]"
-                    },
-                    {
-                      "name": "AzureBlob__credential",
-                      "value": "managedidentity"
-                    },
-                    {
-                      "name": "AzureBlob__clientId",
-                      "value": "[parameters('identityClientId')]"
-                    },
-                    {
-                      "name": "Api__BaseUrl",
-                      "value": "[parameters('apiBaseUrl')]"
-                    },
-                    {
-                      "name": "Storage__BlobEndpoint",
-                      "value": "[parameters('dataBlobEndpoint')]"
-                    },
-                    {
-                      "name": "Speech__Endpoint",
-                      "value": "[parameters('speechEndpoint')]"
-                    },
-                    {
-                      "name": "Speech__Key",
-                      "value": "[format('@Microsoft.KeyVault(SecretUri={0}secrets/speech-key)', parameters('keyVaultUri'))]"
-                    },
-                    {
-                      "name": "Speech__Language",
-                      "value": "[parameters('speechLanguage')]"
-                    }
-                  ]
+                "state": "Enabled",
+                "definition": "[variables('$fxv#1').definition]",
+                "parameters": {
+                  "blobServiceUri": {
+                    "value": "[parameters('dataBlobEndpoint')]"
+                  },
+                  "apiBaseUrl": {
+                    "value": "[parameters('apiBaseUrl')]"
+                  },
+                  "managedIdentityResourceId": {
+                    "value": "[parameters('identityId')]"
+                  }
                 }
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('logicStorageName'))]"
-              ]
+              }
             }
           ],
           "outputs": {
-            "logicAppName": {
+            "transcriptionWorkflowName": {
               "type": "string",
-              "value": "[parameters('logicAppName')]"
+              "value": "[parameters('transcriptionWorkflowName')]"
             },
-            "logicAppHostName": {
+            "purgeWorkflowName": {
               "type": "string",
-              "value": "[reference(resourceId('Microsoft.Web/sites', parameters('logicAppName')), '2023-12-01').defaultHostName]"
+              "value": "[parameters('purgeWorkflowName')]"
             }
           }
         }
@@ -2172,8 +2350,6 @@
       "dependsOn": [
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'api')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'identity')]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'keyvault')]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'monitoring')]",
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('{0}-rg', parameters('environmentName')))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'speech')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'storage')]"
@@ -2215,7 +2391,7 @@
     },
     "AZURE_LOGIC_APP_NAME": {
       "type": "string",
-      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'logic-apps'), '2025-04-01').outputs.logicAppName.value]"
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'logic-apps'), '2025-04-01').outputs.transcriptionWorkflowName.value]"
     },
     "AZURE_EVENTGRID_SYSTEM_TOPIC": {
       "type": "string",
@@ -2225,9 +2401,9 @@
       "type": "string",
       "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'functions'), '2025-04-01').outputs.functionAppName.value]"
     },
-    "SERVICE_LOGIC_APPS_NAME": {
+    "AZURE_PURGE_WORKFLOW_NAME": {
       "type": "string",
-      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'logic-apps'), '2025-04-01').outputs.logicAppName.value]"
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'logic-apps'), '2025-04-01').outputs.purgeWorkflowName.value]"
     },
     "COSMOS_ENDPOINT": {
       "type": "string",

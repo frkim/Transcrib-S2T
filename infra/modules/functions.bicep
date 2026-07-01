@@ -13,7 +13,7 @@ param cosmosDatabase string
 param cosmosContainer string
 param speechEndpoint string
 param keyVaultUri string
-param speechLanguage string = 'en-US'
+param speechLanguage string = 'fr-FR'
 
 // Always-ready instances kept warm to eliminate cold starts on the blob
 // (Event Grid) trigger. 0 = pure pay-per-use (cold starts); >=1 = warm baseline.

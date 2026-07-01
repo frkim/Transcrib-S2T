@@ -24,25 +24,9 @@ services:
     language: dotnet
     host: function
 
-  logic-apps:
-    project: ./src/logic-apps
-    language: js
-    host: function
-    hooks:
-      prepackage:
-        windows:
-          shell: pwsh
-          run: ../../infra/scripts/gen-logicapp-parameters.ps1
-        posix:
-          shell: sh
-          run: ../../infra/scripts/gen-logicapp-parameters.sh
-      postdeploy:
-        windows:
-          shell: pwsh
-          run: ../../infra/scripts/wire-eventgrid.ps1
-        posix:
-          shell: sh
-          run: ../../infra/scripts/wire-eventgrid.sh
+  # Note: the low-code transcription + purge workflows are now Consumption Logic
+  # Apps (Microsoft.Logic/workflows). Their definitions are deployed inline via
+  # Bicep (infra/modules/logicapps.bicep), so there is no azd service to package.
 
   frontend:
     project: ./src/frontend

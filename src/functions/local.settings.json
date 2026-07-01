@@ -10,6 +10,6 @@
     "Storage__BlobEndpoint": "",
     "Speech__Endpoint": "",
     "Speech__Key": "",
-    "Speech__Language": "en-US"
+    "Speech__Language": "fr-FR"
   }
 }

@@ -46,15 +46,7 @@ les fichiers de plus d'un jour sont purgés quotidiennement.
 Les **deux approches** de transcription (Functions *Pro Code* et Logic Apps
 *Low Code*) sont fonctionnellement équivalentes et partagent les mêmes contrats.
 
-## Aperçu du frontend
-
-![Capture d'écran du frontend Transcrib-S2T avec des jobs d'exemple](docs/images/frontend-example.png)
-
-Exemple affiché dans l'interface web :
-
-- `reunion-client.mp3` → statut `Completed`, transcript téléchargeable
-- `interview-produit.mp3` → statut `Processing`
-- `point-support.mp3` → statut `Failed`
+> Documentation d'architecture détaillée : [docs/architecture.md](docs/architecture.md).
 
 ## Contrats partagés
 
@@ -86,7 +78,7 @@ Exemple affiché dans l'interface web :
 | `src/shared` | Bibliothèque C# partagée (modèle `TranscriptionJob`, repository Cosmos, accès Blob, validation MP3). |
 | `src/api` | API C# (ASP.NET Core Minimal API) déployée sur Container Apps. |
 | `src/functions` | Pipeline de transcription **Pro Code** (Azure Functions .NET isolated, blob trigger). |
-| `src/logic-apps` | Workflows **Low Code** (Logic App Standard) : `transcription/` + `purge/`. |
+| `src/logic-apps` | Workflows **Low Code** (Logic Apps *Consumption*) : `transcription/` + `purge/`. |
 | `src/frontend` | Application web **Next.js**. |
 | `infra` | Infrastructure-as-Code **Bicep** + `main.parameters.json`. |
 | `tests` | Tests unitaires xUnit (API + Functions). |
@@ -122,7 +114,7 @@ les Logic Apps et le frontend. Variables optionnelles :
 ```bash
 azd env set AZURE_AD_TENANT_ID <tenant-id>
 azd env set AZURE_AD_CLIENT_ID <client-id>
-azd env set SPEECH_LANGUAGE en-US
+azd env set SPEECH_LANGUAGE fr-FR
 ```
 
 ## Développement local

@@ -2,7 +2,11 @@
   "definition": {
     "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {},
+    "parameters": {
+      "blobServiceUri": { "type": "String" },
+      "apiBaseUrl": { "type": "String" },
+      "managedIdentityResourceId": { "type": "String" }
+    },
     "triggers": {
       "Daily_recurrence": {
         "type": "Recurrence",
@@ -14,58 +18,62 @@
     },
     "actions": {
       "List_audio_blobs": {
-        "type": "ServiceProvider",
+        "type": "Http",
         "inputs": {
-          "parameters": {
-            "containerName": "audio"
+          "method": "GET",
+          "uri": "@{parameters('blobServiceUri')}audio?restype=container&comp=list",
+          "headers": {
+            "x-ms-version": "2021-08-06"
           },
-          "serviceProviderConfiguration": {
-            "connectionName": "AzureBlob",
-            "operationId": "listBlobs",
-            "serviceProviderId": "/serviceProviders/AzureBlob"
+          "authentication": {
+            "type": "ManagedServiceIdentity",
+            "identity": "@parameters('managedIdentityResourceId')",
+            "audience": "https://storage.azure.com"
           }
         },
         "runAfter": {}
       },
       "For_each_audio_blob": {
         "type": "Foreach",
-        "foreach": "@body('List_audio_blobs')",
+        "foreach": "@xpath(xml(body('List_audio_blobs')), '//*[local-name()=\"Blob\"]')",
         "actions": {
           "Condition_older_than_one_day": {
             "type": "If",
             "expression": {
               "less": [
-                "@item()?['LastModified']",
-                "@addDays(utcNow(), -1)"
+                "@ticks(xpath(xml(item()), 'string(//*[local-name()=\"Last-Modified\"])'))",
+                "@ticks(addDays(utcNow(), -1))"
               ]
             },
             "actions": {
               "Delete_audio_blob": {
-                "type": "ServiceProvider",
+                "type": "Http",
                 "inputs": {
-                  "parameters": {
-                    "containerName": "audio",
-                    "blobName": "@item()?['Name']"
+                  "method": "DELETE",
+                  "uri": "@{parameters('blobServiceUri')}audio/@{xpath(xml(item()), 'string(//*[local-name()=\"Name\"])')}",
+                  "headers": {
+                    "x-ms-version": "2021-08-06"
                   },
-                  "serviceProviderConfiguration": {
-                    "connectionName": "AzureBlob",
-                    "operationId": "deleteBlob",
-                    "serviceProviderId": "/serviceProviders/AzureBlob"
+                  "authentication": {
+                    "type": "ManagedServiceIdentity",
+                    "identity": "@parameters('managedIdentityResourceId')",
+                    "audience": "https://storage.azure.com"
                   }
                 },
                 "runAfter": {}
               },
               "Delete_transcript_blob": {
-                "type": "ServiceProvider",
+                "type": "Http",
                 "inputs": {
-                  "parameters": {
-                    "containerName": "transcripts",
-                    "blobName": "@{first(split(item()?['Name'], '.'))}.txt"
+                  "method": "DELETE",
+                  "uri": "@{parameters('blobServiceUri')}transcripts/@{first(split(xpath(xml(item()), 'string(//*[local-name()=\"Name\"])'), '.'))}.txt",
+                  "headers": {
+                    "x-ms-version": "2021-08-06"
                   },
-                  "serviceProviderConfiguration": {
-                    "connectionName": "AzureBlob",
-                    "operationId": "deleteBlob",
-                    "serviceProviderId": "/serviceProviders/AzureBlob"
+                  "authentication": {
+                    "type": "ManagedServiceIdentity",
+                    "identity": "@parameters('managedIdentityResourceId')",
+                    "audience": "https://storage.azure.com"
                   }
                 },
                 "runAfter": {
@@ -79,12 +87,13 @@
                 "type": "Http",
                 "inputs": {
                   "method": "PATCH",
-                  "uri": "@{appsetting('Api__BaseUrl')}/internal/jobs/@{first(split(item()?['Name'], '.'))}/status",
+                  "uri": "@{parameters('apiBaseUrl')}/internal/jobs/@{first(split(xpath(xml(item()), 'string(//*[local-name()=\"Name\"])'), '.'))}/status",
                   "body": {
                     "status": "Purged"
                   },
                   "authentication": {
-                    "type": "ManagedServiceIdentity"
+                    "type": "ManagedServiceIdentity",
+                    "identity": "@parameters('managedIdentityResourceId')"
                   }
                 },
                 "runAfter": {

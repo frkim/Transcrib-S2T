@@ -2,7 +2,12 @@
   "definition": {
     "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {},
+    "parameters": {
+      "speechEndpoint": { "type": "String" },
+      "speechLanguage": { "type": "String", "defaultValue": "fr-FR" },
+      "blobServiceUri": { "type": "String" },
+      "managedIdentityResourceId": { "type": "String" }
+    },
     "triggers": {
       "When_Event_Grid_event_received": {
         "type": "Request",
