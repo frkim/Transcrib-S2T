@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.43.8.12551",
-      "templateHash": "17422957385736965410"
+      "templateHash": "10503386768687839864"
     }
   },
   "parameters": {
@@ -1539,7 +1539,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.43.8.12551",
-              "templateHash": "2572540283367849654"
+              "templateHash": "17485370693764891987"
             }
           },
           "parameters": {
@@ -1591,6 +1591,13 @@
             "speechLanguage": {
               "type": "string",
               "defaultValue": "fr-FR"
+            },
+            "alwaysReadyInstanceCount": {
+              "type": "int",
+              "defaultValue": 1,
+              "metadata": {
+                "description": "Number of always-ready instances for the blob trigger scale group."
+              }
             }
           },
           "resources": [
@@ -1610,16 +1617,38 @@
               }
             },
             {
+              "type": "Microsoft.Storage/storageAccounts/blobServices",
+              "apiVersion": "2023-05-01",
+              "name": "[format('{0}/{1}', parameters('functionStorageName'), 'default')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('functionStorageName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+              "apiVersion": "2023-05-01",
+              "name": "[format('{0}/{1}/{2}', parameters('functionStorageName'), 'default', 'deployment')]",
+              "properties": {
+                "publicAccess": "None"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('functionStorageName'), 'default')]"
+              ]
+            },
+            {
               "type": "Microsoft.Web/serverfarms",
               "apiVersion": "2023-12-01",
               "name": "[parameters('hostingPlanName')]",
               "location": "[parameters('location')]",
               "tags": "[parameters('tags')]",
+              "kind": "functionapp",
               "sku": {
-                "name": "Y1",
-                "tier": "Dynamic"
+                "name": "FC1",
+                "tier": "FlexConsumption"
               },
-              "properties": {}
+              "properties": {
+                "reserved": true
+              }
             },
             {
               "type": "Microsoft.Web/sites",
@@ -1627,7 +1656,7 @@
               "name": "[parameters('functionAppName')]",
               "location": "[parameters('location')]",
               "tags": "[union(parameters('tags'), createObject('azd-service-name', 'functions'))]",
-              "kind": "functionapp",
+              "kind": "functionapp,linux",
               "identity": {
                 "type": "UserAssigned",
                 "userAssignedIdentities": {
@@ -1638,31 +1667,43 @@
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
                 "httpsOnly": true,
                 "keyVaultReferenceIdentity": "[parameters('identityId')]",
+                "functionAppConfig": {
+                  "deployment": {
+                    "storage": {
+                      "type": "blobContainer",
+                      "value": "[format('{0}{1}', reference(resourceId('Microsoft.Storage/storageAccounts', parameters('functionStorageName')), '2023-05-01').primaryEndpoints.blob, 'deployment')]",
+                      "authentication": {
+                        "type": "StorageAccountConnectionString",
+                        "storageAccountConnectionStringName": "DEPLOYMENT_STORAGE_CONNECTION_STRING"
+                      }
+                    }
+                  },
+                  "runtime": {
+                    "name": "dotnet-isolated",
+                    "version": "10.0"
+                  },
+                  "scaleAndConcurrency": {
+                    "alwaysReady": [
+                      {
+                        "name": "blob",
+                        "instanceCount": "[parameters('alwaysReadyInstanceCount')]"
+                      }
+                    ],
+                    "instanceMemoryMB": 2048,
+                    "maximumInstanceCount": 40
+                  }
+                },
                 "siteConfig": {
                   "ftpsState": "Disabled",
                   "minTlsVersion": "1.2",
-                  "use32BitWorkerProcess": false,
-                  "netFrameworkVersion": "v10.0",
                   "appSettings": [
                     {
                       "name": "AzureWebJobsStorage",
                       "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', parameters('functionStorageName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('functionStorageName')), '2023-05-01').keys[0].value)]"
                     },
                     {
-                      "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                      "name": "DEPLOYMENT_STORAGE_CONNECTION_STRING",
                       "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', parameters('functionStorageName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('functionStorageName')), '2023-05-01').keys[0].value)]"
-                    },
-                    {
-                      "name": "WEBSITE_CONTENTSHARE",
-                      "value": "[toLower(parameters('functionAppName'))]"
-                    },
-                    {
-                      "name": "FUNCTIONS_EXTENSION_VERSION",
-                      "value": "~4"
-                    },
-                    {
-                      "name": "FUNCTIONS_WORKER_RUNTIME",
-                      "value": "dotnet-isolated"
                     },
                     {
                       "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
@@ -1720,6 +1761,7 @@
                 }
               },
               "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('functionStorageName'), 'default', 'deployment')]",
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('functionStorageName'))]",
                 "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
               ]
