@@ -206,16 +206,12 @@ module logicApps 'modules/logicapps.bicep' = {
   params: {
     location: location
     tags: tags
-    logicAppName: 'logic-${resourceToken}'
-    hostingPlanName: 'plan-logic-${resourceToken}'
-    logicStorageName: 'stlogic${resourceToken}'
+    transcriptionWorkflowName: 'logic-transcription-${resourceToken}'
+    purgeWorkflowName: 'logic-purge-${resourceToken}'
     identityId: identity.outputs.identityId
-    identityClientId: identity.outputs.identityClientId
-    applicationInsightsConnectionString: monitoring.outputs.applicationInsightsConnectionString
     dataBlobEndpoint: storage.outputs.blobEndpoint
     apiBaseUrl: api.outputs.apiUri
     speechEndpoint: speech.outputs.speechEndpoint
-    keyVaultUri: keyVault.outputs.keyVaultUri
     speechLanguage: speechLanguage
   }
 }
@@ -229,19 +225,17 @@ output SERVICE_API_NAME string = api.outputs.apiName
 output SERVICE_FRONTEND_ENDPOINT_URL string = frontend.outputs.frontendUri
 output SERVICE_FRONTEND_NAME string = frontend.outputs.frontendName
 
-// Consumed by the logic-apps postdeploy hook to wire the Event Grid subscription
-// (audio-auto -> Logic App auto-transcription workflow) once the workflow callback URL exists.
-output AZURE_LOGIC_APP_NAME string = logicApps.outputs.logicAppName
+// Consumption Logic App workflow names (low-code transcription + daily purge).
+output AZURE_LOGIC_APP_NAME string = logicApps.outputs.transcriptionWorkflowName
 output AZURE_EVENTGRID_SYSTEM_TOPIC string = eventGrid.outputs.systemTopicName
 output SERVICE_FUNCTIONS_NAME string = functions.outputs.functionAppName
-output SERVICE_LOGIC_APPS_NAME string = logicApps.outputs.logicAppName
+output AZURE_PURGE_WORKFLOW_NAME string = logicApps.outputs.purgeWorkflowName
 output COSMOS_ENDPOINT string = cosmos.outputs.endpoint
 output STORAGE_BLOB_ENDPOINT string = storage.outputs.blobEndpoint
 output SPEECH_ENDPOINT string = speech.outputs.speechEndpoint
 output KEY_VAULT_URI string = keyVault.outputs.keyVaultUri
 output APPLICATIONINSIGHTS_CONNECTION_STRING string = monitoring.outputs.applicationInsightsConnectionString
 
-// Consumed by the logic-apps prepackage hook to render parameters.json with concrete
-// values (the workflow runtime does not evaluate @appsetting() inside parameters.json).
+// Managed identity resource id (retained for reference by external tooling).
 output AZURE_MANAGED_IDENTITY_RESOURCE_ID string = identity.outputs.identityId
 output SPEECH_LANGUAGE string = speechLanguage

@@ -27,10 +27,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Prepare hook scripts
-        run: |
-          chmod +x infra/scripts/gen-logicapp-parameters.sh infra/scripts/wire-eventgrid.sh
-          sed -i 's/\r$//' infra/scripts/gen-logicapp-parameters.sh infra/scripts/wire-eventgrid.sh
       - name: Install azd
         uses: Azure/setup-azd@v2
       - name: Log in with Azure (Federated Credentials)

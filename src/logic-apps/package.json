@@ -1,9 +1,0 @@
-{
-  "name": "transcrib-logic-apps",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Logic Apps Standard workflows (transcription + daily purge) deployed by azd.",
-  "scripts": {
-    "build": "echo \"No build step required for Logic Apps Standard workflows\""
-  }
-}
