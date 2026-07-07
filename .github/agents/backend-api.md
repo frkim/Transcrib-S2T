@@ -34,7 +34,7 @@ Respecter le schéma de job Cosmos DB et les conteneurs Blob (`audio`, `transcri
 - Les endpoints fonctionnent et respectent le contrat partagé.
 - L'image se build et tourne en conteneur.
 - Tests unitaires essentiels présents (cf. agent `qa-testing`).
-- Aucun secret en dur ; secrets via Key Vault / variables injectées.
+- Aucun secret en dur ; accès aux ressources via **Managed Identity** / variables injectées.
 
 ## Limites
 

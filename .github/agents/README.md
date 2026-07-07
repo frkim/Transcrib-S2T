@@ -9,7 +9,7 @@ Chaque fichier `*.md` définit un agent spécialisé via un frontmatter YAML (`n
 | Agent | Fichier | Rôle |
 | --- | --- | --- |
 | Orchestrateur | [`orchestrator.md`](./orchestrator.md) | Planifie, séquence et délègue le travail aux agents spécialisés ; garantit la cohérence des contrats partagés. |
-| Infrastructure | [`infrastructure.md`](./infrastructure.md) | Bicep + `azd` (Blob, Cosmos DB, AI Speech, Key Vault, App Insights, Container Apps, ACR, Entra ID). |
+| Infrastructure | [`infrastructure.md`](./infrastructure.md) | Bicep + `azd` (Blob, Cosmos DB, AI Speech, App Insights, Container Apps, ACR, Entra ID). |
 | Backend API | [`backend-api.md`](./backend-api.md) | API C# (.NET) sur Azure Container Apps. |
 | Azure Functions | [`azure-functions.md`](./azure-functions.md) | Approche **Pro Code** : pipeline de transcription. |
 | Logic Apps | [`logic-apps.md`](./logic-apps.md) | Approche **Low Code** : workflow de transcription. |
@@ -37,7 +37,7 @@ Pour garantir l'interopérabilité, tous les agents respectent les conventions d
 - **Conteneurs Blob** : `audio` (sources MP3) et `transcripts` (résultats).
 - **Cosmos DB** : conteneur `jobs` avec les champs `id`, `fileName`, `audioBlobUrl`, `transcriptBlobUrl`, `status`, `error`, `createdAt`, `updatedAt`.
 - **Statuts** : `Processing | Completed | Failed | Purged`.
-- **Secrets** : toujours via **Key Vault**.
+- **Secrets** : accès inter-services par **Managed Identity** (Entra ID).
 - **Observabilité** : logs et traces via **Application Insights**.
 
 ## Utilisation

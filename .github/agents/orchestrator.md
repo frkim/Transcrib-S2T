@@ -24,7 +24,7 @@ Deux implémentations backend coexistent : **Low Code (Azure Logic Apps)** et **
 
 | Agent | Responsabilité |
 | --- | --- |
-| `infrastructure` | Infrastructure-as-Code Bicep + configuration `azd` (Blob, Cosmos DB, Speech, Key Vault, App Insights, Container Apps, ACR, Entra ID). |
+| `infrastructure` | Infrastructure-as-Code Bicep + configuration `azd` (Blob, Cosmos DB, Speech, App Insights, Container Apps, ACR, Entra ID). |
 | `backend-api` | API C# (.NET) déployée sur Azure Container Apps. |
 | `azure-functions` | Pipeline de transcription pro-code (Azure Functions). |
 | `logic-apps` | Workflow de transcription low-code (Azure Logic Apps). |
@@ -60,7 +60,7 @@ Pour garantir l'interopérabilité entre agents, impose ces conventions :
     "updatedAt": "<ISO-8601>"
   }
   ```
-- **Secrets** : toujours via Key Vault, jamais en clair dans le code ou l'IaC.
+- **Secrets** : privilégier l'accès par **Managed Identity** (Entra ID), jamais de secret en clair dans le code ou l'IaC.
 - **Observabilité** : logs et traces via Application Insights pour chaque composant.
 
 ## Limites

@@ -12,7 +12,6 @@ param cosmosEndpoint string
 param cosmosDatabase string
 param cosmosContainer string
 param speechEndpoint string
-param keyVaultUri string
 param speechLanguage string = 'fr-FR'
 
 // Always-ready instances kept warm to eliminate cold starts on the blob
@@ -80,7 +79,6 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
   properties: {
     serverFarmId: hostingPlan.id
     httpsOnly: true
-    keyVaultReferenceIdentity: identityId
     functionAppConfig: {
       deployment: {
         storage: {
@@ -126,7 +124,6 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
         { name: 'Cosmos__Container', value: cosmosContainer }
         { name: 'Storage__BlobEndpoint', value: dataBlobEndpoint }
         { name: 'Speech__Endpoint', value: speechEndpoint }
-        { name: 'Speech__Key', value: '@Microsoft.KeyVault(SecretUri=${keyVaultUri}secrets/speech-key)' }
         { name: 'Speech__Language', value: speechLanguage }
       ]
     }

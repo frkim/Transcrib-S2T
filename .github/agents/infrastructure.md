@@ -1,6 +1,6 @@
 ---
 name: infrastructure
-description: Agent Infrastructure-as-Code de Transcrib-S2T. Écrit et maintient les modules Bicep et la configuration azd pour provisionner les ressources Azure (Blob, Cosmos DB, AI Speech, Key Vault, App Insights, Container Apps, ACR, Entra ID). À utiliser pour toute tâche d'infra ou de déploiement.
+description: Agent Infrastructure-as-Code de Transcrib-S2T. Écrit et maintient les modules Bicep et la configuration azd pour provisionner les ressources Azure (Blob, Cosmos DB, AI Speech, App Insights, Container Apps, ACR, Entra ID). À utiliser pour toute tâche d'infra ou de déploiement.
 tools: [edit, search, execute]
 ---
 
@@ -17,7 +17,6 @@ Provisionner et configurer :
 - **Azure Functions** — host du pipeline pro-code.
 - **Azure Logic Apps** — workflows low-code (transcription + purge).
 - **Azure Container Apps** + **Azure Container Registry** — host de l'API C#.
-- **Azure Key Vault** — secrets et chaînes de connexion.
 - **Application Insights / Azure Monitor** — observabilité.
 - **Entra ID** — authentification (app registration / Easy Auth).
 
@@ -26,8 +25,8 @@ Provisionner et configurer :
 - Code Bicep **modulaire** : `infra/main.bicep` + modules réutilisables dans `infra/modules/`.
 - Paramétrer l'environnement et la région ; utiliser `main.parameters.json`.
 - Fichier `azure.yaml` à la racine décrivant les services pour `azd`.
-- **Managed Identity** pour les accès inter-services ; éviter les clés quand possible.
-- Tous les secrets dans **Key Vault** ; jamais de secret en clair dans les fichiers Bicep, paramètres ou variables d'environnement commitées.
+- **Managed Identity** pour les accès inter-services ; privilégier l'auth Entra ID plutôt que les clés.
+- Aucun secret en clair dans les fichiers Bicep, paramètres ou variables d'environnement commitées ; l'accès aux ressources (Blob, Cosmos, Speech) se fait par identité managée.
 - Nommage cohérent des ressources via un token d'unicité (ex. `resourceToken`).
 
 ## Définition de terminé

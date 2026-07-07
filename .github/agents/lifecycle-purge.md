@@ -18,7 +18,7 @@ Tu implémentes la **Logic App planifiée (daily)** chargée de la **purge** des
 ## Conventions techniques
 
 - Logic App déployable en IaC (Bicep / `azd`).
-- Connexions via **Managed Identity** ; secrets via **Key Vault**.
+- Connexions via **Managed Identity** ; aucun secret applicatif.
 - Idempotence : ne pas échouer si un blob est déjà supprimé.
 - **Observabilité** via Application Insights / diagnostics.
 - Gestion d'erreurs minimale : continuer le traitement des autres éléments en cas d'échec unitaire.

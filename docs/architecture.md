@@ -24,7 +24,6 @@ flowchart TD
     Fn[Azure Functions<br/>Pro Code]
     LA[Logic Apps Consumption<br/>Low Code]
     Speech[Azure AI Speech<br/>diarization]
-    KV[Key Vault]
     AI[Application Insights]
     Purge[Purge Logic App<br/>quotidienne]
 
@@ -43,8 +42,6 @@ flowchart TD
     API --> Cosmos
     Purge -->|supprime > 1 jour| Blob
     Purge -->|statut Purged| Cosmos
-    KV -.clé Speech.-> Fn
-    KV -.clé Speech.-> LA
     API -.télémétrie.-> AI
     Fn -.télémétrie.-> AI
     FE -.télémétrie.-> AI
@@ -69,7 +66,6 @@ flowchart TD
 | Stockage audio/transcripts | Azure Blob Storage | PaaS | Conteneurs `audio` et `transcripts`. |
 | Métadonnées jobs | Azure Cosmos DB | PaaS | Conteneur `jobs` (partition `/id`). |
 | Routage d'événements | Azure Event Grid | PaaS | Notification « blob créé » vers Functions / Logic Apps. |
-| Secrets | Azure Key Vault | PaaS | Clé Azure AI Speech, accès inter-services par Managed Identity. |
 | Observabilité | Application Insights | PaaS | Logs et traces pour chaque composant. |
 
 ## Services Azure (inventaire complet)
@@ -90,11 +86,10 @@ entre parenthèses) et leur rôle.
 | Azure Blob Storage — Functions | `stfunc…` | Stockage de déploiement et d'état du runtime Functions. |
 | Azure Cosmos DB (serverless) | `cosmos-` | Métadonnées des jobs (conteneur `jobs`, partition `/id`). |
 | Azure Event Grid (system topic) | `evgt-` | Routage de l'événement « blob créé » vers la Function. |
-| Azure Key Vault | `kv-` | Secrets (clé Azure AI Speech). |
 | Azure Container Registry (Basic) | `acr…` | Images conteneurs de l'API et du frontend. |
 | Application Insights | `appi-` | APM, traces distribuées, diagnostic. |
 | Log Analytics Workspace | `log-` | Backend de logs (Container Apps, App Insights). |
-| User-assigned Managed Identity | `id-` | Identité unique inter-services (accès RBAC Blob, Cosmos, Key Vault, Speech). |
+| User-assigned Managed Identity | `id-` | Identité unique inter-services (accès RBAC Blob, Cosmos, Speech). |
 
 ## Choix du service Azure Speech
 
@@ -126,9 +121,10 @@ avec **diarization** activée (`maxSpeakers = 10`).
 5. **Cohérence Pro Code / Low Code** — la même API REST est invoquée par la
    Function et par le workflow Logic App, garantissant des résultats équivalents.
 
-> Authentification de l'appel Speech : par **clé** côté Function (clé lue depuis
-> Key Vault, en-tête `Ocp-Apim-Subscription-Key`) et par **Managed Identity**
-> côté Logic App (audience `https://cognitiveservices.azure.com`).
+> Authentification de l'appel Speech : par **Managed Identity** (Entra ID,
+> audience `https://cognitiveservices.azure.com`) côté Function **et** côté Logic
+> App. L'authentification par clé est désactivée sur la ressource Speech
+> (`disableLocalAuth`).
 
 ## Flux de transcription
 
@@ -228,9 +224,9 @@ et transcripts de plus d'un jour et bascule le statut des jobs concernés vers
 ## Sécurité et identité
 
 - **Managed Identity** : les services communiquent entre eux (Blob, Cosmos DB,
-  Key Vault, Speech) via des identités managées, sans secret en clair.
-- **Key Vault** : la clé Azure AI Speech est stockée dans Key Vault et lue par
-  les pipelines de transcription.
+  Speech) via des identités managées, sans secret en clair. L'accès à Azure AI
+  Speech utilise un jeton Entra ID (aucune clé n'est provisionnée ; l'auth locale
+  par clé est désactivée sur la ressource).
 - **Entra ID** : l'authentification du frontend et de l'API est activée
   automatiquement dès que la section `AzureAd` (`ClientId` / `TenantId`) est
   configurée.
@@ -245,7 +241,7 @@ mesure du temps de traitement (`updatedAt − createdAt`) et le diagnostic des
 ## Infrastructure et déploiement
 
 L'infrastructure est décrite en **Bicep** (`infra/`), organisée en modules par
-ressource (storage, cosmos, speech, keyvault, functions, logicapps, api,
+ressource (storage, cosmos, speech, functions, logicapps, api,
 frontend, eventgrid, monitoring, identity, registry, containerAppsEnv). Le
 déploiement de bout en bout est orchestré par **Azure Developer CLI** (`azd`) :
 
@@ -281,7 +277,6 @@ services légèrement supérieurs).
 | Azure Cosmos DB (serverless) | Par RU consommée | ~0–1 |
 | Azure Blob Storage (LRS, 2 comptes) | Go stockés + opérations | ~0,5–1 |
 | Azure Event Grid | Par opération (100 k gratuites/mois) | ~0 |
-| Azure Key Vault | Par transaction | ~0 |
 | User-assigned Managed Identity | — | Gratuit |
 | **Total estimé** | | **~8–20 USD/mois** |
 

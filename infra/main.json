@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.43.8.12551",
-      "templateHash": "10503386768687839864"
+      "templateHash": "1457619105418717631"
     }
   },
   "parameters": {
@@ -236,124 +236,6 @@
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('{0}-rg', parameters('environmentName')))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2025-04-01",
-      "name": "keyvault",
-      "resourceGroup": "[format('{0}-rg', parameters('environmentName'))]",
-      "properties": {
-        "expressionEvaluationOptions": {
-          "scope": "inner"
-        },
-        "mode": "Incremental",
-        "parameters": {
-          "location": {
-            "value": "[parameters('location')]"
-          },
-          "tags": {
-            "value": "[variables('tags')]"
-          },
-          "keyVaultName": {
-            "value": "[format('kv-{0}', variables('resourceToken'))]"
-          },
-          "readerPrincipalIds": {
-            "value": [
-              "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'identity'), '2025-04-01').outputs.identityPrincipalId.value]"
-            ]
-          }
-        },
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "metadata": {
-            "_generator": {
-              "name": "bicep",
-              "version": "0.43.8.12551",
-              "templateHash": "2361522170166867082"
-            }
-          },
-          "parameters": {
-            "location": {
-              "type": "string",
-              "metadata": {
-                "description": "Key Vault for secrets (Speech key, connection strings)."
-              }
-            },
-            "tags": {
-              "type": "object"
-            },
-            "keyVaultName": {
-              "type": "string"
-            },
-            "readerPrincipalIds": {
-              "type": "array",
-              "defaultValue": [],
-              "metadata": {
-                "description": "Principal ids granted secret access (Key Vault Secrets User role)."
-              }
-            }
-          },
-          "variables": {
-            "secretsUserRoleId": "4633458b-17de-408a-b874-0445c86b69e6"
-          },
-          "resources": [
-            {
-              "type": "Microsoft.KeyVault/vaults",
-              "apiVersion": "2023-07-01",
-              "name": "[parameters('keyVaultName')]",
-              "location": "[parameters('location')]",
-              "tags": "[parameters('tags')]",
-              "properties": {
-                "sku": {
-                  "family": "A",
-                  "name": "standard"
-                },
-                "tenantId": "[subscription().tenantId]",
-                "enableRbacAuthorization": true,
-                "enableSoftDelete": true,
-                "softDeleteRetentionInDays": 7
-              }
-            },
-            {
-              "copy": {
-                "name": "secretsUserAssignment",
-                "count": "[length(parameters('readerPrincipalIds'))]"
-              },
-              "type": "Microsoft.Authorization/roleAssignments",
-              "apiVersion": "2022-04-01",
-              "scope": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
-              "name": "[guid(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), parameters('readerPrincipalIds')[copyIndex()], variables('secretsUserRoleId'))]",
-              "properties": {
-                "principalId": "[parameters('readerPrincipalIds')[copyIndex()]]",
-                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('secretsUserRoleId'))]",
-                "principalType": "ServicePrincipal"
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
-              ]
-            }
-          ],
-          "outputs": {
-            "keyVaultName": {
-              "type": "string",
-              "value": "[parameters('keyVaultName')]"
-            },
-            "keyVaultUri": {
-              "type": "string",
-              "value": "[reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri]"
-            },
-            "keyVaultId": {
-              "type": "string",
-              "value": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
-            }
-          }
-        }
-      },
-      "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'identity')]",
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('{0}-rg', parameters('environmentName')))]"
       ]
     },
@@ -732,9 +614,6 @@
           "speechAccountName": {
             "value": "[format('speech-{0}', variables('resourceToken'))]"
           },
-          "keyVaultName": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'keyvault'), '2025-04-01').outputs.keyVaultName.value]"
-          },
           "userPrincipalIds": {
             "value": [
               "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'identity'), '2025-04-01').outputs.identityPrincipalId.value]"
@@ -748,23 +627,20 @@
             "_generator": {
               "name": "bicep",
               "version": "0.43.8.12551",
-              "templateHash": "18108084547209583560"
+              "templateHash": "6099016737625570383"
             }
           },
           "parameters": {
             "location": {
               "type": "string",
               "metadata": {
-                "description": "Azure AI Speech (Cognitive Services) resource with diarization support, fronted by Azure AI Foundry conventions."
+                "description": "Azure AI Speech (Cognitive Services) resource with diarization support. Accessed via Microsoft Entra ID (Managed Identity) — no keys are provisioned or stored."
               }
             },
             "tags": {
               "type": "object"
             },
             "speechAccountName": {
-              "type": "string"
-            },
-            "keyVaultName": {
               "type": "string"
             },
             "userPrincipalIds": {
@@ -791,19 +667,9 @@
               },
               "properties": {
                 "customSubDomainName": "[parameters('speechAccountName')]",
-                "publicNetworkAccess": "Enabled"
+                "publicNetworkAccess": "Enabled",
+                "disableLocalAuth": true
               }
-            },
-            {
-              "type": "Microsoft.KeyVault/vaults/secrets",
-              "apiVersion": "2023-07-01",
-              "name": "[format('{0}/{1}', parameters('keyVaultName'), 'speech-key')]",
-              "properties": {
-                "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('speechAccountName')), '2024-10-01').key1]"
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.CognitiveServices/accounts', parameters('speechAccountName'))]"
-              ]
             },
             {
               "copy": {
@@ -832,17 +698,12 @@
             "speechEndpoint": {
               "type": "string",
               "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', parameters('speechAccountName')), '2024-10-01').endpoint]"
-            },
-            "speechKeySecretUri": {
-              "type": "string",
-              "value": "[reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('keyVaultName'), 'speech-key'), '2023-07-01').secretUri]"
             }
           }
         }
       },
       "dependsOn": [
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'identity')]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'keyvault')]",
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('{0}-rg', parameters('environmentName')))]"
       ]
     },
@@ -1525,9 +1386,6 @@
           "speechEndpoint": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'speech'), '2025-04-01').outputs.speechEndpoint.value]"
           },
-          "keyVaultUri": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'keyvault'), '2025-04-01').outputs.keyVaultUri.value]"
-          },
           "speechLanguage": {
             "value": "[parameters('speechLanguage')]"
           }
@@ -1539,7 +1397,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.43.8.12551",
-              "templateHash": "17485370693764891987"
+              "templateHash": "13501990953201399052"
             }
           },
           "parameters": {
@@ -1583,9 +1441,6 @@
               "type": "string"
             },
             "speechEndpoint": {
-              "type": "string"
-            },
-            "keyVaultUri": {
               "type": "string"
             },
             "speechLanguage": {
@@ -1666,7 +1521,6 @@
               "properties": {
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
                 "httpsOnly": true,
-                "keyVaultReferenceIdentity": "[parameters('identityId')]",
                 "functionAppConfig": {
                   "deployment": {
                     "storage": {
@@ -1750,10 +1604,6 @@
                       "value": "[parameters('speechEndpoint')]"
                     },
                     {
-                      "name": "Speech__Key",
-                      "value": "[format('@Microsoft.KeyVault(SecretUri={0}secrets/speech-key)', parameters('keyVaultUri'))]"
-                    },
-                    {
                       "name": "Speech__Language",
                       "value": "[parameters('speechLanguage')]"
                     }
@@ -1786,7 +1636,6 @@
       "dependsOn": [
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'cosmos')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'identity')]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'keyvault')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'monitoring')]",
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('{0}-rg', parameters('environmentName')))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'speech')]",
@@ -2416,10 +2265,6 @@
     "SPEECH_ENDPOINT": {
       "type": "string",
       "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'speech'), '2025-04-01').outputs.speechEndpoint.value]"
-    },
-    "KEY_VAULT_URI": {
-      "type": "string",
-      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg', parameters('environmentName'))), 'Microsoft.Resources/deployments', 'keyvault'), '2025-04-01').outputs.keyVaultUri.value]"
     },
     "APPLICATIONINSIGHTS_CONNECTION_STRING": {
       "type": "string",

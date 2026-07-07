@@ -20,7 +20,7 @@ Tu implémentes l'**Approche 2 — Pro Code** : le pipeline de transcription en 
 
 - Functions en **.NET isolated** (cohérent avec l'API C#).
 - SDK : Azure Speech SDK, `Azure.Storage.Blobs`, `Microsoft.Azure.Cosmos`, `Azure.Identity`.
-- **Managed Identity** pour l'accès aux ressources ; secrets via Key Vault.
+- **Managed Identity** pour l'accès aux ressources ; aucun secret applicatif (auth Entra ID pour Speech).
 - Gestion d'erreurs : `try/catch`, **retry simple**, statut `Failed` avec message en cas d'échec définitif.
 - **Observabilité** via Application Insights (intégration native Functions).
 

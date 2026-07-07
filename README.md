@@ -67,8 +67,8 @@ Les **deux approches** de transcription (Functions *Pro Code* et Logic Apps
   }
   ```
 
-- **Secrets** : via **Key Vault** (clé Speech), accès inter-services par
-  **Managed Identity**.
+- **Secrets** : aucun secret applicatif stocké — l'accès inter-services (Blob,
+  Cosmos DB, Azure AI Speech) se fait entièrement par **Managed Identity** (Entra ID).
 - **Observabilité** : logs et traces **Application Insights** pour chaque composant.
 
 ## Structure du dépôt

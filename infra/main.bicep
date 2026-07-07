@@ -50,19 +50,6 @@ module identity 'modules/identity.bicep' = {
   }
 }
 
-module keyVault 'modules/keyvault.bicep' = {
-  name: 'keyvault'
-  scope: resourceGroup
-  params: {
-    location: location
-    tags: tags
-    keyVaultName: 'kv-${resourceToken}'
-    readerPrincipalIds: [
-      identity.outputs.identityPrincipalId
-    ]
-  }
-}
-
 module storage 'modules/storage.bicep' = {
   name: 'storage'
   scope: resourceGroup
@@ -96,7 +83,6 @@ module speech 'modules/speech.bicep' = {
     location: location
     tags: tags
     speechAccountName: 'speech-${resourceToken}'
-    keyVaultName: keyVault.outputs.keyVaultName
     userPrincipalIds: [
       identity.outputs.identityPrincipalId
     ]
@@ -182,7 +168,6 @@ module functions 'modules/functions.bicep' = {
     cosmosDatabase: cosmos.outputs.databaseName
     cosmosContainer: cosmos.outputs.containerName
     speechEndpoint: speech.outputs.speechEndpoint
-    keyVaultUri: keyVault.outputs.keyVaultUri
     speechLanguage: speechLanguage
   }
 }
@@ -233,7 +218,6 @@ output AZURE_PURGE_WORKFLOW_NAME string = logicApps.outputs.purgeWorkflowName
 output COSMOS_ENDPOINT string = cosmos.outputs.endpoint
 output STORAGE_BLOB_ENDPOINT string = storage.outputs.blobEndpoint
 output SPEECH_ENDPOINT string = speech.outputs.speechEndpoint
-output KEY_VAULT_URI string = keyVault.outputs.keyVaultUri
 output APPLICATIONINSIGHTS_CONNECTION_STRING string = monitoring.outputs.applicationInsightsConnectionString
 
 // Managed identity resource id (retained for reference by external tooling).

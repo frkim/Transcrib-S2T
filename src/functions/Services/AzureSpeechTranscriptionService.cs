@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using Azure.Core;
 using Microsoft.Extensions.Logging;
 
 namespace Transcrib.Functions.Services;
@@ -10,22 +11,26 @@ namespace Transcrib.Functions.Services;
 /// synchronous Fast Transcription REST API. The service decodes compressed audio
 /// (MP3, etc.) server-side, so no local GStreamer/codec is required on the host.
 /// Diarization is enabled so each phrase is attributed to a speaker.
+/// Authentication uses Microsoft Entra ID (Managed Identity) — no subscription key.
 /// </summary>
 public class AzureSpeechTranscriptionService : ITranscriptionService
 {
     private const string ApiVersion = "2024-11-15";
     private const int MaxSpeakers = 10;
 
+    // Entra ID scope for Azure AI / Cognitive Services data-plane access.
+    private static readonly string[] Scopes = ["https://cognitiveservices.azure.com/.default"];
+
     private readonly string _endpoint;
-    private readonly string _key;
+    private readonly TokenCredential _credential;
     private readonly string _language;
     private readonly ILogger<AzureSpeechTranscriptionService> _logger;
     private readonly HttpClient _httpClient;
 
-    public AzureSpeechTranscriptionService(string endpoint, string key, string language, ILogger<AzureSpeechTranscriptionService> logger)
+    public AzureSpeechTranscriptionService(string endpoint, TokenCredential credential, string language, ILogger<AzureSpeechTranscriptionService> logger)
     {
         _endpoint = endpoint;
-        _key = key;
+        _credential = credential;
         _language = language;
         _logger = logger;
         _httpClient = new HttpClient { Timeout = TimeSpan.FromMinutes(5) };
@@ -56,7 +61,9 @@ public class AzureSpeechTranscriptionService : ITranscriptionService
         form.Add(definitionContent, "definition");
 
         using var request = new HttpRequestMessage(HttpMethod.Post, requestUri) { Content = form };
-        request.Headers.Add("Ocp-Apim-Subscription-Key", _key);
+
+        var token = await _credential.GetTokenAsync(new TokenRequestContext(Scopes), cancellationToken);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
 
         using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         var payload = await response.Content.ReadAsStringAsync(cancellationToken);

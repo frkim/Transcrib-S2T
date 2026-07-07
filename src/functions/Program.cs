@@ -44,16 +44,14 @@ builder.Services.AddSingleton(_ =>
 });
 builder.Services.AddSingleton<IBlobStorageService, AzureBlobStorageService>();
 
-// Azure AI Speech (diarization enabled).
+// Azure AI Speech (diarization enabled) — authenticated via Managed Identity.
 builder.Services.AddSingleton<ITranscriptionService>(sp =>
 {
     var endpoint = configuration["Speech__Endpoint"] ?? configuration["Speech:Endpoint"]
         ?? throw new InvalidOperationException("Speech endpoint is not configured.");
-    var key = configuration["Speech__Key"] ?? configuration["Speech:Key"]
-        ?? throw new InvalidOperationException("Speech key is not configured.");
     var language = configuration["Speech__Language"] ?? configuration["Speech:Language"] ?? "fr-FR";
     var logger = sp.GetRequiredService<ILogger<AzureSpeechTranscriptionService>>();
-    return new AzureSpeechTranscriptionService(endpoint, key, language, logger);
+    return new AzureSpeechTranscriptionService(endpoint, credential, language, logger);
 });
 
 builder.Services.AddSingleton<TranscriptionProcessor>();

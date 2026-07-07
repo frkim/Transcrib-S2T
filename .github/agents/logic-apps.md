@@ -19,7 +19,7 @@ Tu implémentes l'**Approche 1 — Low Code** : le workflow de transcription en 
 ## Conventions techniques
 
 - Définition de workflow versionnée (JSON `workflow.json` / Standard Logic App) pour permettre le déploiement via Bicep et `azd`.
-- Connexions via **Managed Identity** ; secrets référencés depuis **Key Vault**.
+- Connexions via **Managed Identity** ; aucun secret applicatif (auth Entra ID pour Speech).
 - Configurer le **scope `run after`** pour la branche d'erreur (gestion des échecs).
 - **Observabilité** via Application Insights / diagnostics Logic Apps.
 
