@@ -121,6 +121,21 @@ avec **diarization** activée (`maxSpeakers = 10`).
 5. **Cohérence Pro Code / Low Code** — la même API REST est invoquée par la
    Function et par le workflow Logic App, garantissant des résultats équivalents.
 
+### Format du transcript
+
+Chaque phrase est écrite sur une ligne préfixée par sa **plage temporelle**
+`[début → fin]` (au format `hh:mm:ss`, dérivée de `offsetMilliseconds` /
+`durationMilliseconds` renvoyés par l'API) et par son locuteur :
+
+```text
+[00:00:03 → 00:00:07] Speaker 1: Bonjour, merci d'être là aujourd'hui.
+[00:00:07 → 00:00:11] Speaker 2: Avec plaisir, ravi de participer.
+```
+
+Les deux chemins (Function pro-code et workflow Logic App low-code) produisent
+le même format. En l'absence de phrases diarizées, le texte combiné
+(`combinedPhrases`) est utilisé en repli, sans horodatage.
+
 > Authentification de l'appel Speech : par **Managed Identity** (Entra ID,
 > audience `https://cognitiveservices.azure.com`) côté Function **et** côté Logic
 > App. L'authentification par clé est désactivée sur la ressource Speech

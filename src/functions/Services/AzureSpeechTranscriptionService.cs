@@ -79,9 +79,10 @@ public class AzureSpeechTranscriptionService : ITranscriptionService
 
     /// <summary>
     /// Builds a human-readable transcript from the Fast Transcription response,
-    /// attributing each phrase to its diarized speaker.
+    /// attributing each phrase to its diarized speaker and prefixing it with the
+    /// <c>[start → end]</c> time range (extracted from the phrase offset/duration).
     /// </summary>
-    private static string BuildTranscript(string payload)
+    internal static string BuildTranscript(string payload)
     {
         using var doc = JsonDocument.Parse(payload);
         var root = doc.RootElement;
@@ -102,7 +103,17 @@ public class AzureSpeechTranscriptionService : ITranscriptionService
                     ? s.GetInt32().ToString()
                     : "Unknown";
 
-                transcript.AppendLine($"Speaker {speaker}: {text}");
+                var offset = phrase.TryGetProperty("offsetMilliseconds", out var o) && o.ValueKind == JsonValueKind.Number
+                    ? o.GetInt64()
+                    : 0L;
+                var duration = phrase.TryGetProperty("durationMilliseconds", out var d) && d.ValueKind == JsonValueKind.Number
+                    ? d.GetInt64()
+                    : 0L;
+
+                var start = FormatTimestamp(offset);
+                var end = FormatTimestamp(offset + duration);
+
+                transcript.AppendLine($"[{start} → {end}] Speaker {speaker}: {text}");
             }
         }
         else if (root.TryGetProperty("combinedPhrases", out var combined) && combined.ValueKind == JsonValueKind.Array)
@@ -119,4 +130,10 @@ public class AzureSpeechTranscriptionService : ITranscriptionService
 
         return transcript.ToString().TrimEnd();
     }
+
+    /// <summary>
+    /// Formats a millisecond offset as an <c>hh:mm:ss</c> timestamp.
+    /// </summary>
+    private static string FormatTimestamp(long milliseconds) =>
+        TimeSpan.FromMilliseconds(milliseconds).ToString(@"hh\:mm\:ss");
 }

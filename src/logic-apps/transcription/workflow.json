@@ -92,11 +92,23 @@
                 ]
               }
             },
-            "Build_transcript": {
-              "type": "Compose",
-              "inputs": "@if(greater(length(coalesce(body('Transcribe_with_Azure_AI_Speech')?['combinedPhrases'], json('[]'))), 0), body('Transcribe_with_Azure_AI_Speech')?['combinedPhrases'][0]?['text'], '')",
+            "Select_transcript_lines": {
+              "type": "Select",
+              "inputs": {
+                "from": "@coalesce(body('Transcribe_with_Azure_AI_Speech')?['phrases'], json('[]'))",
+                "select": "[@{addToTime('1970-01-01T00:00:00Z', div(item()?['offsetMilliseconds'], 1000), 'Second', 'HH:mm:ss')} → @{addToTime('1970-01-01T00:00:00Z', div(add(coalesce(item()?['offsetMilliseconds'], 0), coalesce(item()?['durationMilliseconds'], 0)), 1000), 'Second', 'HH:mm:ss')}] Speaker @{coalesce(item()?['speaker'], '?')}: @{item()?['text']}"
+              },
               "runAfter": {
                 "Transcribe_with_Azure_AI_Speech": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Build_transcript": {
+              "type": "Compose",
+              "inputs": "@if(greater(length(coalesce(body('Transcribe_with_Azure_AI_Speech')?['phrases'], json('[]'))), 0), join(body('Select_transcript_lines'), decodeUriComponent('%0A')), if(greater(length(coalesce(body('Transcribe_with_Azure_AI_Speech')?['combinedPhrases'], json('[]'))), 0), body('Transcribe_with_Azure_AI_Speech')?['combinedPhrases'][0]?['text'], ''))",
+              "runAfter": {
+                "Select_transcript_lines": [
                   "Succeeded"
                 ]
               }
