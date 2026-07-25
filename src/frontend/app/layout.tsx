@@ -19,7 +19,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Transcrib-S2T",
-  description: "Upload MP3 files and download speech-to-text transcripts.",
+  description: "Transcrivez vos fichiers audio et analysez la qualité du discours client.",
 };
 
 export default function RootLayout({
@@ -28,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="fr">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>

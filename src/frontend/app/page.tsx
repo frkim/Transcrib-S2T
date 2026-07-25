@@ -1,17 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import AppBar from "@mui/material/AppBar";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
-import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import GraphicEqIcon from "@mui/icons-material/GraphicEq";
 import type { TranscriptionJob } from "@/lib/types";
 import { deleteJob, listJobs } from "@/lib/api";
+import AppHeader from "@/components/AppHeader";
 import UploadForm from "@/components/UploadForm";
 import JobList from "@/components/JobList";
 
@@ -59,37 +57,32 @@ export default function Home() {
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
-      <AppBar position="static" elevation={0}>
-        <Toolbar>
-          <GraphicEqIcon sx={{ mr: 1.5 }} />
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Transcrib-S2T
-          </Typography>
-        </Toolbar>
-      </AppBar>
+      <AppHeader />
 
-      <Container maxWidth="md" sx={{ py: 4 }}>
+      <Container maxWidth="lg" sx={{ py: { xs: 3, md: 4 } }}>
         <Stack spacing={4}>
           <Box>
-            <Typography variant="h1" gutterBottom>
-              Speech-to-Text Transcription
+            <Typography variant="overline" color="primary.main" sx={{ fontWeight: 800 }}>
+              Transcription audio
             </Typography>
-            <Typography color="text.secondary">
-              Upload one or more MP3 files to generate speech-to-text
-              transcripts.
+            <Typography variant="h1" gutterBottom>
+              Transformez vos conversations en données exploitables
+            </Typography>
+            <Typography color="text.secondary" sx={{ fontSize: 17, maxWidth: 760 }}>
+              Déposez un ou plusieurs MP3, suivez leur traitement et ouvrez les transcripts terminés dans l’espace d’analyse qualitative.
             </Typography>
           </Box>
 
           <Paper variant="outlined" sx={{ p: 3 }}>
             <Typography variant="h2" gutterBottom>
-              Upload
+              Nouveaux fichiers audio
             </Typography>
             <UploadForm onUploaded={() => setReloadToken((t) => t + 1)} />
           </Paper>
 
           <Box>
             <Typography variant="h2" gutterBottom>
-              Jobs
+              Transcriptions
             </Typography>
             {error && (
               <Alert severity="error" role="alert" sx={{ mb: 2 }}>

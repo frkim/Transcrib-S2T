@@ -5,7 +5,10 @@ Solution Azure **event-driven** de transcription de fichiers audio **MP3 → tex
 
 Un utilisateur dépose un ou plusieurs MP3, un job de transcription est créé
 automatiquement, le transcript est généré puis stocké, le statut est suivi, et
-les fichiers de plus d'un jour sont purgés quotidiennement.
+les fichiers de plus d'un jour sont purgés quotidiennement. Les transcripts
+terminés peuvent ensuite être sélectionnés dans l'espace **Analyse qualité**
+pour évaluer le discours, comparer jusqu'à cinq conversations et générer un
+plan de coaching et des rapports exportables.
 
 ## Architecture
 
@@ -79,7 +82,7 @@ Les **deux approches** de transcription (Functions *Pro Code* et Logic Apps
 | `src/api` | API C# (ASP.NET Core Minimal API) déployée sur Container Apps. |
 | `src/functions` | Pipeline de transcription **Pro Code** (Azure Functions .NET isolated, blob trigger). |
 | `src/logic-apps` | Workflows **Low Code** (Logic Apps *Consumption*) : `transcription/` + `purge/`. |
-| `src/frontend` | Application web **Next.js**. |
+| `src/frontend` | Application web **Next.js** : upload, suivi, téléchargement et analyse qualitative V4.1 des transcripts. |
 | `infra` | Infrastructure-as-Code **Bicep** + `main.parameters.json`. |
 | `tests` | Tests unitaires xUnit (API + Functions). |
 | `azure.yaml` | Configuration `azd` (déploiement de bout en bout). |

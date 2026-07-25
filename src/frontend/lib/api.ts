@@ -16,6 +16,27 @@ export async function listJobs(): Promise<TranscriptionJob[]> {
   return (await response.json()) as TranscriptionJob[];
 }
 
+/** Loads one transcription job. */
+export async function getJob(jobId: string): Promise<TranscriptionJob> {
+  const response = await fetch(url(`/jobs/${jobId}`), { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error(`Failed to load job (${response.status})`);
+  }
+  return (await response.json()) as TranscriptionJob;
+}
+
+/** Loads the UTF-8 transcript content through the API. */
+export async function getTranscript(jobId: string): Promise<string> {
+  const response = await fetch(url(`/jobs/${jobId}/transcript`), {
+    cache: "no-store",
+    headers: { Accept: "text/plain" },
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to load transcript (${response.status})`);
+  }
+  return response.text();
+}
+
 /** Uploads one or more MP3 files to create transcription jobs. */
 export async function uploadJobs(files: File[]): Promise<void> {
   const form = new FormData();

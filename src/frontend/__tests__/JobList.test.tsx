@@ -20,10 +20,10 @@ function job(overrides: Partial<TranscriptionJob>): TranscriptionJob {
 describe("JobList", () => {
   it("renders an empty state", () => {
     render(<JobList jobs={[]} />);
-    expect(screen.getByText(/no transcription jobs/i)).toBeInTheDocument();
+    expect(screen.getByText(/aucune transcription/i)).toBeInTheDocument();
   });
 
-  it("shows a download link only for completed jobs", () => {
+  it("shows download and analysis links only for completed jobs", () => {
     render(
       <JobList
         jobs={[
@@ -34,9 +34,13 @@ describe("JobList", () => {
     );
 
     expect(screen.getByText("a.mp3")).toBeInTheDocument();
-    const links = screen.getAllByRole("link", { name: /download/i });
-    expect(links).toHaveLength(1);
-    expect(links[0]).toHaveAttribute("href", expect.stringContaining("/jobs/2/transcript"));
+    const downloadLinks = screen.getAllByRole("link", { name: /télécharger/i });
+    expect(downloadLinks).toHaveLength(1);
+    expect(downloadLinks[0]).toHaveAttribute("href", expect.stringContaining("/jobs/2/transcript"));
+
+    const analysisLinks = screen.getAllByRole("link", { name: /analyser/i });
+    expect(analysisLinks).toHaveLength(1);
+    expect(analysisLinks[0]).toHaveAttribute("href", "/analysis?job=2");
   });
 
   it("shows a processing indicator for processing jobs", () => {
@@ -54,7 +58,7 @@ describe("JobList", () => {
     );
 
     await userEvent.click(
-      screen.getByRole("button", { name: /delete talk.mp3/i })
+      screen.getByRole("button", { name: /supprimer talk.mp3/i })
     );
     expect(onDelete).toHaveBeenCalledWith("42");
   });

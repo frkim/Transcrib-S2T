@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
@@ -15,6 +16,7 @@ import TableRow from "@mui/material/TableRow";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import AnalyticsOutlinedIcon from "@mui/icons-material/AnalyticsOutlined";
 import DownloadIcon from "@mui/icons-material/Download";
 import type { JobStatus, TranscriptionJob } from "@/lib/types";
 import {
@@ -102,7 +104,7 @@ export default function JobList({ jobs, onDelete }: JobListProps) {
 
   if (jobs.length === 0) {
     return (
-      <Typography color="text.secondary">No transcription jobs yet.</Typography>
+      <Typography color="text.secondary">Aucune transcription pour le moment.</Typography>
     );
   }
 
@@ -120,13 +122,13 @@ export default function JobList({ jobs, onDelete }: JobListProps) {
 
   return (
     <TableContainer component={Paper} variant="outlined">
-      <Table aria-label="transcription jobs">
+      <Table aria-label="transcriptions">
         <TableHead>
           <TableRow>
-            <TableCell>File</TableCell>
-            <TableCell>Status</TableCell>
-            <TableCell>Created</TableCell>
-            <TableCell>Duration</TableCell>
+            <TableCell>Fichier</TableCell>
+            <TableCell>Statut</TableCell>
+            <TableCell>Créé le</TableCell>
+            <TableCell>Durée</TableCell>
             <TableCell>Transcript</TableCell>
             <TableCell align="right">Actions</TableCell>
           </TableRow>
@@ -144,11 +146,11 @@ export default function JobList({ jobs, onDelete }: JobListProps) {
               </TableCell>
               <TableCell>
                 {canDownloadTranscript(job.status) ? (
-                  <Tooltip title="Download transcript">
+                  <Tooltip title="Télécharger le transcript">
                     <IconButton
                       component="a"
                       href={transcriptUrl(job.id)}
-                      aria-label={`download transcript for ${job.fileName}`}
+                      aria-label={`télécharger le transcript de ${job.fileName}`}
                       size="small"
                       color="primary"
                     >
@@ -170,10 +172,23 @@ export default function JobList({ jobs, onDelete }: JobListProps) {
                 )}
               </TableCell>
               <TableCell align="right">
-                <Tooltip title="Delete job">
+                {canDownloadTranscript(job.status) && (
+                  <Tooltip title="Analyser la conversation">
+                    <IconButton
+                      component={Link}
+                      href={`/analysis?job=${encodeURIComponent(job.id)}`}
+                      aria-label={`analyser ${job.fileName}`}
+                      size="small"
+                      color="primary"
+                    >
+                      <AnalyticsOutlinedIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                <Tooltip title="Supprimer le job">
                   <span>
                     <IconButton
-                      aria-label={`delete ${job.fileName}`}
+                      aria-label={`supprimer ${job.fileName}`}
                       size="small"
                       color="error"
                       disabled={!onDelete || deletingId === job.id}

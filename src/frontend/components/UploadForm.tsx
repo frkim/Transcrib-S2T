@@ -29,28 +29,28 @@ export default function UploadForm({ onUploaded }: UploadFormProps) {
 
     const selected = Array.from(inputRef.current?.files ?? []);
     if (selected.length === 0) {
-      setError("Please select at least one MP3 file.");
+      setError("Sélectionnez au moins un fichier MP3.");
       return;
     }
 
     const { accepted, rejected } = partitionMp3Files(selected);
     if (accepted.length === 0) {
-      setError("Only .mp3 files are accepted.");
+      setError("Seuls les fichiers .mp3 sont acceptés.");
       return;
     }
 
     setBusy(true);
     try {
       await uploadJobs(accepted as File[]);
-      const skipped = rejected.length > 0 ? ` (skipped: ${rejected.join(", ")})` : "";
-      setMessage(`Uploaded ${accepted.length} file(s)${skipped}.`);
+      const skipped = rejected.length > 0 ? ` (ignorés : ${rejected.join(", ")})` : "";
+      setMessage(`${accepted.length} fichier(s) envoyé(s)${skipped}.`);
       if (inputRef.current) {
         inputRef.current.value = "";
       }
       setFileCount(0);
       onUploaded();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed.");
+      setError(err instanceof Error ? err.message : "L’envoi a échoué.");
     } finally {
       setBusy(false);
     }
@@ -74,7 +74,7 @@ export default function UploadForm({ onUploaded }: UploadFormProps) {
             startIcon={<CloudUploadIcon />}
             disabled={busy}
           >
-            Choose MP3 files
+            Choisir des fichiers MP3
             <input
               ref={inputRef}
               type="file"
@@ -88,7 +88,7 @@ export default function UploadForm({ onUploaded }: UploadFormProps) {
           </Button>
           {fileCount > 0 && (
             <Typography variant="body2" color="text.secondary">
-              {fileCount} file(s) selected
+              {fileCount} fichier(s) sélectionné(s)
             </Typography>
           )}
           <Button
@@ -99,7 +99,7 @@ export default function UploadForm({ onUploaded }: UploadFormProps) {
               busy ? <CircularProgress size={18} color="inherit" /> : undefined
             }
           >
-            {busy ? "Uploading…" : "Upload"}
+            {busy ? "Envoi…" : "Envoyer"}
           </Button>
         </Box>
         {message && (

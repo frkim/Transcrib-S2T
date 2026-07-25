@@ -57,7 +57,7 @@ flowchart TD
 
 | Composant | Technologie | Hébergement | Rôle |
 | --- | --- | --- | --- |
-| Frontend | Next.js (App Router), React | Azure Container Apps | Upload MP3 (single + multi), suivi des jobs, téléchargement des transcripts. |
+| Frontend | Next.js (App Router), React | Azure Container Apps | Upload MP3, suivi des jobs, téléchargement et analyse qualitative consolidée des transcripts. |
 | Backend API | C# / ASP.NET Core Minimal API | Azure Container Apps | Réception des uploads, création/consultation des jobs, exposition des transcripts. |
 | Bibliothèque partagée | C# (`src/shared`) | — | Modèle `TranscriptionJob`, repository Cosmos, accès Blob, validation MP3. |
 | Pipeline Pro Code | Azure Functions .NET isolated | Azure Functions (Consumption) | Transcription déclenchée par Event Grid sur dépôt de blob. |
@@ -67,6 +67,25 @@ flowchart TD
 | Métadonnées jobs | Azure Cosmos DB | PaaS | Conteneur `jobs` (partition `/id`). |
 | Routage d'événements | Azure Event Grid | PaaS | Notification « blob créé » vers Functions / Logic Apps. |
 | Observabilité | Application Insights | PaaS | Logs et traces pour chaque composant. |
+
+## Analyse qualitative des conversations
+
+La route frontend `/analysis` permet de sélectionner jusqu'à cinq jobs
+`Completed`. Le navigateur charge leur contenu texte via
+`GET /jobs/{id}/transcript` : l'URL Blob privée n'est jamais exposée ni appelée
+directement. Les jobs `Processing`, `Failed` ou `Purged` ne sont pas proposés,
+car aucun transcript exploitable n'est garanti pour ces états.
+
+L'analyse V4.1 est exécutée localement dans le navigateur. Elle évalue sept
+étapes pondérées (accueil, identification, écoute active, reformulation,
+questionnement, résolution et conclusion), détecte les signaux sensibles et
+les frictions, extrait des preuves, puis produit une synthèse, un plan de
+coaching sur 90 jours et des exports TXT, JSON, CSV, HTML et EML. Aucun contenu
+de conversation n'est envoyé à un service d'analyse supplémentaire.
+
+L'espace accepte aussi des fichiers locaux TXT, SRT et VTT et une saisie
+manuelle. Le moteur tolère le texte libre, mais la fiabilité est meilleure avec
+des lignes identifiées `Speaker 1` / `Speaker 2` ou `Conseiller` / `Client`.
 
 ## Services Azure (inventaire complet)
 
