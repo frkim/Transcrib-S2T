@@ -24,6 +24,13 @@ jobs:
       SPEECH_LANGUAGE: ${{ vars.SPEECH_LANGUAGE }}
       AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
       AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
+      AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+      AZURE_CONTAINER_REGISTRY_ENDPOINT: ${{ vars.AZURE_CONTAINER_REGISTRY_ENDPOINT }}
+      SERVICE_API_NAME: ${{ vars.SERVICE_API_NAME }}
+      SERVICE_API_ENDPOINT_URL: ${{ vars.SERVICE_API_ENDPOINT_URL }}
+      SERVICE_FRONTEND_NAME: ${{ vars.SERVICE_FRONTEND_NAME }}
+      SERVICE_FRONTEND_ENDPOINT_URL: ${{ vars.SERVICE_FRONTEND_ENDPOINT_URL }}
+      SERVICE_FUNCTIONS_NAME: ${{ vars.SERVICE_FUNCTIONS_NAME }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,9 +45,9 @@ jobs:
         shell: pwsh
 
 
-      - name: Provision Infrastructure
-        run: azd provision --no-prompt
-
+      # Infrastructure changes are provisioned deliberately from a validated
+      # environment. Pushes to main only deploy application revisions, which
+      # keeps this workflow's OIDC identity scoped to the resource group.
       - name: Deploy Application
-        run: azd deploy --no-prompt
+        run: azd deploy frontend --no-prompt
         
