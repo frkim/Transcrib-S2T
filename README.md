@@ -101,6 +101,23 @@ Les **deux approches** de transcription (Functions *Pro Code* et Logic Apps
 L'authentification **Entra ID** est activée automatiquement dès que la section
 `AzureAd` (`ClientId`/`TenantId`) est configurée.
 
+### Limites d'utilisation
+
+Le endpoint `POST /jobs` applique des quotas (configurables via la section
+`TranscriptionLimits` de `appsettings.json`) :
+
+| Limite | Valeur par défaut | Clé de configuration |
+| --- | --- | --- |
+| Transcriptions par jour | 3 | `MaxPerDay` |
+| Transcriptions par semaine | 10 | `MaxPerWeek` |
+| Durée maximale par fichier | 5 minutes | `MaxDurationMinutes` |
+
+Les quotas sont appliqués globalement sur des fenêtres glissantes (24 h et 7 j)
+à partir de la date de création des jobs. Un fichier dépassant la durée maximale
+est rejeté avec sa raison ; lorsqu'un quota est atteint et qu'aucun job n'est
+créé, l'API répond `429 Too Many Requests`. Dans tous les cas, le corps de la
+réponse contient la liste `rejected` (`fileName`, `reason`).
+
 ## Déploiement
 
 Prérequis : [Azure Developer CLI (`azd`)](https://aka.ms/azd), .NET 10 SDK,

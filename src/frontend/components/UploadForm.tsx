@@ -15,6 +15,11 @@ interface UploadFormProps {
   onUploaded: () => void;
 }
 
+// Kept in sync with the API's TranscriptionLimits configuration.
+const MAX_PER_DAY = 3;
+const MAX_PER_WEEK = 10;
+const MAX_DURATION_MINUTES = 5;
+
 export default function UploadForm({ onUploaded }: UploadFormProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -41,14 +46,31 @@ export default function UploadForm({ onUploaded }: UploadFormProps) {
 
     setBusy(true);
     try {
-      await uploadJobs(accepted as File[]);
-      const skipped = rejected.length > 0 ? ` (ignorés : ${rejected.join(", ")})` : "";
-      setMessage(`${accepted.length} fichier(s) envoyé(s)${skipped}.`);
+      const result = await uploadJobs(accepted as File[]);
+
+      // Combine client-side non-MP3 skips with server-side rejections
+      // (too long / daily / weekly quota).
+      const serverRejections = result.rejected.map(
+        (r) => `${r.fileName} — ${r.reason}`,
+      );
+      const details = [...rejected, ...serverRejections];
+      const suffix = details.length > 0 ? ` (ignorés : ${details.join(", ")})` : "";
+
+      if (result.created.length === 0) {
+        setError(
+          result.limitReached
+            ? `Limite atteinte : maximum ${MAX_PER_DAY} transcriptions par jour et ${MAX_PER_WEEK} par semaine.${suffix}`
+            : `Aucun fichier n’a été accepté.${suffix}`,
+        );
+      } else {
+        setMessage(`${result.created.length} fichier(s) envoyé(s)${suffix}.`);
+        onUploaded();
+      }
+
       if (inputRef.current) {
         inputRef.current.value = "";
       }
       setFileCount(0);
-      onUploaded();
     } catch (err) {
       setError(err instanceof Error ? err.message : "L’envoi a échoué.");
     } finally {
@@ -102,6 +124,10 @@ export default function UploadForm({ onUploaded }: UploadFormProps) {
             {busy ? "Envoi…" : "Envoyer"}
           </Button>
         </Box>
+        <Typography variant="body2" color="text.secondary">
+          Limites : {MAX_PER_DAY} transcriptions par jour, {MAX_PER_WEEK} par
+          semaine, et {MAX_DURATION_MINUTES} minutes maximum par fichier.
+        </Typography>
         {message && (
           <Alert severity="success" role="status" sx={{ width: "100%" }}>
             {message}

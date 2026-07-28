@@ -37,8 +37,22 @@ export async function getTranscript(jobId: string): Promise<string> {
   return response.text();
 }
 
+/** A file the API refused, with the reason why. */
+export interface RejectedUpload {
+  fileName: string;
+  reason: string;
+}
+
+/** Outcome of an upload request. */
+export interface UploadResult {
+  created: TranscriptionJob[];
+  rejected: RejectedUpload[];
+  /** True when a daily/weekly quota was hit and nothing was created (HTTP 429). */
+  limitReached: boolean;
+}
+
 /** Uploads one or more MP3 files to create transcription jobs. */
-export async function uploadJobs(files: File[]): Promise<void> {
+export async function uploadJobs(files: File[]): Promise<UploadResult> {
   const form = new FormData();
   for (const file of files) {
     form.append("files", file, file.name);
@@ -49,10 +63,29 @@ export async function uploadJobs(files: File[]): Promise<void> {
     body: form,
   });
 
-  if (!response.ok) {
-    const message = await response.text();
-    throw new Error(`Upload failed (${response.status}): ${message}`);
+  // 201 Created (some created), 400 Bad Request (none valid) and
+  // 429 Too Many Requests (quota hit) all carry a JSON body describing the
+  // created jobs and/or the per-file rejection reasons.
+  type UploadResponseBody = {
+    created?: TranscriptionJob[];
+    rejected?: RejectedUpload[];
+  };
+  let body: UploadResponseBody | null = null;
+  try {
+    body = (await response.json()) as UploadResponseBody;
+  } catch {
+    body = null;
   }
+
+  if (response.status === 201 || response.status === 400 || response.status === 429) {
+    return {
+      created: body?.created ?? [],
+      rejected: body?.rejected ?? [],
+      limitReached: response.status === 429,
+    };
+  }
+
+  throw new Error(`Upload failed (${response.status})`);
 }
 
 /** Builds the transcript download URL for a job. */

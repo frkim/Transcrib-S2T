@@ -50,6 +50,14 @@ builder.Services.AddSingleton(_ =>
 });
 builder.Services.AddSingleton<IBlobStorageService, AzureBlobStorageService>();
 
+// Audio duration probe used to enforce the maximum conversation length.
+builder.Services.AddSingleton<IAudioDurationProbe, Mp3DurationProbe>();
+
+// Upload quotas (per day / per week) and maximum audio length.
+var limits = builder.Configuration.GetSection("TranscriptionLimits").Get<TranscriptionLimits>()
+    ?? new TranscriptionLimits();
+builder.Services.AddSingleton(limits);
+
 builder.Services.AddScoped<JobService>();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -100,7 +108,13 @@ jobs.MapPost("/", async (HttpRequest request, JobService service, CancellationTo
     var result = await service.CreateJobsAsync(uploads, ct);
     if (result.Created.Count == 0)
     {
-        return Results.BadRequest(new { error = "No valid MP3 files were uploaded.", rejected = result.Rejected });
+        // A quota being hit is a rate-limit condition (429); anything else is a
+        // client input problem (400).
+        return result.LimitReached
+            ? Results.Json(
+                new { error = "Transcription limit reached.", rejected = result.Rejected },
+                statusCode: StatusCodes.Status429TooManyRequests)
+            : Results.BadRequest(new { error = "No valid MP3 files were uploaded.", rejected = result.Rejected });
     }
 
     return Results.Created("/jobs", new { created = result.Created, rejected = result.Rejected });

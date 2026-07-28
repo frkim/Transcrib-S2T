@@ -8,11 +8,20 @@ namespace Transcrib.Api.Tests;
 
 public class JobServiceTests
 {
-    private static JobService CreateService(out InMemoryJobRepository jobs, out InMemoryBlobStorageService blobs)
+    private static JobService CreateService(
+        out InMemoryJobRepository jobs,
+        out InMemoryBlobStorageService blobs,
+        TranscriptionLimits? limits = null,
+        TimeSpan? duration = null)
     {
         jobs = new InMemoryJobRepository();
         blobs = new InMemoryBlobStorageService();
-        return new JobService(jobs, blobs, NullLogger<JobService>.Instance);
+        return new JobService(
+            jobs,
+            blobs,
+            new FakeAudioDurationProbe(duration),
+            limits ?? new TranscriptionLimits(),
+            NullLogger<JobService>.Instance);
     }
 
     private static UploadFile Mp3(string name = "sample.mp3")
@@ -54,9 +63,81 @@ public class JobServiceTests
         });
 
         Assert.Empty(result.Created);
-        Assert.Equal("notes.txt", Assert.Single(result.Rejected));
+        Assert.Equal("notes.txt", Assert.Single(result.Rejected).FileName);
+    }
+    [Fact]
+    public async Task CreateJobsAsync_TooLong_IsRejected()
+    {
+        var service = CreateService(out _, out _, duration: TimeSpan.FromMinutes(6));
+
+        var result = await service.CreateJobsAsync(new[] { Mp3() });
+
+        Assert.Empty(result.Created);
+        var rejected = Assert.Single(result.Rejected);
+        Assert.Equal("sample.mp3", rejected.FileName);
+        Assert.Contains("too long", rejected.Reason, StringComparison.OrdinalIgnoreCase);
     }
 
+    [Fact]
+    public async Task CreateJobsAsync_UnderDurationLimit_IsAccepted()
+    {
+        var service = CreateService(out _, out _, duration: TimeSpan.FromMinutes(4));
+
+        var result = await service.CreateJobsAsync(new[] { Mp3() });
+
+        Assert.Single(result.Created);
+        Assert.Empty(result.Rejected);
+    }
+
+    [Fact]
+    public async Task CreateJobsAsync_DailyLimit_RejectsExcess()
+    {
+        var limits = new TranscriptionLimits { MaxPerDay = 3, MaxPerWeek = 10 };
+        var service = CreateService(out _, out _, limits);
+
+        var result = await service.CreateJobsAsync(new[]
+        {
+            Mp3("a.mp3"), Mp3("b.mp3"), Mp3("c.mp3"), Mp3("d.mp3")
+        });
+
+        Assert.Equal(3, result.Created.Count);
+        var rejected = Assert.Single(result.Rejected);
+        Assert.Equal("d.mp3", rejected.FileName);
+        Assert.True(result.LimitReached);
+    }
+
+    [Fact]
+    public async Task CreateJobsAsync_DailyLimit_CountsExistingJobsInWindow()
+    {
+        var limits = new TranscriptionLimits { MaxPerDay = 3, MaxPerWeek = 10 };
+        var service = CreateService(out var jobs, out _, limits);
+        for (var i = 0; i < 3; i++)
+        {
+            await jobs.CreateAsync(new TranscriptionJob { FileName = $"old-{i}.mp3" });
+        }
+
+        var result = await service.CreateJobsAsync(new[] { Mp3("new.mp3") });
+
+        Assert.Empty(result.Created);
+        Assert.True(result.LimitReached);
+        Assert.Equal("new.mp3", Assert.Single(result.Rejected).FileName);
+    }
+
+    [Fact]
+    public async Task CreateJobsAsync_WeeklyLimit_RejectsExcess()
+    {
+        var limits = new TranscriptionLimits { MaxPerDay = 100, MaxPerWeek = 2 };
+        var service = CreateService(out _, out _, limits);
+
+        var result = await service.CreateJobsAsync(new[]
+        {
+            Mp3("a.mp3"), Mp3("b.mp3"), Mp3("c.mp3")
+        });
+
+        Assert.Equal(2, result.Created.Count);
+        Assert.Equal("c.mp3", Assert.Single(result.Rejected).FileName);
+        Assert.True(result.LimitReached);
+    }
     [Fact]
     public async Task GetTranscriptAsync_WhenCompleted_ReturnsTranscript()
     {
