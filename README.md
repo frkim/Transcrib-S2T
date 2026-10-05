@@ -50,6 +50,8 @@ Les **deux approches** de transcription (Functions *Pro Code* et Logic Apps
 *Low Code*) sont fonctionnellement équivalentes et partagent les mêmes contrats.
 
 > Documentation d'architecture détaillée : [docs/architecture.md](docs/architecture.md).
+> Estimation des coûts (non-production / production sécurisée, transcription) :
+> [docs/pricing.md](docs/pricing.md).
 
 ## Contrats partagés
 

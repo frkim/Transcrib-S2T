@@ -320,7 +320,11 @@ services légèrement supérieurs).
 > À titre de comparaison, **sans** les optimisations (plan Logic App Standard
 > WS1 toujours actif + Container Apps `minReplicas=1` + Defender activé), le
 > total observé était de l'ordre de **~60–75 USD/mois**.
+>
+> Estimation détaillée (non-production vs production sécurisée, coût de la
+> transcription par heure d'audio et scénarios de volume) : [pricing.md](pricing.md).
 
 ## Références
 
 - Vue d'ensemble et guide de démarrage : [../README.md](../README.md).
+- Estimation des coûts : [pricing.md](pricing.md).
