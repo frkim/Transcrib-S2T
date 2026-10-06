@@ -322,7 +322,8 @@ services légèrement supérieurs).
 > total observé était de l'ordre de **~60–75 USD/mois**.
 >
 > Estimation détaillée (non-production vs production sécurisée, coût de la
-> transcription par heure d'audio et scénarios de volume) : [pricing.md](pricing.md).
+> transcription par heure d'audio, scénarios de volume et hypothèse centre
+> d'appel — DMT 7 min, 5 M audios/an) : [pricing.md](pricing.md).
 
 ## Références
 
