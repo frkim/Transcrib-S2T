@@ -340,6 +340,37 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 
 ---
 
+# Variante budgétaire : analyse échantillonnée
+
+<p class="kicker">Si la couverture exhaustive n'est pas requise, ne transcrire qu'un échantillon des appels réduit la facture Speech d'autant.</p>
+
+<div class="cols">
+<div>
+  <h2>Coût Azure annuel selon le taux</h2>
+
+| Taux | Fast, pay-as-you-go | Batch (option A) |
+| ---: | ---: | ---: |
+| 5 % | ~34–39 k€ | ~12–17 k€ |
+| 10 % | ~61–66 k€ | ~17–22 k€ |
+| **15 %** | **~88–94 k€** | **~22–28 k€** |
+| 25 % | ~143–149 k€ | ~33–39 k€ |
+| 50 % | ~278–286 k€ | ~58–66 k€ |
+| 100 % (référence) | ~548–562 k€ | ~109–122 k€ |
+
+<p class="small">Production sécurisée, 5 M d'appels/an × 7 min, échantillonnage à la source (téléphonie). Détail : docs/pricing.md.</p>
+</div>
+<div>
+  <h2>Quel taux retenir ?</h2>
+  <div class="card green" style="margin-bottom:12px"><h3>Pilotage global — 5 à 10 %</h3><p>Tendances, motifs d'appel, irritants : marge d'erreur inférieure à ±1 point.</p></div>
+  <div class="card teal" style="margin-bottom:12px"><h3>Coaching individuel — 15 à 25 %</h3><p>Ou un quota fixe de ~100–150 appels par conseiller et par mois (échantillonnage stratifié).</p></div>
+  <div class="card amber"><h3>Exhaustif — 100 %</h3><p>Conformité, litiges, détection systématique des signaux faibles.</p></div>
+</div>
+</div>
+
+<div class="callout">À <strong>15 % en Batch</strong>, retour sur investissement en <strong>~10 mois</strong> (au lieu de 13–14), gain de productivité préservé. En contrepartie, la couverture à 100 % est abandonnée : option budgétaire ou phase de montée en charge.</div>
+
+---
+
 # Risques maîtrisés
 
 | Risque | Niveau | Mitigation |

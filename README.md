@@ -55,6 +55,9 @@ Les **deux approches** de transcription (Functions *Pro Code* et Logic Apps
 > Dossier projet (expression de besoins, solution, offre financière, plan
 > projet estimatif) : [docs/dossier-projet.md](docs/dossier-projet.md), et sa
 > présentation Marp : [docs/presentations/](docs/presentations/transcrib-s2t.md).
+> Présentation en ligne (HTML) : [frkim.github.io/Transcrib-S2T](https://frkim.github.io/Transcrib-S2T/)
+> — également en [PDF](https://frkim.github.io/Transcrib-S2T/transcrib-s2t.pdf)
+> et [PPTX](https://frkim.github.io/Transcrib-S2T/transcrib-s2t.pptx).
 
 ## Contrats partagés
 
@@ -186,7 +189,7 @@ vers l'API.
   Marp (HTML, PDF, PPTX) à chaque modification de `docs/presentations/` et la
   publie en artefact `transcrib-s2t-presentation`. Sur `main` (push ou
   déclenchement manuel), la version HTML est aussi déployée sur **GitHub Pages**
-  (`https://<owner>.github.io/<repo>/`, PDF et PPTX téléchargeables via
+  ([frkim.github.io/Transcrib-S2T](https://frkim.github.io/Transcrib-S2T/), PDF et PPTX téléchargeables via
   `transcrib-s2t.pdf` / `transcrib-s2t.pptx`). Prérequis unique : *Settings →
   Pages → Source : GitHub Actions*. En local :
 
