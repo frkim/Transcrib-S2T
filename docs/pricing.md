@@ -32,6 +32,7 @@ par an).
 - [Environnement non-production](#environnement-non-production)
 - [Environnement de production sécurisé](#environnement-de-production-sécurisé)
 - [Hypothèse centre d'appel (DMT 7 min, 5 M audios/an)](#hypothèse-centre-dappel-dmt-7-min-5-m-audiosan)
+- [Variante centre d'appel : analyse échantillonnée](#variante-centre-dappel--analyse-échantillonnée)
 - [Synthèse](#synthèse)
 - [Leviers d'optimisation](#leviers-doptimisation)
 
@@ -292,6 +293,103 @@ Ajustement du [socle de production sécurisée](#estimation-détaillée) :
   depuis la plateforme de téléphonie (appels à l'API `POST /jobs`) plutôt que
   via l'interface web.
 
+## Variante centre d'appel : analyse échantillonnée
+
+L'[hypothèse centre d'appel](#hypothèse-centre-dappel-dmt-7-min-5-m-audiosan)
+transcrit **100 % des appels**. Cette variante ne transcrit qu'un **échantillon**
+des appels (ex. 15 %) pour réduire la facture. Le coût Speech étant strictement
+proportionnel au volume d'audio, l'échantillonnage est le levier le plus direct,
+devant le *commitment tier*.
+
+> ⚠️ Cette variante **déroge à l'objectif O1** du
+> [dossier projet](dossier-projet.md#21-contexte-et-objectifs) (« couvrir
+> l'ensemble des conversations, et non un échantillon ») : elle est à présenter
+> comme une **option budgétaire** ou une **phase de montée en charge**
+> (ex. démarrer à 15 %, puis étendre), pas comme la cible.
+
+Hypothèses : celles du centre d'appel (5 M audios/an, DMT 7 min) ;
+échantillonnage réalisé **à la source** (plateforme de téléphonie ou script
+d'ingestion, avant `POST /jobs`), de sorte que les audios non retenus ne sont
+ni téléversés, ni stockés, ni traités. Le socle de production sécurisée
+(~600–920 €/mois) reste fixe ; sa part variable (Front Door, Functions, Blob,
+Private Endpoints, logs…) est extrapolée linéairement entre le faible volume et
+le [socle à pleine échelle](#socle-de-production-à-cette-échelle-hors-speech).
+
+### Volumétrie et coût Speech par taux d'échantillonnage
+
+| Taux | Audios / mois | Heures d'audio / mois | Speech Fast *pay-as-you-go* (€/mois) | Speech Batch (€/mois) |
+| ---: | ---: | ---: | ---: | ---: |
+| 5 % | ~20 800 | ~2 430 h | ~2 240 | ~400 |
+| 10 % | ~41 700 | ~4 860 h | ~4 470 | ~800 |
+| **15 %** | **~62 500** | **~7 290 h** | **~6 710** | **~1 210** |
+| 25 % | ~104 200 | ~12 150 h | ~11 180 | ~2 010 |
+| 50 % | ~208 300 | ~24 300 h | ~22 360 | ~4 020 |
+| 100 % (référence) | ~416 700 | ~48 600 h | ~44 700 | ~8 050 |
+
+> **Engagement** : le palier 50 000 h/mois n'est plus adapté en dessous de
+> ~100 % de couverture. Dès ~2 000 h/mois (≈ 4 % d'échantillonnage), un palier
+> inférieur peut être plus rentable que le *pay-as-you-go* : prix des paliers
+> intermédiaires à valider avec
+> l'[Azure Pricing Calculator](https://azure.microsoft.com/fr-fr/pricing/calculator/).
+
+### Coût total par taux d'échantillonnage (production sécurisée)
+
+| Taux | Socle hors Speech (€/mois) | Total Fast (€/mois) | Total Fast (€/an) | Total Batch (€/mois) | Total Batch (€/an) | Coût complet par audio transcrit (Fast / Batch) |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 5 % | ~620–980 | ~2 860–3 220 | ~34–39 k | ~1 020–1 380 | ~12–17 k | ~0,15 € / ~0,06 € |
+| 10 % | ~640–1 040 | ~5 110–5 510 | ~61–66 k | ~1 450–1 840 | ~17–22 k | ~0,13 € / ~0,04 € |
+| **15 %** | **~660–1 100** | **~7 370–7 800** | **~88–94 k** | **~1 870–2 300** | **~22–28 k** | **~0,12 € / ~0,033 €** |
+| 25 % | ~700–1 220 | ~11 880–12 390 | ~143–149 k | ~2 710–3 230 | ~33–39 k | ~0,12 € / ~0,029 € |
+| 50 % | ~800–1 510 | ~23 160–23 870 | ~278–286 k | ~4 830–5 540 | ~58–66 k | ~0,11 € / ~0,025 € |
+| 100 % (référence) | ~1 000–2 100 | ~45 700–46 800 | ~548–562 k | ~9 050–10 150 | ~109–122 k | ~0,11 € / ~0,023 € |
+
+> La facture baisse presque proportionnellement au taux, mais le **coût par
+> audio transcrit augmente** aux faibles taux, car le socle de sécurité est
+> réparti sur moins d'appels.
+
+### Représentativité statistique
+
+Le bon taux dépend de la **maille d'analyse la plus fine** visée, pas du volume
+global. Marge d'erreur à 95 % sur une proportion (ex. taux d'appels
+non conformes, pire cas p = 50 %, avec correction de population finie), avec
+une hypothèse illustrative de **~500 conseillers** (~830 appels par conseiller
+et par mois) :
+
+| Taux | Audios / mois | Marge globale (mois) | Audios / conseiller / mois | Marge par conseiller (mois) |
+| ---: | ---: | ---: | ---: | ---: |
+| 5 % | ~20 800 | ±0,7 pt | ~42 | ±15 pts |
+| 10 % | ~41 700 | ±0,5 pt | ~83 | ±10 pts |
+| 15 % | ~62 500 | ±0,4 pt | ~125 | ±8 pts |
+| 25 % | ~104 200 | ±0,3 pt | ~208 | ±6 pts |
+| 50 % | ~208 300 | ±0,15 pt | ~417 | ±3 pts |
+
+### Recommandations
+
+- **Pilotage global** (tendances, motifs d'appel, irritants) : **5–10 %**
+  suffisent largement.
+- **Coaching individuel** (indicateurs mensuels par conseiller) : **15–25 %**,
+  ou mieux un **échantillonnage stratifié** à quota fixe (ex. 100–150 appels
+  par conseiller et par mois, soit ~12–18 % avec ~500 conseillers), qui garantit
+  la même précision pour chaque conseiller ou chaque file.
+- **Modèle hybride** : transcrire **100 % des appels ciblés** (réclamations,
+  escalades, appels longs, ventes soumises à conformité) et un échantillon
+  aléatoire du reste.
+- **Rester à 100 %** si le besoin est exhaustif : obligations réglementaires,
+  litiges, recherche dans l'ensemble des appels, détection systématique des
+  signaux faibles.
+- **Mise en œuvre** : sélection aléatoire reproductible à la source (ex. hachage
+  de l'identifiant d'appel), taux tracé pour redresser les indicateurs. Aucune
+  évolution de l'API n'est requise ; ajuster les quotas `TranscriptionLimits`
+  au volume échantillonné (ex. à 15 % : ~3 000 audios/jour ouvré, soit
+  `MaxPerDay` ≥ 4 000 et `MaxPerWeek` ≥ 20 000).
+- **Retour sur investissement** : le gain de productivité du
+  [dossier projet](dossier-projet.md#8-valeur-et-retour-sur-investissement)
+  (évaluation de 1 % des appels) reste acquis tant que le taux est ≥ 1 % et que
+  les appels évalués font partie de l'échantillon. À 15 % en Batch, le coût de
+  fonctionnement passe à ~55–60 k€/an (Azure + MCO) et le retour sur
+  investissement à **~10 mois** (au lieu de ~13–14), au prix de la perte de la
+  couverture exhaustive.
+
 ## Synthèse
 
 | Volume audio / mois | Non-production | Production sécurisée |
@@ -300,6 +398,7 @@ Ajustement du [socle de production sécurisée](#estimation-détaillée) :
 | ~40 h | ~40–50 € | ~635–955 € |
 | ~730 h | ~675–685 € | ~1 270–1 590 € |
 | 2 000 h | ~1 845–1 855 € | ~2 440–2 760 € (≈ 2 070–2 390 € avec engagement Speech) |
+| ~7 300 h (centre d'appel échantillonné à 15 %, voir [variante](#variante-centre-dappel--analyse-échantillonnée)) | — (volume de production) | ~7 370–7 800 € (≈ 1 870–2 300 € en Batch) |
 | ~48 600 h (centre d'appel : 5 M audios/an × DMT 7 min) | — (volume de production) | ~45 700–46 800 € (≈ 24 000–25 100 € avec engagement 50 000 h ; ≈ 9 050–10 150 € en Batch) |
 
 - En **non-production**, le coût fixe est minime (~9 €/mois) : la facture suit
@@ -310,7 +409,9 @@ Ajustement du [socle de production sécurisée](#estimation-détaillée) :
   premier poste.
 - Dans l'**hypothèse centre d'appel** (5 M audios/an, DMT 7 min), le budget
   annuel varie de **~555 k€** (*pay-as-you-go*) à **~295 k€** (engagement
-  50 000 h) voire **~115 k€** (Batch Transcription).
+  50 000 h) voire **~115 k€** (Batch Transcription). En
+  [échantillonnant 15 % des appels](#variante-centre-dappel--analyse-échantillonnée),
+  il descend à **~90 k€** (*pay-as-you-go*) ou **~25 k€** (Batch).
 
 ## Leviers d'optimisation
 
@@ -319,6 +420,10 @@ Ajustement du [socle de production sécurisée](#estimation-détaillée) :
   traitements non urgents en **Batch Transcription** (~0,17 €/h). Pour un
   centre d'appel (~48 600 h/mois), le palier d'engagement 50 000 h divise
   quasiment par deux la facture Speech, et le Batch la divise par ~5,5.
+- **Échantillonnage** : si la couverture exhaustive n'est pas requise,
+  transcrire un échantillon (ex. 15 %, ou un quota par conseiller) divise la
+  facture Speech d'autant ; cumulable avec le Batch (voir
+  [variante échantillonnée](#variante-centre-dappel--analyse-échantillonnée)).
 - **Non-production** : garder le scale-to-zero, la purge quotidienne et Defender
   désactivé ; supprimer l'environnement (`azd down`) lorsqu'il n'est pas utilisé.
 - **Production** : mutualiser Front Door / Defender / Log Analytics avec

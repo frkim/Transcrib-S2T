@@ -371,6 +371,10 @@ d'audio/mois) :
 | Fast + engagement 50 000 h | ~24 000–25 100 | ~288 000–301 000 | ~0,06 € |
 | **Batch (option A)** | **~9 050–10 150** | **~109 000–122 000** | **~0,023 €** |
 
+Variante budgétaire (dérogeant à l'objectif O1) : transcrire un **échantillon**
+des appels, par exemple 15 % (~22–28 k€/an en Batch). Voir
+[pricing.md](pricing.md#variante-centre-dappel--analyse-échantillonnée).
+
 ### 7.5 Échéancier de facturation
 
 | Jalon | % | Montant (€ HT) |
