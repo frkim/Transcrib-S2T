@@ -36,7 +36,7 @@ conversations clients sur Azure.
 | **Problème** | Les équipes qualité n'écoutent qu'une faible part des appels (typiquement 1 à 2 %), à la main, avec ~15 minutes par évaluation. Les signaux faibles (insatisfaction, non-conformité, risque de churn) passent inaperçus. |
 | **Solution** | Une plateforme Azure *event-driven* qui transcrit automatiquement chaque enregistrement (avec *speaker diarization*), suit le traitement de bout en bout, puis outille l'analyse qualitative et le coaching des conseillers. |
 | **Atout** | Un **accélérateur déjà opérationnel** (ce dépôt) : API, pipeline de transcription, frontend, analyse qualité V4.1, IaC Bicep et CI. Le projet porte sur l'**industrialisation**, pas sur une page blanche. |
-| **Délai** | **15 semaines** de la notification à la fin de l'hypercare, avec un pilote démontrable en **semaine 6**. |
+| **Délai** | **7,5 semaines** de la notification à la fin de l'hypercare, avec un pilote démontrable en **semaine 3**. |
 | **Investissement** | **229 450 € HT** au forfait (250 jours·homme), payable par jalons. |
 | **Run** | De **~9 €/mois** (non-production) à **~600–920 €/mois** hors Speech (production sécurisée) ; Speech facturé à l'usage (~0,92 €/h d'audio, ~0,17 €/h en Batch). |
 | **Valeur** | Couverture qualité portée de 1 % à **100 % des appels**, et ~**8 300 heures** de superviseur libérées par an dans l'hypothèse centre d'appel (retour sur investissement estimé à **~13–14 mois**). |
@@ -205,17 +205,19 @@ flowchart LR
 
 ### 5.1 Démarche
 
-Une démarche **agile par paliers de valeur**, en sprints de deux semaines avec
+Une démarche **agile par paliers de valeur**, en sprints d'une semaine avec
 démonstration systématique, et un **Go/No-Go** à l'issue du pilote pour
-sécuriser l'investissement.
+sécuriser l'investissement. Le planning est volontairement resserré : la charge
+est inchangée, mais les profils interviennent en parallèle (équipe d'environ
+6 à 7 ETP au pic).
 
 | Phase | Durée | Objectif | Livrables clés |
 | --- | --- | --- | --- |
-| **P0 — Cadrage** | S1–S2 | Aligner besoins, architecture et conformité | Note de cadrage, architecture validée, backlog priorisé, AIPD initiée |
-| **P1 — Pilote** | S3–S6 | Prouver la valeur sur données réelles | Environnement pilote, connecteur d'ingestion, mesure de qualité (WER, diarization), grille qualité calibrée, rapport Go/No-Go |
-| **P2 — Industrialisation** | S7–S12 | Rendre la solution sûre, robuste et exploitable | IaC production sécurisée, CI/CD multi-environnements, observabilité, tests de charge, test d'intrusion, *runbooks* |
-| **P3 — Déploiement et adoption** | S13–S15 | Mettre en service et ancrer les usages | Mise en production progressive, formation des superviseurs, hypercare de 2 semaines, VSR |
-| **Run — MCO** | À partir de S16 | Maintenir et faire évoluer | Support, maintenance corrective et évolutive, revue mensuelle des coûts |
+| **P0 — Cadrage** | S1 | Aligner besoins, architecture et conformité | Note de cadrage, architecture validée, backlog priorisé, AIPD initiée |
+| **P1 — Pilote** | S2–S3 | Prouver la valeur sur données réelles | Environnement pilote, connecteur d'ingestion, mesure de qualité (WER, diarization), grille qualité calibrée, rapport Go/No-Go |
+| **P2 — Industrialisation** | S4–S6 | Rendre la solution sûre, robuste et exploitable | IaC production sécurisée, CI/CD multi-environnements, observabilité, tests de charge, test d'intrusion, *runbooks* |
+| **P3 — Déploiement et adoption** | S7–mi-S8 | Mettre en service et ancrer les usages | Mise en production progressive, formation des superviseurs, hypercare d'une semaine, VSR |
+| **Run — MCO** | À partir de S9 | Maintenir et faire évoluer | Support, maintenance corrective et évolutive, revue mensuelle des coûts |
 
 ### 5.2 Planning
 
@@ -224,31 +226,31 @@ date de notification.
 
 ```mermaid
 gantt
-    title Transcrib-S2T — plan projet estimatif (15 semaines)
+    title Transcrib-S2T — plan projet estimatif (7,5 semaines)
     dateFormat YYYY-MM-DD
     axisFormat S%W
 
     section P0 Cadrage
-    Ateliers besoins et conformité          :p0a, 2027-01-04, 10d
-    Architecture cible validée              :milestone, m1, 2027-01-15, 0d
+    Ateliers besoins et conformité          :p0a, 2027-01-04, 5d
+    Architecture cible validée              :milestone, m1, 2027-01-08, 0d
 
     section P1 Pilote
-    Déploiement pilote et connecteur        :p1a, 2027-01-18, 14d
-    Mesure qualité et calibration           :p1b, 2027-02-01, 12d
-    Go / No-Go pilote                       :milestone, m2, 2027-02-12, 0d
+    Déploiement pilote et connecteur        :p1a, 2027-01-11, 7d
+    Mesure qualité et calibration           :p1b, 2027-01-18, 5d
+    Go / No-Go pilote                       :milestone, m2, 2027-01-22, 0d
 
     section P2 Industrialisation
-    IaC production sécurisée                :p2a, 2027-02-15, 28d
-    Évolutions applicatives et observabilité:p2b, 2027-02-15, 35d
-    CI/CD et runbooks                       :p2c, 2027-03-01, 26d
-    Tests de charge et intrusion            :p2d, 2027-03-15, 12d
-    Recette sécurité validée                :milestone, m3, 2027-03-26, 0d
+    IaC production sécurisée                :p2a, 2027-01-25, 14d
+    Évolutions applicatives et observabilité:p2b, 2027-01-25, 18d
+    CI/CD et runbooks                       :p2c, 2027-02-01, 12d
+    Tests de charge et intrusion            :p2d, 2027-02-08, 5d
+    Recette sécurité validée                :milestone, m3, 2027-02-12, 0d
 
     section P3 Déploiement
-    Mise en production progressive          :p3a, 2027-03-29, 5d
-    Formation superviseurs                  :p3b, 2027-03-29, 10d
-    Hypercare                               :p3c, 2027-04-05, 12d
-    VSR et passage en MCO                   :milestone, m4, 2027-04-16, 0d
+    Mise en production progressive          :p3a, 2027-02-15, 3d
+    Formation superviseurs                  :p3b, 2027-02-15, 5d
+    Hypercare                               :p3c, 2027-02-18, 6d
+    VSR et passage en MCO                   :milestone, m4, 2027-02-24, 0d
 ```
 
 ### 5.3 Jalons
@@ -256,11 +258,11 @@ gantt
 | Jalon | Semaine | Critère de passage |
 | --- | --- | --- |
 | J0 — Lancement | S1 | Équipes nommées, accès Azure et données d'échantillon disponibles |
-| J1 — Architecture validée | Fin S2 | Note de cadrage et architecture signées (métier, RSSI, DPO) |
-| J2 — Go/No-Go pilote | Fin S6 | Indicateurs O1–O3 atteints sur l'échantillon, coûts unitaires confirmés |
-| J3 — Recette sécurité | Fin S12 | Tests de charge (pointe ×2) et test d'intrusion sans vulnérabilité critique |
-| J4 — Mise en production | S13 | Bascule progressive validée par le COPIL |
-| J5 — VSR | Fin S15 | Vérification de service régulier prononcée, passage en MCO |
+| J1 — Architecture validée | Fin S1 | Note de cadrage et architecture signées (métier, RSSI, DPO) |
+| J2 — Go/No-Go pilote | Fin S3 | Indicateurs O1–O3 atteints sur l'échantillon, coûts unitaires confirmés |
+| J3 — Recette sécurité | Fin S6 | Tests de charge (pointe ×2) et test d'intrusion sans vulnérabilité critique |
+| J4 — Mise en production | S7 | Bascule progressive validée par le COPIL |
+| J5 — VSR | Mi-S8 | Vérification de service régulier prononcée, passage en MCO |
 
 ## 6. Organisation et gouvernance
 
@@ -293,7 +295,7 @@ pie showData
 | --- | --- | --- | --- |
 | COPIL | Mensuel + jalons | Sponsor, direction relation client, DSI, RSSI, DPO, directeur de projet | Arbitrages, budget, Go/No-Go |
 | COPROJ | Hebdomadaire | Chef de projet, *product owner*, architecte | Avancement, risques, priorités |
-| Revue de sprint | Toutes les 2 semaines | Équipe, *product owner*, utilisateurs clés | Démonstration et validation |
+| Revue de sprint | Hebdomadaire | Équipe, *product owner*, utilisateurs clés | Démonstration et validation |
 
 ### 6.3 RACI simplifié
 
@@ -431,8 +433,11 @@ frictions et des écarts de conformité, et coaching fondé sur des preuves.
 - Tenant Entra ID du client : création des inscriptions d'application et des
   groupes de sécurité par la DSI.
 - Échantillon représentatif d'au moins 200 enregistrements MP3 anonymisables
-  fourni avant S3 pour le pilote.
+  fourni avant S2 pour le pilote.
 - Un *product owner* client disponible ~1 jour par semaine.
+- Planning resserré (7,5 semaines) : disponibilité simultanée des profils de
+  l'équipe projet et décisions client (validation d'architecture, Go/No-Go,
+  recette) sous 48 h.
 - Langue de transcription : français (`fr-FR`) ; autres langues en option.
 - Travail en mode hybride (sur site ponctuel pour les ateliers et la formation).
 - Prix forfaitaires sur le périmètre décrit ; toute évolution fait l'objet
@@ -445,7 +450,7 @@ frictions et des écarts de conformité, et coaching fondé sur des preuves.
 2. **Mise à disposition** d'un échantillon d'enregistrements et d'un accès
    Azure de démonstration.
 3. **Commande des phases P0 + P1** (84 700 € HT) et lancement sous 2 semaines.
-4. **Go/No-Go** à S6 sur la base d'indicateurs mesurés sur vos données.
+4. **Go/No-Go** à S3 sur la base d'indicateurs mesurés sur vos données.
 
 ## Références
 

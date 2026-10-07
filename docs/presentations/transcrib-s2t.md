@@ -209,11 +209,11 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 
 ---
 
-# Plan projet estimatif — 15 semaines
+# Plan projet estimatif — 7,5 semaines
 
-<div class="gantt">
+<div class="gantt" style="--cols:18">
   <div class="lbl"></div>
-  <div class="wk">S1</div><div class="wk">S2</div><div class="wk">S3</div><div class="wk">S4</div><div class="wk">S5</div><div class="wk">S6</div><div class="wk">S7</div><div class="wk">S8</div><div class="wk">S9</div><div class="wk">S10</div><div class="wk">S11</div><div class="wk">S12</div><div class="wk">S13</div><div class="wk">S14</div><div class="wk">S15</div><div class="wk">S16+</div>
+  <div class="wk" style="grid-column:span 2">S1</div><div class="wk" style="grid-column:span 2">S2</div><div class="wk" style="grid-column:span 2">S3</div><div class="wk" style="grid-column:span 2">S4</div><div class="wk" style="grid-column:span 2">S5</div><div class="wk" style="grid-column:span 2">S6</div><div class="wk" style="grid-column:span 2">S7</div><div class="wk" style="grid-column:span 2">S8</div><div class="wk" style="grid-column:span 2">S9+</div>
   <div class="lbl" style="grid-column:1">P0 · Cadrage<span>besoins, architecture, AIPD</span></div>
   <div class="bar p0" style="grid-column:2 / 4">20 j·h</div>
   <div class="lbl" style="grid-column:1">P1 · Pilote<span>données réelles, mesure qualité</span></div>
@@ -223,7 +223,7 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
   <div class="lbl" style="grid-column:1">P3 · Déploiement<span>bascule, formation, hypercare</span></div>
   <div class="bar p3" style="grid-column:14 / 17">37 j·h</div>
   <div class="lbl" style="grid-column:1">Run · MCO<span>support et évolutions</span></div>
-  <div class="bar run" style="grid-column:17 / 18"></div>
+  <div class="bar run" style="grid-column:18 / 20"></div>
   <div class="lbl" style="grid-column:1">Jalons</div>
   <div class="ms" style="grid-column:2"></div><div class="ms" style="grid-column:3"></div><div class="ms" style="grid-column:7"></div><div class="ms" style="grid-column:13"></div><div class="ms" style="grid-column:14"></div><div class="ms" style="grid-column:16"></div>
   <div class="lbl" style="grid-column:1"></div>
@@ -234,7 +234,7 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
   <div class="card" style="border-top-color:#13325c"><h3>Cadrage</h3><p>Note de cadrage, architecture validée, backlog priorisé.</p></div>
   <div class="card"><h3>Pilote</h3><p>Mesure WER et diarization sur vos appels, grille calibrée.</p></div>
   <div class="card teal"><h3>Industrialisation</h3><p>IaC production, tests de charge et d'intrusion, runbooks.</p></div>
-  <div class="card green"><h3>Déploiement</h3><p>Bascule progressive, formation, 2 semaines d'hypercare.</p></div>
+  <div class="card green"><h3>Déploiement</h3><p>Bascule progressive, formation, 1 semaine d'hypercare.</p></div>
 </div>
 
 ---
@@ -258,7 +258,7 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 <div>
   <div class="card" style="margin-bottom:12px"><h3>COPIL · mensuel + jalons</h3><p>Sponsor, relation client, DSI, RSSI, DPO. Arbitrages, budget, Go/No-Go.</p></div>
   <div class="card teal" style="margin-bottom:12px"><h3>COPROJ · hebdomadaire</h3><p>Avancement, risques, priorisation du backlog.</p></div>
-  <div class="card green"><h3>Sprints de 2 semaines</h3><p>Démonstration aux utilisateurs clés à chaque fin de sprint. <strong>Product owner client : ~1 j/semaine.</strong></p></div>
+  <div class="card green"><h3>Sprints d'une semaine</h3><p>Démonstration aux utilisateurs clés à chaque fin de sprint. Équipe de ~6–7 ETP au pic. <strong>Product owner client : ~1 j/semaine.</strong></p></div>
 </div>
 </div>
 
@@ -277,7 +277,7 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 | P3 · Déploiement & adoption | 37 | 33 600 |
 | **Total forfait** | **250** | **229 450** |
 
-<div class="callout"><strong>Engagement par paliers</strong> : P0 + P1 commandables seuls (<strong>84 700 € HT</strong>). La suite est conditionnée au Go/No-Go de S6.</div>
+<div class="callout"><strong>Engagement par paliers</strong> : P0 + P1 commandables seuls (<strong>84 700 € HT</strong>). La suite est conditionnée au Go/No-Go de S3.</div>
 
 </div>
 <div>
@@ -375,7 +375,7 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 
 | Risque | Niveau | Mitigation |
 | --- | :---: | --- |
-| Qualité de transcription (audio 8 kHz, bruit, accents) | <span class="pill hi">élevé</span> | Mesure du WER dès le pilote sur vos appels, Custom Speech si besoin, Go/No-Go S6 |
+| Qualité de transcription (audio 8 kHz, bruit, accents) | <span class="pill hi">élevé</span> | Mesure du WER dès le pilote sur vos appels, Custom Speech si besoin, Go/No-Go S3 |
 | Données personnelles sensibles | <span class="pill hi">élevé</span> | AIPD au cadrage, purge J+1, réseau privé, accès Entra ID tracés |
 | Quotas Azure AI Speech en pointe | <span class="pill todo">moyen</span> | Tests de charge (pointe ×2), demande de quotas anticipée, reprise sur erreur |
 | Dérive des coûts de consommation | <span class="pill todo">moyen</span> | Quotas applicatifs, budgets et alertes Cost Management, option Batch |
@@ -392,11 +392,11 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 
 # Démarrons par le pilote
 
-### Une décision à risque maîtrisé : **84 700 € HT** pour prouver la valeur sur vos données en **6 semaines**
+### Une décision à risque maîtrisé : **84 700 € HT** pour prouver la valeur sur vos données en **3 semaines**
 
 <div class="meta">
 1 · Atelier de restitution avec le sponsor et la DSI (1 h 30)<br/>
 2 · Mise à disposition d'un échantillon d'enregistrements et d'un accès Azure<br/>
 3 · Commande P0 + P1, lancement sous 2 semaines<br/>
-4 · Go/No-Go en semaine 6 sur indicateurs mesurés
+4 · Go/No-Go en semaine 3 sur indicateurs mesurés
 </div>

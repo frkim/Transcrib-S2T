@@ -12,39 +12,68 @@ plan de coaching et des rapports exportables.
 
 ## Architecture
 
-```
-                    ┌─────────────┐
-   Upload MP3  ───▶ │  Frontend   │  Next.js (App Router)
-                    └──────┬──────┘
-                           │ POST /jobs
-                    ┌──────▼──────┐
-                    │  Backend    │  C# / ASP.NET Core  ──▶  Azure Container Apps
-                    │   API       │
-                    └──┬───────┬──┘
-          Blob "audio" │       │ Cosmos DB "jobs"
-                  ┌────▼───┐   └────────────┐
-                  │ Blob   │                │
-                  │Storage │                │
-                  └───┬────┘                │
-   Blob trigger /     │ upload event        │  status updates
-   When a blob added  │                     │
-        ┌─────────────┴──────────────┐      │
-        ▼                            ▼      │
-  ┌───────────────┐          ┌───────────────┐
-  │ Azure         │          │ Azure         │
-  │ Functions     │   ==     │ Logic Apps    │   (deux approches équivalentes)
-  │ (Pro Code)    │          │ (Low Code)    │
-  └───────┬───────┘          └───────┬───────┘
-          │   Azure AI Speech (diarization)  │
-          └──────────────┬───────────────────┘
-                         ▼
-                 Blob "transcripts"  +  Cosmos "jobs" (Completed/Failed)
+```mermaid
+flowchart LR
+    User(["👤 Utilisateur"])
 
-  ┌────────────────────────────────────────────┐
-  │ Purge Logic App (daily) → supprime audio &  │
-  │ transcripts > 1 jour, statut "Purged"       │
-  └────────────────────────────────────────────┘
+    subgraph App["Application · Azure Container Apps"]
+        FE["Frontend<br/>Next.js"]
+        API["Backend API<br/>ASP.NET Core"]
+    end
+
+    subgraph Data["Données"]
+        Blob[("Blob Storage<br/>audio · transcripts")]
+        Cosmos[("Cosmos DB<br/>jobs")]
+    end
+
+    EG{{"Event Grid<br/>blob créé"}}
+
+    subgraph Proc["Transcription · deux approches équivalentes"]
+        Fn["Azure Functions<br/>Pro Code"]
+        LA["Logic Apps<br/>Low Code"]
+    end
+
+    Speech["Azure AI Speech<br/>diarization"]
+    Purge["Purge quotidienne<br/>Logic App"]
+
+    User -->|"① upload MP3"| FE
+    FE -->|"② POST /jobs"| API
+    API -->|"③ audio"| Blob
+    API -->|"③ job Processing"| Cosmos
+    Blob -->|"④ événement"| EG
+    EG --> Fn
+    EG -.-> LA
+    Fn -->|"⑤ transcription"| Speech
+    LA -.-> Speech
+    Fn -->|"⑥ transcript"| Blob
+    Fn -->|"⑥ Completed / Failed"| Cosmos
+    LA -.->|"⑥ PATCH statut"| API
+    Purge -->|"supprime > 1 jour"| Blob
+    Purge -->|"statut Purged"| Cosmos
+
+    classDef app fill:#e7f1fb,stroke:#0078d4,color:#0b1f3a
+    classDef data fill:#e6f6f7,stroke:#00a3ad,color:#0b1f3a
+    classDef proc fill:#fff,stroke:#0078d4,color:#0b1f3a
+    classDef ai fill:#0078d4,stroke:#0078d4,color:#fff
+    classDef ops fill:#fff6e0,stroke:#f2a900,color:#0b1f3a,stroke-dasharray:4 3
+    class FE,API app
+    class Blob,Cosmos data
+    class EG,Fn,LA proc
+    class Speech ai
+    class Purge ops
 ```
+
+| Étape | Description |
+| --- | --- |
+| ① ② | L'utilisateur dépose un ou plusieurs MP3 ; le frontend appelle l'API. |
+| ③ | L'API stocke l'audio (`audio/{jobId}.mp3`) et crée le job `Processing`. |
+| ④ | Le dépôt du blob déclenche le pipeline de transcription. |
+| ⑤ | Azure AI Speech transcrit avec identification des locuteurs. |
+| ⑥ | Le transcript est écrit (`transcripts/{jobId}.txt`) et le job passe `Completed` (ou `Failed`). |
+| 🗑️ | Chaque jour, audio et transcripts de plus d'un jour sont supprimés (statut `Purged`). |
+
+Socle transverse : **Microsoft Entra ID** (SSO), **Managed Identity** entre
+services (aucun secret), **Application Insights** (logs et traces).
 
 Les **deux approches** de transcription (Functions *Pro Code* et Logic Apps
 *Low Code*) sont fonctionnellement équivalentes et partagent les mêmes contrats.
