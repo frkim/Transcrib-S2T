@@ -387,7 +387,7 @@ et par mois) :
   (évaluation de 1 % des appels) reste acquis tant que le taux est ≥ 1 % et que
   les appels évalués font partie de l'échantillon. À 15 % en Batch, le coût de
   fonctionnement passe à ~55–60 k€/an (Azure + MCO) et le retour sur
-  investissement à **~10 mois** (au lieu de ~13–14), au prix de la perte de la
+  investissement à **~5 mois** (au lieu de ~7–8), au prix de la perte de la
   couverture exhaustive.
 
 ## Synthèse
