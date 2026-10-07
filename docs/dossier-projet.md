@@ -37,9 +37,9 @@ conversations clients sur Azure.
 | **Solution** | Une plateforme Azure *event-driven* qui transcrit automatiquement chaque enregistrement (avec *speaker diarization*), suit le traitement de bout en bout, puis outille l'analyse qualitative et le coaching des conseillers. |
 | **Atout** | Un **accélérateur déjà opérationnel** (ce dépôt) : API, pipeline de transcription, frontend, analyse qualité V4.1, IaC Bicep et CI. Le projet porte sur l'**industrialisation**, pas sur une page blanche. |
 | **Délai** | **7,5 semaines** de la notification à la fin de l'hypercare, avec un pilote démontrable en **semaine 3**. |
-| **Investissement** | **229 450 € HT** au forfait (250 jours·homme), payable par jalons. |
+| **Investissement** | **114 725 € HT** au forfait (125 jours·homme), payable par jalons. |
 | **Run** | De **~9 €/mois** (non-production) à **~600–920 €/mois** hors Speech (production sécurisée) ; Speech facturé à l'usage (~0,92 €/h d'audio, ~0,17 €/h en Batch). |
-| **Valeur** | Couverture qualité portée de 1 % à **100 % des appels**, et ~**8 300 heures** de superviseur libérées par an dans l'hypothèse centre d'appel (retour sur investissement estimé à **~13–14 mois**). |
+| **Valeur** | Couverture qualité portée de 1 % à **100 % des appels**, et ~**8 300 heures** de superviseur libérées par an dans l'hypothèse centre d'appel (retour sur investissement estimé à **~7–8 mois**). |
 
 ## 2. Expression de besoins
 
@@ -207,9 +207,8 @@ flowchart LR
 
 Une démarche **agile par paliers de valeur**, en sprints d'une semaine avec
 démonstration systématique, et un **Go/No-Go** à l'issue du pilote pour
-sécuriser l'investissement. Le planning est volontairement resserré : la charge
-est inchangée, mais les profils interviennent en parallèle (équipe d'environ
-6 à 7 ETP au pic).
+sécuriser l'investissement. Le planning est volontairement resserré : les profils
+interviennent en parallèle (équipe d'environ 4 ETP au pic, en industrialisation).
 
 | Phase | Durée | Objectif | Livrables clés |
 | --- | --- | --- | --- |
@@ -270,23 +269,23 @@ gantt
 
 | Profil | Rôle | Charge (j·h) |
 | --- | --- | ---: |
-| Directeur / chef de projet | Pilotage, planning, risques, comitologie | 34 |
-| Architecte cloud Azure | Architecture cible, sécurité, revue de conception | 29 |
-| Développeur(s) senior .NET / Next.js | Connecteur, évolutions API et frontend, tests | 85 |
-| Ingénieur DevOps / sécurité | IaC production, CI/CD, réseau privé, observabilité | 46 |
-| Ingénieur QA | Stratégie de test, recette, tests de charge | 32 |
-| Consultant data / IA | Mesure de qualité de transcription, calibration de la grille qualité | 24 |
-| **Total** | | **250** |
+| Directeur / chef de projet | Pilotage, planning, risques, comitologie | 17 |
+| Architecte cloud Azure | Architecture cible, sécurité, revue de conception | 14,5 |
+| Développeur(s) senior .NET / Next.js | Connecteur, évolutions API et frontend, tests | 42,5 |
+| Ingénieur DevOps / sécurité | IaC production, CI/CD, réseau privé, observabilité | 23 |
+| Ingénieur QA | Stratégie de test, recette, tests de charge | 16 |
+| Consultant data / IA | Mesure de qualité de transcription, calibration de la grille qualité | 12 |
+| **Total** | | **125** |
 
 ```mermaid
 pie showData
     title Répartition de l'effort (jours·homme)
-    "Développement" : 85
-    "DevOps / sécurité" : 46
-    "Pilotage" : 34
-    "QA" : 32
-    "Architecture" : 29
-    "Data / IA" : 24
+    "Développement" : 42.5
+    "DevOps / sécurité" : 23
+    "Pilotage" : 17
+    "QA" : 16
+    "Architecture" : 14.5
+    "Data / IA" : 12
 ```
 
 ### 6.2 Comitologie
@@ -325,23 +324,24 @@ pie showData
 
 | Phase | Charge (j·h) | Montant (€ HT) |
 | --- | ---: | ---: |
-| P0 — Cadrage | 20 | 21 200 |
-| P1 — Pilote | 70 | 63 500 |
-| P2 — Industrialisation | 123 | 111 150 |
-| P3 — Déploiement et adoption | 37 | 33 600 |
-| **Total forfait** | **250** | **229 450** |
+| P0 — Cadrage | 10 | 10 600 |
+| P1 — Pilote | 35 | 31 750 |
+| P2 — Industrialisation | 61,5 | 55 575 |
+| P3 — Déploiement et adoption | 18,5 | 16 800 |
+| **Total forfait** | **125** | **114 725** |
 
 Détail de la charge par phase et par profil (j·h) :
 
 | Phase | Chef de projet | Architecte | Développeur | DevOps | QA | Data / IA |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| P0 | 6 | 8 | 0 | 2 | 0 | 4 |
-| P1 | 8 | 6 | 30 | 8 | 8 | 10 |
-| P2 | 12 | 12 | 45 | 30 | 18 | 6 |
-| P3 | 8 | 3 | 10 | 6 | 6 | 4 |
+| P0 | 3 | 4 | 0 | 1 | 0 | 2 |
+| P1 | 4 | 3 | 15 | 4 | 4 | 5 |
+| P2 | 6 | 6 | 22,5 | 15 | 9 | 3 |
+| P3 | 4 | 1,5 | 5 | 3 | 3 | 2 |
+| **Total** | **17** | **14,5** | **42,5** | **23** | **16** | **12** |
 
-> **Engagement par paliers** : les phases P0 + P1 (**84 700 € HT**) peuvent être
-> commandées seules. La poursuite (P2 + P3, **144 750 € HT**) est conditionnée
+> **Engagement par paliers** : les phases P0 + P1 (**42 350 € HT**) peuvent être
+> commandées seules. La poursuite (P2 + P3, **72 375 € HT**) est conditionnée
 > au Go/No-Go du jalon J2.
 
 ### 7.3 Options
@@ -381,11 +381,11 @@ des appels, par exemple 15 % (~22–28 k€/an en Batch). Voir
 
 | Jalon | % | Montant (€ HT) |
 | --- | ---: | ---: |
-| Commande (J0) | 20 % | 45 890,00 |
-| Go/No-Go pilote (J2) | 25 % | 57 362,50 |
-| Mise en production (J4) | 35 % | 80 307,50 |
-| VSR (J5) | 20 % | 45 890,00 |
-| **Total** | **100 %** | **229 450,00** |
+| Commande (J0) | 20 % | 22 945,00 |
+| Go/No-Go pilote (J2) | 25 % | 28 681,25 |
+| Mise en production (J4) | 35 % | 40 153,75 |
+| VSR (J5) | 20 % | 22 945,00 |
+| **Total** | **100 %** | **114 725,00** |
 
 Validité de l'offre : 3 mois. Paiement à 30 jours fin de mois.
 
@@ -405,8 +405,8 @@ Estimation pour l'hypothèse centre d'appel, à affiner pendant le cadrage.
 | Gain de productivité | 8 300 h × 45 € | **~375 k€ / an** |
 | Coût de fonctionnement (Batch + MCO) | ~109–122 k€ Azure + 32,4 k€ MCO | ~141–154 k€ / an |
 | Gain net annuel | | **~221–234 k€ / an** |
-| Investissement (build + option A) | 229 450 + 25 100 | 254 550 € |
-| **Retour sur investissement** | | **~13–14 mois** |
+| Investissement (build + option A) | 114 725 + 25 100 | 139 825 € |
+| **Retour sur investissement** | 139 825 ÷ (221–234 k€ ÷ 12) | **~7–8 mois** |
 
 Au-delà du gain de productivité, la plateforme porte la couverture qualité de
 **1 % à 100 % des appels** : détection systématique des signaux sensibles, des
@@ -449,7 +449,7 @@ frictions et des écarts de conformité, et coaching fondé sur des preuves.
    la DSI.
 2. **Mise à disposition** d'un échantillon d'enregistrements et d'un accès
    Azure de démonstration.
-3. **Commande des phases P0 + P1** (84 700 € HT) et lancement sous 2 semaines.
+3. **Commande des phases P0 + P1** (42 350 € HT) et lancement sous 2 semaines.
 4. **Go/No-Go** à S3 sur la base d'indicateurs mesurés sur vos données.
 
 ## Références

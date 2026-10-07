@@ -215,13 +215,13 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
   <div class="lbl"></div>
   <div class="wk" style="grid-column:span 2">S1</div><div class="wk" style="grid-column:span 2">S2</div><div class="wk" style="grid-column:span 2">S3</div><div class="wk" style="grid-column:span 2">S4</div><div class="wk" style="grid-column:span 2">S5</div><div class="wk" style="grid-column:span 2">S6</div><div class="wk" style="grid-column:span 2">S7</div><div class="wk" style="grid-column:span 2">S8</div><div class="wk" style="grid-column:span 2">S9+</div>
   <div class="lbl" style="grid-column:1">P0 · Cadrage<span>besoins, architecture, AIPD</span></div>
-  <div class="bar p0" style="grid-column:2 / 4">20 j·h</div>
+  <div class="bar p0" style="grid-column:2 / 4">10 j·h</div>
   <div class="lbl" style="grid-column:1">P1 · Pilote<span>données réelles, mesure qualité</span></div>
-  <div class="bar p1" style="grid-column:4 / 8">70 j·h · démonstrateur</div>
+  <div class="bar p1" style="grid-column:4 / 8">35 j·h · démonstrateur</div>
   <div class="lbl" style="grid-column:1">P2 · Industrialisation<span>sécurité, CI/CD, charge</span></div>
-  <div class="bar p2" style="grid-column:8 / 14">123 j·h · production sécurisée</div>
+  <div class="bar p2" style="grid-column:8 / 14">61,5 j·h · production sécurisée</div>
   <div class="lbl" style="grid-column:1">P3 · Déploiement<span>bascule, formation, hypercare</span></div>
-  <div class="bar p3" style="grid-column:14 / 17">37 j·h</div>
+  <div class="bar p3" style="grid-column:14 / 17">18,5 j·h</div>
   <div class="lbl" style="grid-column:1">Run · MCO<span>support et évolutions</span></div>
   <div class="bar run" style="grid-column:18 / 20"></div>
   <div class="lbl" style="grid-column:1">Jalons</div>
@@ -246,19 +246,19 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 
 | Profil | Rôle | j·h |
 | --- | --- | ---: |
-| Chef de projet | Pilotage, risques, comitologie | 34 |
-| Architecte cloud Azure | Architecture, sécurité, revues | 29 |
-| Développeurs seniors | Connecteur, API, frontend, tests | 85 |
-| Ingénieur DevOps / sécurité | IaC, CI/CD, réseau, observabilité | 46 |
-| Ingénieur QA | Recette, tests de charge | 32 |
-| Consultant data / IA | Qualité de transcription, calibration | 24 |
-| **Total** | | **250** |
+| Chef de projet | Pilotage, risques, comitologie | 17 |
+| Architecte cloud Azure | Architecture, sécurité, revues | 14,5 |
+| Développeurs seniors | Connecteur, API, frontend, tests | 42,5 |
+| Ingénieur DevOps / sécurité | IaC, CI/CD, réseau, observabilité | 23 |
+| Ingénieur QA | Recette, tests de charge | 16 |
+| Consultant data / IA | Qualité de transcription, calibration | 12 |
+| **Total** | | **125** |
 
 </div>
 <div>
   <div class="card" style="margin-bottom:12px"><h3>COPIL · mensuel + jalons</h3><p>Sponsor, relation client, DSI, RSSI, DPO. Arbitrages, budget, Go/No-Go.</p></div>
   <div class="card teal" style="margin-bottom:12px"><h3>COPROJ · hebdomadaire</h3><p>Avancement, risques, priorisation du backlog.</p></div>
-  <div class="card green"><h3>Sprints d'une semaine</h3><p>Démonstration aux utilisateurs clés à chaque fin de sprint. Équipe de ~6–7 ETP au pic. <strong>Product owner client : ~1 j/semaine.</strong></p></div>
+  <div class="card green"><h3>Sprints d'une semaine</h3><p>Démonstration aux utilisateurs clés à chaque fin de sprint. Équipe de ~4 ETP au pic. <strong>Product owner client : ~1 j/semaine.</strong></p></div>
 </div>
 </div>
 
@@ -271,13 +271,13 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 
 | Phase | j·h | € HT |
 | --- | ---: | ---: |
-| P0 · Cadrage | 20 | 21 200 |
-| P1 · Pilote | 70 | 63 500 |
-| P2 · Industrialisation | 123 | 111 150 |
-| P3 · Déploiement & adoption | 37 | 33 600 |
-| **Total forfait** | **250** | **229 450** |
+| P0 · Cadrage | 10 | 10 600 |
+| P1 · Pilote | 35 | 31 750 |
+| P2 · Industrialisation | 61,5 | 55 575 |
+| P3 · Déploiement & adoption | 18,5 | 16 800 |
+| **Total forfait** | **125** | **114 725** |
 
-<div class="callout"><strong>Engagement par paliers</strong> : P0 + P1 commandables seuls (<strong>84 700 € HT</strong>). La suite est conditionnée au Go/No-Go de S3.</div>
+<div class="callout"><strong>Engagement par paliers</strong> : P0 + P1 commandables seuls (<strong>42&nbsp;350&nbsp;€&nbsp;HT</strong>). La suite est conditionnée au Go/No-Go de S3.</div>
 
 </div>
 <div>
@@ -326,7 +326,7 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
   <div class="kpi"><div class="v">×100</div><div class="l">couverture qualité : de 1 % à 100 % des appels</div></div>
   <div class="kpi alt"><div class="v">~8 300 <small>h</small></div><div class="l">de superviseur libérées par an (15 → 5 min par évaluation)</div></div>
   <div class="kpi warn"><div class="v">~375 <small>k€</small></div><div class="l">de gain de productivité annuel (45 €/h chargé)</div></div>
-  <div class="kpi dark"><div class="v">13–14 <small>mois</small></div><div class="l">de retour sur investissement (build + option A)</div></div>
+  <div class="kpi dark"><div class="v">7–8 <small>mois</small></div><div class="l">de retour sur investissement (build + option A)</div></div>
 </div>
 
 <h2 style="margin-top:26px">Coût Azure annuel — 5 M d'appels × 7 min (~48 600 h d'audio / mois)</h2>
@@ -336,7 +336,7 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
   <div>Batch (option A)</div><div class="track"><div class="fill green" style="width:21%"></div></div><div class="val">~115 k€</div>
 </div>
 
-<p class="small" style="margin-top:14px">Hypothèses : 1 % des appels évalués aujourd'hui (50 000/an) ; run annuel Batch + MCO ≈ 141–154 k€ ; investissement 254 550 € HT. Gain net ≈ 221–234 k€/an. À affiner au cadrage.</p>
+<p class="small" style="margin-top:14px">Hypothèses : 1 % des appels évalués aujourd'hui (50 000/an) ; run annuel Batch + MCO ≈ 141–154 k€ ; investissement 139 825 € HT (build 114 725 + option A 25 100). Gain net ≈ 221–234 k€/an. À affiner au cadrage.</p>
 
 ---
 
@@ -367,7 +367,7 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 </div>
 </div>
 
-<div class="callout">À <strong>15 % en Batch</strong>, retour sur investissement en <strong>~10 mois</strong> (au lieu de 13–14), gain de productivité préservé. En contrepartie, la couverture à 100 % est abandonnée : option budgétaire ou phase de montée en charge.</div>
+<div class="callout">À <strong>15 % en Batch</strong>, retour sur investissement en <strong>~5 mois</strong> (au lieu de 7–8), gain de productivité préservé. En contrepartie, la couverture à 100 % est abandonnée : option budgétaire ou phase de montée en charge.</div>
 
 ---
 
@@ -392,7 +392,7 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 
 # Démarrons par le pilote
 
-### Une décision à risque maîtrisé : **84 700 € HT** pour prouver la valeur sur vos données en **3 semaines**
+### Une décision à risque maîtrisé : **42 350 € HT** pour prouver la valeur sur vos données en **3 semaines**
 
 <div class="meta">
 1 · Atelier de restitution avec le sponsor et la DSI (1 h 30)<br/>
