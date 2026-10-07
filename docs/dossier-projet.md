@@ -30,7 +30,7 @@ conversations clients sur Azure.
 
 ## 1. Synthèse
 
-| | |
+| Thème | En bref |
 | --- | --- |
 | **Problème** | Les équipes qualité n'écoutent qu'une faible part des appels (typiquement 1 à 2 %), à la main, avec ~15 minutes par évaluation. Les signaux faibles (insatisfaction, non-conformité, risque de churn) passent inaperçus. |
 | **Solution** | Une plateforme Azure *event-driven* qui transcrit automatiquement chaque enregistrement (avec *speaker diarization*), suit le traitement de bout en bout, puis outille l'analyse qualitative et le coaching des conseillers. |
