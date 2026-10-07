@@ -11,8 +11,9 @@ conversations clients sur Azure.
 > [`presentation.yml`](../.github/workflows/presentation.yml).
 >
 > ⚠️ Les montants sont **indicatifs** (hors taxes, hors frais de déplacement).
-> Les coûts Azure reprennent [pricing.md](pricing.md) (USD, *pay-as-you-go*,
-> France Central ; 1 USD ≈ 0,92 EUR). Ils sont à confirmer à l'issue du cadrage.
+> Les coûts Azure reprennent [pricing.md](pricing.md) (€ HT, *pay-as-you-go*,
+> région France Central par défaut ; alternatives Sweden Central puis North
+> Europe). Ils sont à confirmer à l'issue du cadrage.
 
 ## Sommaire
 
@@ -37,7 +38,7 @@ conversations clients sur Azure.
 | **Atout** | Un **accélérateur déjà opérationnel** (ce dépôt) : API, pipeline de transcription, frontend, analyse qualité V4.1, IaC Bicep et CI. Le projet porte sur l'**industrialisation**, pas sur une page blanche. |
 | **Délai** | **15 semaines** de la notification à la fin de l'hypercare, avec un pilote démontrable en **semaine 6**. |
 | **Investissement** | **229 450 € HT** au forfait (250 jours·homme), payable par jalons. |
-| **Run** | De **~10 $/mois** (non-production) à **~650–1 000 $/mois** hors Speech (production sécurisée) ; Speech facturé à l'usage (~1 $/h d'audio, ~0,18 $/h en Batch). |
+| **Run** | De **~9 €/mois** (non-production) à **~600–920 €/mois** hors Speech (production sécurisée) ; Speech facturé à l'usage (~0,92 €/h d'audio, ~0,17 €/h en Batch). |
 | **Valeur** | Couverture qualité portée de 1 % à **100 % des appels**, et ~**8 300 heures** de superviseur libérées par an dans l'hypothèse centre d'appel (retour sur investissement estimé à **~13–14 mois**). |
 
 ## 2. Expression de besoins
@@ -54,7 +55,7 @@ de service et accompagner la montée en compétence des conseillers.
 | O2 | Réduire le temps d'évaluation d'une conversation | De ~15 min à ~5 min par évaluation |
 | O3 | Objectiver le coaching des conseillers | Plan de coaching généré pour 100 % des conversations analysées |
 | O4 | Protéger les données personnelles | 0 audio ni transcript conservé au-delà de 24 h |
-| O5 | Maîtriser les coûts | Coût complet ≤ 0,12 $ par appel de 7 min (≤ 0,03 $ en Batch) |
+| O5 | Maîtriser les coûts | Coût complet ≤ 0,11 € par appel de 7 min (≤ 0,03 € en Batch) |
 
 ### 2.2 Acteurs
 
@@ -88,7 +89,7 @@ de service et accompagner la montée en compétence des conseillers.
 | --- | --- | --- |
 | ENF-01 | Sécurité | Authentification Entra ID (SSO) ; accès inter-services par **Managed Identity**, aucun secret applicatif. |
 | ENF-02 | Réseau | En production : Private Endpoints, accès public désactivé sur les données, exposition via WAF. |
-| ENF-03 | Conformité | Hébergement **France Central** ; purge à J+1 ; journalisation des accès. |
+| ENF-03 | Conformité | Hébergement **France Central** (à défaut, après validation DPO / RSSI : Sweden Central, puis North Europe — UE) ; purge à J+1 ; journalisation des accès. |
 | ENF-04 | Performance | Transcription d'un appel de 7 min en moins de 2 min (Fast Transcription) ; pointe de ~35 traitements/min. |
 | ENF-05 | Disponibilité | 99,9 % en production (zone redundancy Container Apps, stockage ZRS). |
 | ENF-06 | Scalabilité | Services *serverless* et *scale-to-zero* : coût proportionnel à l'usage. |
@@ -167,8 +168,8 @@ flowchart LR
 | --- | --- | --- | --- |
 | Frontend | Next.js (App Router) sur Container Apps | Standard du client, rendu serveur, analyse locale dans le navigateur. | SPA statique : pas de proxy API ni de rendu serveur. |
 | API | ASP.NET Core Minimal API sur Container Apps | Performances, typage fort, scale-to-zero, déploiement conteneur. | App Service : coût fixe plus élevé à faible charge. |
-| Transcription | Azure AI Speech — **Fast Transcription** | Synchrone, décodage MP3 côté service, diarization incluse, ~1 $/h. | Speech SDK temps réel : décodage local (GStreamer) nécessaire. |
-| Gros volumes | Azure AI Speech — **Batch** (option A) | ~0,18 $/h, soit −80 % sur le poste principal. | Engagement Fast seul : économie limitée à ~−50 %. |
+| Transcription | Azure AI Speech — **Fast Transcription** | Synchrone, décodage MP3 côté service, diarization incluse, ~0,92 €/h. | Speech SDK temps réel : décodage local (GStreamer) nécessaire. |
+| Gros volumes | Azure AI Speech — **Batch** (option A) | ~0,17 €/h, soit −80 % sur le poste principal. | Engagement Fast seul : économie limitée à ~−50 %. |
 | Orchestration | **Azure Functions** (*Pro Code*) déclenchées par Event Grid | Intégration VNet, testabilité, coût marginal à fort volume. | Logic Apps Consumption : incompatibles avec les Private Endpoints (conservées pour la non-production). |
 | Données | Blob Storage + Cosmos DB serverless | Stockage éphémère (purge J+1), métadonnées à la demande. | Azure SQL : schéma et coût fixe superflus. |
 | Identité | Entra ID + Managed Identity | Zéro secret, RBAC fin, SSO. | Clés d'accès / chaînes de connexion. |
@@ -354,9 +355,9 @@ Détail de la charge par phase et par profil (j·h) :
 | Poste | Hypothèse | Coût mensuel |
 | --- | --- | ---: |
 | MCO / TMA | 3 j·h par mois (DevOps + développeur), support heures ouvrées | 2 700 € HT |
-| Azure — non-production | Infrastructure `azd up` de ce dépôt | ~8–20 $ |
-| Azure — production sécurisée (hors Speech) | Front Door + WAF, Private Endpoints, Defender, logs | ~650–1 000 $ |
-| Azure AI Speech | À l'usage : ~1 $/h d'audio (Fast), ~0,18 $/h (Batch) | Variable |
+| Azure — non-production | Infrastructure `azd up` de ce dépôt | ~7–18 € HT |
+| Azure — production sécurisée (hors Speech) | Front Door + WAF, Private Endpoints, Defender, logs | ~600–920 € HT |
+| Azure AI Speech | À l'usage : ~0,92 €/h d'audio (Fast), ~0,17 €/h (Batch) | Variable |
 
 Consommation Azure facturée directement par Microsoft sur l'abonnement du
 client (refacturation possible). Le détail figure dans [pricing.md](pricing.md).
@@ -364,11 +365,11 @@ client (refacturation possible). Le détail figure dans [pricing.md](pricing.md)
 Pour l'hypothèse **centre d'appel** (5 M d'appels/an, DMT 7 min, ~48 600 h
 d'audio/mois) :
 
-| Option Speech | Azure / mois (USD) | Azure / an (USD) | Coût complet par appel |
+| Option Speech | Azure / mois (€ HT) | Azure / an (€ HT) | Coût complet par appel |
 | --- | ---: | ---: | ---: |
-| Fast Transcription *pay-as-you-go* | ~49 700–50 900 | ~596 000–611 000 | ~0,12 $ |
-| Fast + engagement 50 000 h | ~26 100–27 300 | ~313 000–328 000 | ~0,065 $ |
-| **Batch (option A)** | **~9 850–11 050** | **~118 000–133 000** | **~0,025 $** |
+| Fast Transcription *pay-as-you-go* | ~45 700–46 800 | ~548 000–562 000 | ~0,11 € |
+| Fast + engagement 50 000 h | ~24 000–25 100 | ~288 000–301 000 | ~0,06 € |
+| **Batch (option A)** | **~9 050–10 150** | **~109 000–122 000** | **~0,023 €** |
 
 ### 7.5 Échéancier de facturation
 
@@ -419,8 +420,10 @@ frictions et des écarts de conformité, et coaching fondé sur des preuves.
 
 ## 10. Hypothèses et conditions
 
-- Abonnement Azure fourni par le client, région France Central, droits de
-  déploiement accordés à l'équipe via GitHub Actions (OIDC).
+- Abonnement Azure fourni par le client, région France Central par défaut
+  (alternatives : Sweden Central, puis North Europe, sous réserve de validation
+  de la conformité), droits de déploiement accordés à l'équipe via GitHub
+  Actions (OIDC).
 - Tenant Entra ID du client : création des inscriptions d'application et des
   groupes de sécurité par la DSI.
 - Échantillon représentatif d'au moins 200 enregistrements MP3 anonymisables

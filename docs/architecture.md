@@ -294,17 +294,22 @@ Logic Apps et le frontend.
 
 ## Coût approximatif (France Central)
 
-Estimations **indicatives** en USD/mois pour un déploiement en **France Central**
-avec un usage de type démonstration/léger, **après optimisations** (Logic Apps
-en Consumption, Container Apps en scale-to-zero, Microsoft Defender for Cloud
-désactivé). Les prix France Central sont comparables à Sweden Central (certains
-services légèrement supérieurs).
+Estimations **indicatives** en euros hors taxes par mois (€ HT/mois) pour un
+déploiement en **France Central** (région par défaut) avec un usage de type
+démonstration/léger, **après optimisations** (Logic Apps en Consumption,
+Container Apps en scale-to-zero, Microsoft Defender for Cloud désactivé).
 
-| Service | Base de facturation | Coût approx. (USD/mois) |
+**Régions alternatives** (`AZURE_LOCATION`), par ordre de préférence, en cas
+d'indisponibilité d'un service ou d'un quota en France Central :
+**Sweden Central** (`swedencentral`), puis **North Europe** (`northeurope`).
+Leurs prix sont identiques ou légèrement inférieurs (quelques %) ; ces régions
+restent dans l'UE mais hors de France (à valider au regard de la conformité).
+
+| Service | Base de facturation | Coût approx. (€/mois) |
 | --- | --- | ---: |
 | Azure Container Registry (Basic) | Forfait fixe | ~5 |
 | Log Analytics + Application Insights | Par Go ingéré | ~1–3 |
-| Azure AI Speech (S0, Fast transcription) | Par heure d'audio (~1 $/h) | variable (~1–5) |
+| Azure AI Speech (S0, Fast transcription) | Par heure d'audio (~0,92 €/h) | variable (~1–5) |
 | Azure Container Apps (scale-to-zero) | vCPU-s / GiB-s (crédit gratuit mensuel) | ~0–3 |
 | Azure Functions (Consumption) | Exécutions + GB-s | ~0–2 |
 | Azure Logic Apps (Consumption) | Par action exécutée | ~0–1 |
@@ -312,18 +317,19 @@ services légèrement supérieurs).
 | Azure Blob Storage (LRS, 2 comptes) | Go stockés + opérations | ~0,5–1 |
 | Azure Event Grid | Par opération (100 k gratuites/mois) | ~0 |
 | User-assigned Managed Identity | — | Gratuit |
-| **Total estimé** | | **~8–20 USD/mois** |
+| **Total estimé** | | **~7–18 €/mois** |
 
 > Le poste dominant à faible charge est le **Container Registry Basic** (forfait
-> fixe ~5 $). Le coût **Speech** croît avec le volume audio transcrit.
+> fixe ~5 €). Le coût **Speech** croît avec le volume audio transcrit.
 >
 > À titre de comparaison, **sans** les optimisations (plan Logic App Standard
 > WS1 toujours actif + Container Apps `minReplicas=1` + Defender activé), le
-> total observé était de l'ordre de **~60–75 USD/mois**.
+> total observé était de l'ordre de **~55–70 €/mois**.
 >
 > Estimation détaillée (non-production vs production sécurisée, coût de la
-> transcription par heure d'audio, scénarios de volume et hypothèse centre
-> d'appel — DMT 7 min, 5 M audios/an) : [pricing.md](pricing.md).
+> transcription par heure d'audio, scénarios de volume, hypothèse centre
+> d'appel — DMT 7 min, 5 M audios/an — et choix de la région) :
+> [pricing.md](pricing.md).
 
 ## Références
 

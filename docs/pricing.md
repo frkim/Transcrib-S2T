@@ -13,16 +13,21 @@ Speech), qui est le seul poste réellement proportionnel au volume d'audio, et
 une **hypothèse haute « centre d'appel »** (DMT 7 minutes, 5 millions d'audios
 par an).
 
-> ⚠️ **Estimations indicatives**, en **USD/mois**, basées sur les prix publics
-> *pay-as-you-go* (hors remises, réservations, EA/MCA ou taxes) pour la région
-> **France Central**. Les prix Azure évoluent : valider systématiquement avec
-> l'[Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/)
-> et la page [Tarifs Azure AI Speech](https://azure.microsoft.com/pricing/details/cognitive-services/speech-services/).
-> Ordre de grandeur de conversion : 1 USD ≈ 0,90–0,95 EUR.
+> ⚠️ **Estimations indicatives**, en **euros hors taxes par mois (€ HT/mois)**,
+> basées sur les prix publics *pay-as-you-go* (hors remises, réservations,
+> EA/MCA ou taxes) pour la région **France Central**, région par défaut du
+> projet (alternatives : **Sweden Central**, puis **North Europe** — voir
+> [Région de déploiement](#région-de-déploiement)). Les montants sont arrondis
+> (base de conversion de la grille publique : 1 USD ≈ 0,92 EUR). Les prix Azure
+> évoluent : valider systématiquement avec
+> l'[Azure Pricing Calculator](https://azure.microsoft.com/fr-fr/pricing/calculator/)
+> (devise **Euro (€)**, région **France Central**) et la page
+> [Tarifs Azure AI Speech](https://azure.microsoft.com/fr-fr/pricing/details/cognitive-services/speech-services/).
 
 ## Sommaire
 
 - [Hypothèses communes](#hypothèses-communes)
+- [Région de déploiement](#région-de-déploiement)
 - [Coût de la transcription (Azure AI Speech)](#coût-de-la-transcription-azure-ai-speech)
 - [Environnement non-production](#environnement-non-production)
 - [Environnement de production sécurisé](#environnement-de-production-sécurisé)
@@ -32,7 +37,9 @@ par an).
 
 ## Hypothèses communes
 
-- Région **France Central**, un seul environnement par estimation.
+- Région **France Central** par défaut (alternatives : Sweden Central, puis
+  North Europe), un seul environnement par estimation.
+- Montants en **euros hors taxes** (€ HT), arrondis.
 - Fichiers **MP3** (~128 kbit/s ≈ 1 Mo/min, soit ~60 Mo par heure d'audio).
 - Audio et transcripts **purgés après 1 jour** (Logic App de purge) : le volume
   stocké reste donc très faible quel que soit le volume transcrit.
@@ -43,30 +50,56 @@ par an).
 - Quotas par défaut de l'API (`TranscriptionLimits`) : 3 transcriptions/jour,
   10/semaine, 5 minutes max par fichier.
 
+## Région de déploiement
+
+La région est choisie à la création de l'environnement `azd` (variable
+`AZURE_LOCATION`) ; toutes les ressources sont déployées dans cette région.
+Ordre de préférence :
+
+| Priorité | Région (`AZURE_LOCATION`) | Localisation des données | Quand la retenir | Prix indicatifs vs France Central |
+| --- | --- | --- | --- | --- |
+| **1 — par défaut** | **France Central** (`francecentral`) | Paris, France | Hébergement des données en France (exigence de conformité du projet). | Référence des estimations de cette page |
+| 2 — alternative | Sweden Central (`swedencentral`) | Suède (UE) | Service, SKU, capacité ou quota indisponible en France Central (ex. quota Azure AI Speech, Functions Flex Consumption). | Speech généralement identique ; calcul, stockage et réseau identiques ou légèrement inférieurs (quelques %) |
+| 3 — alternative | North Europe (`northeurope`) | Irlande (UE) | Si Sweden Central ne convient pas non plus. | Speech généralement identique ; calcul, stockage et réseau identiques ou légèrement inférieurs (quelques %) |
+
+```bash
+azd env new <nom-environnement> --location francecentral   # par défaut
+# azd env new <nom-environnement> --location swedencentral # alternative 1
+# azd env new <nom-environnement> --location northeurope   # alternative 2
+```
+
+Pour le workflow GitHub Actions (`azure-dev.yml`), renseigner la variable de
+dépôt `AZURE_LOCATION` avec la même valeur.
+
+> Les estimations en France Central constituent un **majorant raisonnable**
+> pour Sweden Central et North Europe. Ces deux régions restent dans l'Union
+> européenne (RGPD) mais **hors de France** : leur utilisation doit être validée
+> avec le DPO / RSSI au regard de l'exigence d'hébergement en France.
+
 ## Coût de la transcription (Azure AI Speech)
 
 ### Grille tarifaire Speech-to-Text (S0, pay-as-you-go)
 
 | Mode Speech-to-Text | Prix public indicatif | Commentaire |
 | --- | ---: | --- |
-| **Fast Transcription** (utilisé par le projet) | **~1,00 $ / heure d'audio** (≈ 0,0167 $/min) | Synchrone, facturé à la seconde d'audio. |
-| Temps réel (standard) | ~1,00 $ / heure | Streaming (SDK), non utilisé. |
-| Batch Transcription | ~0,18 $ / heure | Asynchrone (soumission + *polling*) — ~80 % moins cher. |
-| Modèle personnalisé (Custom Speech) | ~1,20 $ / heure + hébergement du endpoint (~0,05 $/h) | Uniquement si un vocabulaire métier spécifique est nécessaire. |
+| **Fast Transcription** (utilisé par le projet) | **~0,92 € / heure d'audio** (≈ 0,0153 €/min) | Synchrone, facturé à la seconde d'audio. |
+| Temps réel (standard) | ~0,92 € / heure | Streaming (SDK), non utilisé. |
+| Batch Transcription | ~0,17 € / heure | Asynchrone (soumission + *polling*) — ~80 % moins cher. |
+| Modèle personnalisé (Custom Speech) | ~1,10 € / heure + hébergement du endpoint (~0,05 €/h) | Uniquement si un vocabulaire métier spécifique est nécessaire. |
 | *Speaker diarization* | **Inclus** | Pas de surcoût. |
 | Niveau gratuit (F0) | 5 h d'audio / mois | Possible en dev, limité en concurrence ; la ressource du projet est en **S0**. |
-| Engagement (*commitment tier*) | ex. 2 000 h ≈ 1 600 $ (~0,80 $/h) ; 50 000 h ≈ 25 000 $ (~0,50 $/h) | Rentable au-delà de ~1 500 h/mois régulières. |
+| Engagement (*commitment tier*) | ex. 2 000 h ≈ 1 470 € (~0,74 €/h) ; 50 000 h ≈ 23 000 € (~0,46 €/h) | Rentable au-delà de ~1 500 h/mois régulières. |
 
 ### Coût marginal par heure d'audio
 
 | Poste | Coût par heure d'audio transcrite |
 | --- | ---: |
-| Azure AI Speech (Fast Transcription) | ~1,00 $ |
-| Blob Storage (≈ 60 Mo MP3 + transcript, conservés 1 jour, opérations) | < 0,001 $ |
-| Azure Functions / Logic Apps (1 exécution par fichier) | < 0,001 $ |
-| Cosmos DB serverless (quelques écritures/lectures de job) | < 0,001 $ |
-| Event Grid (1 événement par fichier) | ~0 $ |
-| **Total marginal** | **≈ 1,00 $ / heure d'audio (≈ 0,017 $ / minute)** |
+| Azure AI Speech (Fast Transcription) | ~0,92 € |
+| Blob Storage (≈ 60 Mo MP3 + transcript, conservés 1 jour, opérations) | < 0,001 € |
+| Azure Functions / Logic Apps (1 exécution par fichier) | < 0,001 € |
+| Cosmos DB serverless (quelques écritures/lectures de job) | < 0,001 € |
+| Event Grid (1 événement par fichier) | ~0 € |
+| **Total marginal** | **≈ 0,92 € / heure d'audio (≈ 0,015 € / minute)** |
 
 > Le coût marginal est **quasi entièrement** celui d'Azure AI Speech : les autres
 > services sont négligeables à l'unité grâce à la purge quotidienne.
@@ -75,11 +108,11 @@ par an).
 
 | Scénario | Volume audio / mois | Fast Transcription (pay-as-you-go) | Équivalent Batch (pour comparaison) |
 | --- | ---: | ---: | ---: |
-| Quotas par défaut (10 fichiers × 5 min / semaine) | ~3,6 h | **~3,6 $** | ~0,7 $ |
-| Petite équipe (20 appels × 5 min / jour ouvré) | ~37 h | **~37 $** | ~7 $ |
-| Service client (200 appels × 10 min / jour ouvré) | ~730 h | **~730 $** | ~130 $ |
-| Centre de contact (2 000 h / mois) | 2 000 h | **~2 000 $** (≈ 1 600 $ avec engagement) | ~360 $ |
-| **Centre d'appel — hypothèse max** (5 M audios/an × DMT 7 min, voir [détail](#hypothèse-centre-dappel-dmt-7-min-5-m-audiosan)) | ~48 600 h | **~48 600 $** (≈ 25 000 $ avec engagement 50 000 h) | ~8 750 $ |
+| Quotas par défaut (10 fichiers × 5 min / semaine) | ~3,6 h | **~3,3 €** | ~0,6 € |
+| Petite équipe (20 appels × 5 min / jour ouvré) | ~37 h | **~34 €** | ~6 € |
+| Service client (200 appels × 10 min / jour ouvré) | ~730 h | **~670 €** | ~120 € |
+| Centre de contact (2 000 h / mois) | 2 000 h | **~1 840 €** (≈ 1 470 € avec engagement) | ~330 € |
+| **Centre d'appel — hypothèse max** (5 M audios/an × DMT 7 min, voir [détail](#hypothèse-centre-dappel-dmt-7-min-5-m-audiosan)) | ~48 600 h | **~44 700 €** (≈ 23 000 € avec engagement 50 000 h) | ~8 050 € |
 
 > Au-delà de quelques centaines d'heures par mois, il est pertinent d'évaluer
 > un *commitment tier* ou un passage partiel en **Batch Transcription** (au prix
@@ -92,10 +125,10 @@ Configuration actuellement déployée par `infra/` : services *serverless*,
 scale-to-zero, endpoints publics protégés par Managed Identity / Entra ID,
 Microsoft Defender for Cloud désactivé, rétention des logs 30 jours.
 
-| Service | SKU / configuration (`infra/`) | Base de facturation | Coût approx. (USD/mois) |
+| Service | SKU / configuration (`infra/`) | Base de facturation | Coût approx. (€/mois) |
 | --- | --- | --- | ---: |
 | Azure Container Apps (frontend + API) | Consumption, `minReplicas: 0`, 0,5 vCPU / 1 Gi | vCPU-s / GiB-s (180 000 vCPU-s et 360 000 GiB-s gratuits/mois) | ~0–3 |
-| Azure Container Registry | Basic | Forfait (~0,167 $/jour) | ~5 |
+| Azure Container Registry | Basic | Forfait (~0,15 €/jour) | ~5 |
 | Azure Functions | Flex Consumption (FC1) | GB-s + exécutions (franchise mensuelle) | ~0–2 |
 | Azure Logic Apps (transcription + purge) | Consumption | Par action exécutée | ~0–1 |
 | Azure AI Speech | S0, Fast Transcription | Par heure d'audio | ~1–5 (quotas par défaut) |
@@ -105,7 +138,7 @@ Microsoft Defender for Cloud désactivé, rétention des logs 30 jours.
 | Log Analytics + Application Insights | PerGB2018, rétention 30 jours | Par Go ingéré (5 Go gratuits/mois) | ~1–3 |
 | User-assigned Managed Identity | — | — | Gratuit |
 | Entra ID (inscription d'application) | Niveau gratuit | — | Gratuit |
-| **Total non-production** | | | **~8–20 USD/mois** |
+| **Total non-production** | | | **~7–18 €/mois** |
 
 > Le poste dominant à faible charge est le **Container Registry Basic**
 > (forfait fixe). Le coût Speech reste faible tant que les quotas par défaut
@@ -145,34 +178,34 @@ ajoute :
 
 ### Estimation détaillée
 
-| Service | Configuration production | Coût approx. (USD/mois) |
+| Service | Configuration production | Coût approx. (€/mois) |
 | --- | --- | ---: |
-| Azure Front Door Premium + WAF | Forfait de base + requêtes/transfert (faible trafic) | ~335–400 |
-| Azure Container Apps (frontend + API) | Workload profiles (profil Consumption), VNet, `minReplicas: 1–2`, zone redundancy | ~70–150 |
-| Azure Functions | Flex Consumption + intégration VNet + 1 instance *always ready* | ~20–40 |
-| Purge | Politique de cycle de vie Blob / Function *timer* (option : Logic Apps Standard WS1 ~180 $) | ~0 (ou ~180) |
+| Azure Front Door Premium + WAF | Forfait de base + requêtes/transfert (faible trafic) | ~310–370 |
+| Azure Container Apps (frontend + API) | Workload profiles (profil Consumption), VNet, `minReplicas: 1–2`, zone redundancy | ~65–140 |
+| Azure Functions | Flex Consumption + intégration VNet + 1 instance *always ready* | ~18–37 |
+| Purge | Politique de cycle de vie Blob / Function *timer* (option : Logic Apps Standard WS1 ~165 €) | ~0 (ou ~165) |
 | Azure AI Speech | S0, Fast Transcription, accès public désactivé | **variable** — voir [scénarios](#scénarios-de-volume) |
-| Azure Cosmos DB | Serverless (ou autoscale zone-redondant), sauvegarde continue 7 jours | ~5–30 |
-| Azure Blob Storage (2 comptes) | Standard ZRS, *soft delete* | ~3–10 |
-| Azure Container Registry | Premium | ~50 |
-| Private Endpoints | ~9 endpoints (~7,30 $/mois chacun) + données traitées | ~65–75 |
+| Azure Cosmos DB | Serverless (ou autoscale zone-redondant), sauvegarde continue 7 jours | ~5–28 |
+| Azure Blob Storage (2 comptes) | Standard ZRS, *soft delete* | ~3–9 |
+| Azure Container Registry | Premium | ~46 |
+| Private Endpoints | ~9 endpoints (~6,70 €/mois chacun) + données traitées | ~60–69 |
 | Private DNS zones | ~7 zones | ~4 |
-| NAT Gateway | 1 passerelle + IP publique + données sortantes | ~35–45 |
+| NAT Gateway | 1 passerelle + IP publique + données sortantes | ~32–41 |
 | Azure Key Vault | Standard | ~1 |
-| Log Analytics + Application Insights | 10–30 Go/mois, rétention 90 jours | ~25–90 |
-| Microsoft Defender for Cloud | Storage (×2), Containers, Key Vault, Cosmos DB, Resource Manager | ~40–100 |
+| Log Analytics + Application Insights | 10–30 Go/mois, rétention 90 jours | ~23–83 |
+| Microsoft Defender for Cloud | Storage (×2), Containers, Key Vault, Cosmos DB, Resource Manager | ~37–92 |
 | Azure Event Grid | System topic | ~0–1 |
 | User-assigned Managed Identity | — | Gratuit |
-| Entra ID | Niveau gratuit (option P1 ~6 $/utilisateur/mois pour l'accès conditionnel) | 0 (+ licences) |
-| **Total production sécurisée (hors Speech)** | | **~650–1 000 USD/mois** |
+| Entra ID | Niveau gratuit (option P1 ~5,60 €/utilisateur/mois pour l'accès conditionnel) | 0 (+ licences) |
+| **Total production sécurisée (hors Speech)** | | **~600–920 €/mois** |
 
 > **Variante sans exposition Internet** (accès uniquement via VPN /
 > ExpressRoute, ingress Container Apps interne) : sans Front Door Premium, le
-> socle descend à **~320–600 USD/mois** (hors Speech).
+> socle descend à **~295–550 €/mois** (hors Speech).
 >
-> **Options non incluses** : Azure DDoS Network Protection (~2 950 $/mois),
-> Azure Firewall (~900 $/mois et plus), Microsoft Sentinel, Defender for Storage
-> *malware scanning* (~0,15 $/Go analysé), multi-région / reprise d'activité.
+> **Options non incluses** : Azure DDoS Network Protection (~2 710 €/mois),
+> Azure Firewall (~830 €/mois et plus), Microsoft Sentinel, Defender for Storage
+> *malware scanning* (~0,14 €/Go analysé), multi-région / reprise d'activité.
 
 ## Hypothèse centre d'appel (DMT 7 min, 5 M audios/an)
 
@@ -197,9 +230,9 @@ configuration de **production sécurisée** décrite ci-dessus.
 
 | Mode | Prix unitaire | Coût par audio (7 min) | Coût / mois | Coût / an |
 | --- | ---: | ---: | ---: | ---: |
-| Fast Transcription, *pay-as-you-go* (actuel) | ~1,00 $/h | ~0,117 $ | **~48 600 $** | **~583 000 $** |
-| Fast Transcription + *commitment tier* 50 000 h/mois¹ | ~0,50 $/h (forfait ~25 000 $/mois) | ~0,058 $ | **~25 000 $** | **~300 000 $** |
-| Batch Transcription² | ~0,18 $/h | ~0,021 $ | **~8 750 $** | **~105 000 $** |
+| Fast Transcription, *pay-as-you-go* (actuel) | ~0,92 €/h | ~0,107 € | **~44 700 €** | **~536 000 €** |
+| Fast Transcription + *commitment tier* 50 000 h/mois¹ | ~0,46 €/h (forfait ~23 000 €/mois) | ~0,054 € | **~23 000 €** | **~276 000 €** |
+| Batch Transcription² | ~0,17 €/h | ~0,019 € | **~8 050 €** | **~96 600 €** |
 
 ¹ Le palier 50 000 h/mois couvre les ~48 600 h mensuelles ; les heures au-delà
 du forfait sont facturées au tarif de dépassement. Vérifier l'éligibilité de
@@ -214,33 +247,33 @@ différé des appels.
 À ce volume, les postes « négligeables à l'unité » ne le sont plus en cumulé.
 Ajustement du [socle de production sécurisée](#estimation-détaillée) :
 
-| Service | Hypothèse de charge | Coût approx. (USD/mois) |
+| Service | Hypothèse de charge | Coût approx. (€/mois) |
 | --- | --- | ---: |
-| Azure Front Door Premium + WAF | Forfait + ~420 k uploads/mois (~2,9 To) + requêtes UI | ~400–650 |
-| Azure Container Apps (frontend + API) | Plusieurs réplicas en heures ouvrées (uploads ~7 Mo) | ~150–300 |
-| Azure Functions (Pro Code) | ~420 k exécutions/mois, chacune attend la réponse Speech (~30–90 s) | ~100–400 |
-| Azure Cosmos DB | ~420 k jobs/mois (créations + mises à jour de statut + requêtes UI) | ~10–50 |
-| Azure Blob Storage (2 comptes) | ~2,9 To écrits/mois, ~100–200 Go stockés, millions d'opérations | ~30–60 |
-| Private Endpoints | ~9 endpoints + ~6–9 To de données traitées (0,01 $/Go) | ~130–165 |
-| Log Analytics + Application Insights | ~50–150 Go/mois (traces par job), rétention 90 jours | ~150–400 |
-| Microsoft Defender for Cloud | Inchangé (hors *malware scanning*) | ~40–100 |
-| Autres (ACR Premium, NAT Gateway, Private DNS, Key Vault, Event Grid, purge) | Inchangé ; Event Grid ~1 M opérations/mois | ~90–100 |
-| **Total socle production (hors Speech)** | | **~1 100–2 300 USD/mois** |
+| Azure Front Door Premium + WAF | Forfait + ~420 k uploads/mois (~2,9 To) + requêtes UI | ~370–600 |
+| Azure Container Apps (frontend + API) | Plusieurs réplicas en heures ouvrées (uploads ~7 Mo) | ~140–275 |
+| Azure Functions (Pro Code) | ~420 k exécutions/mois, chacune attend la réponse Speech (~30–90 s) | ~90–370 |
+| Azure Cosmos DB | ~420 k jobs/mois (créations + mises à jour de statut + requêtes UI) | ~9–46 |
+| Azure Blob Storage (2 comptes) | ~2,9 To écrits/mois, ~100–200 Go stockés, millions d'opérations | ~28–55 |
+| Private Endpoints | ~9 endpoints + ~6–9 To de données traitées (~0,01 €/Go) | ~120–150 |
+| Log Analytics + Application Insights | ~50–150 Go/mois (traces par job), rétention 90 jours | ~140–370 |
+| Microsoft Defender for Cloud | Inchangé (hors *malware scanning*) | ~37–92 |
+| Autres (ACR Premium, NAT Gateway, Private DNS, Key Vault, Event Grid, purge) | Inchangé ; Event Grid ~1 M opérations/mois | ~83–92 |
+| **Total socle production (hors Speech)** | | **~1 000–2 100 €/mois** |
 
 > Avec l'approche *Low Code* (Logic Apps Consumption, ~15–20 actions par
-> fichier), compter **~400–800 $/mois** supplémentaires pour la transcription ;
+> fichier), compter **~370–740 €/mois** supplémentaires pour la transcription ;
 > l'approche *Pro Code* (Functions) est recommandée à ce volume.
 >
 > Option : Defender for Storage *malware scanning* sur les uploads
-> (~2,9 To × 0,15 $/Go) ≈ **+440 $/mois**.
+> (~2,9 To × ~0,14 €/Go) ≈ **+400 €/mois**.
 
 ### Total hypothèse centre d'appel
 
-| Option Speech | Total / mois (USD) | Total / an (USD) | Coût complet par audio |
+| Option Speech | Total / mois (€) | Total / an (€) | Coût complet par audio |
 | --- | ---: | ---: | ---: |
-| Fast Transcription *pay-as-you-go* | **~49 700–50 900** | **~596 000–611 000** | ~0,12 $ |
-| Fast Transcription + engagement 50 000 h | **~26 100–27 300** | **~313 000–328 000** | ~0,065 $ |
-| Batch Transcription | **~9 850–11 050** | **~118 000–133 000** | ~0,025 $ |
+| Fast Transcription *pay-as-you-go* | **~45 700–46 800** | **~548 000–562 000** | ~0,11 € |
+| Fast Transcription + engagement 50 000 h | **~24 000–25 100** | **~288 000–301 000** | ~0,06 € |
+| Batch Transcription | **~9 050–10 150** | **~109 000–122 000** | ~0,023 € |
 
 > Avec une DMT de 7 minutes et 5 M d'audios/an, **Speech représente ~85–97 %**
 > de la facture selon l'option : le choix du mode de facturation (engagement)
@@ -263,27 +296,27 @@ Ajustement du [socle de production sécurisée](#estimation-détaillée) :
 
 | Volume audio / mois | Non-production | Production sécurisée |
 | ---: | ---: | ---: |
-| ~4 h (quotas par défaut) | ~10–20 $ | ~655–1 005 $ |
-| ~40 h | ~45–55 $ | ~690–1 040 $ |
-| ~730 h | ~735–745 $ | ~1 380–1 730 $ |
-| 2 000 h | ~2 005–2 015 $ | ~2 650–3 000 $ (≈ 2 250–2 600 $ avec engagement Speech) |
-| ~48 600 h (centre d'appel : 5 M audios/an × DMT 7 min) | — (volume de production) | ~49 700–50 900 $ (≈ 26 100–27 300 $ avec engagement 50 000 h ; ≈ 9 850–11 050 $ en Batch) |
+| ~4 h (quotas par défaut) | ~9–18 € | ~605–925 € |
+| ~40 h | ~40–50 € | ~635–955 € |
+| ~730 h | ~675–685 € | ~1 270–1 590 € |
+| 2 000 h | ~1 845–1 855 € | ~2 440–2 760 € (≈ 2 070–2 390 € avec engagement Speech) |
+| ~48 600 h (centre d'appel : 5 M audios/an × DMT 7 min) | — (volume de production) | ~45 700–46 800 € (≈ 24 000–25 100 € avec engagement 50 000 h ; ≈ 9 050–10 150 € en Batch) |
 
-- En **non-production**, le coût fixe est minime (~10 $/mois) : la facture suit
-  presque uniquement le volume transcrit (~1 $ par heure d'audio).
+- En **non-production**, le coût fixe est minime (~9 €/mois) : la facture suit
+  presque uniquement le volume transcrit (~0,92 € par heure d'audio).
 - En **production sécurisée**, le coût est dominé par le **socle de sécurité**
   (Front Door/WAF, Private Endpoints, ACR Premium, Defender, logs) tant que le
   volume audio reste inférieur à ~700 h/mois ; au-delà, **Speech** devient le
   premier poste.
 - Dans l'**hypothèse centre d'appel** (5 M audios/an, DMT 7 min), le budget
-  annuel varie de **~600 k$** (*pay-as-you-go*) à **~320 k$** (engagement
-  50 000 h) voire **~125 k$** (Batch Transcription).
+  annuel varie de **~555 k€** (*pay-as-you-go*) à **~295 k€** (engagement
+  50 000 h) voire **~115 k€** (Batch Transcription).
 
 ## Leviers d'optimisation
 
 - **Speech** : conserver les quotas `TranscriptionLimits` comme garde-fou,
   souscrire un *commitment tier* pour un volume régulier élevé, ou basculer les
-  traitements non urgents en **Batch Transcription** (~0,18 $/h). Pour un
+  traitements non urgents en **Batch Transcription** (~0,17 €/h). Pour un
   centre d'appel (~48 600 h/mois), le palier d'engagement 50 000 h divise
   quasiment par deux la facture Speech, et le Batch la divise par ~5,5.
 - **Non-production** : garder le scale-to-zero, la purge quotidienne et Defender
@@ -293,16 +326,22 @@ Ajustement du [socle de production sécurisée](#estimation-détaillée) :
   d'Application Insights, et étudier les réservations (Container Apps,
   Cosmos DB) pour les charges stables.
 - Mettre en place des **budgets et alertes Azure Cost Management** par
-  environnement (groupe de ressources).
+  environnement (groupe de ressources), en euros.
+- **Région** : conserver France Central par défaut ; ne basculer vers Sweden
+  Central (puis North Europe) qu'en cas d'indisponibilité de service ou de
+  quota, après validation de la conformité (voir
+  [Région de déploiement](#région-de-déploiement)). L'économie attendue sur le
+  socle reste de l'ordre de quelques %.
 
 ## Références
 
 - Architecture détaillée : [architecture.md](architecture.md).
 - Dossier projet et offre financière : [dossier-projet.md](dossier-projet.md).
 - Vue d'ensemble et déploiement : [../README.md](../README.md).
-- [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/).
-- [Tarifs Azure AI Speech](https://azure.microsoft.com/pricing/details/cognitive-services/speech-services/).
-- [Tarifs Azure Container Apps](https://azure.microsoft.com/pricing/details/container-apps/).
-- [Tarifs Azure Front Door](https://azure.microsoft.com/pricing/details/frontdoor/).
-- [Tarifs Private Link](https://azure.microsoft.com/pricing/details/private-link/).
-- [Tarifs Microsoft Defender for Cloud](https://azure.microsoft.com/pricing/details/defender-for-cloud/).
+- [Azure Pricing Calculator](https://azure.microsoft.com/fr-fr/pricing/calculator/) (devise Euro, région France Central).
+- [Tarifs Azure AI Speech](https://azure.microsoft.com/fr-fr/pricing/details/cognitive-services/speech-services/).
+- [Tarifs Azure Container Apps](https://azure.microsoft.com/fr-fr/pricing/details/container-apps/).
+- [Tarifs Azure Front Door](https://azure.microsoft.com/fr-fr/pricing/details/frontdoor/).
+- [Tarifs Private Link](https://azure.microsoft.com/fr-fr/pricing/details/private-link/).
+- [Tarifs Microsoft Defender for Cloud](https://azure.microsoft.com/fr-fr/pricing/details/defender-for-cloud/).
+- [Régions prises en charge par Azure AI Speech](https://learn.microsoft.com/fr-fr/azure/ai-services/speech-service/regions).
