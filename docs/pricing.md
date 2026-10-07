@@ -9,7 +9,9 @@ deux configurations :
    WAF, haute disponibilité, Defender for Cloud, rétention des logs…).
 
 Elle détaille aussi le **coût de la transcription vocale → texte** (Azure AI
-Speech), qui est le seul poste réellement proportionnel au volume d'audio.
+Speech), qui est le seul poste réellement proportionnel au volume d'audio, et
+une **hypothèse haute « centre d'appel »** (DMT 7 minutes, 5 millions d'audios
+par an).
 
 > ⚠️ **Estimations indicatives**, en **USD/mois**, basées sur les prix publics
 > *pay-as-you-go* (hors remises, réservations, EA/MCA ou taxes) pour la région
@@ -24,6 +26,7 @@ Speech), qui est le seul poste réellement proportionnel au volume d'audio.
 - [Coût de la transcription (Azure AI Speech)](#coût-de-la-transcription-azure-ai-speech)
 - [Environnement non-production](#environnement-non-production)
 - [Environnement de production sécurisé](#environnement-de-production-sécurisé)
+- [Hypothèse centre d'appel (DMT 7 min, 5 M audios/an)](#hypothèse-centre-dappel-dmt-7-min-5-m-audiosan)
 - [Synthèse](#synthèse)
 - [Leviers d'optimisation](#leviers-doptimisation)
 
@@ -52,7 +55,7 @@ Speech), qui est le seul poste réellement proportionnel au volume d'audio.
 | Modèle personnalisé (Custom Speech) | ~1,20 $ / heure + hébergement du endpoint (~0,05 $/h) | Uniquement si un vocabulaire métier spécifique est nécessaire. |
 | *Speaker diarization* | **Inclus** | Pas de surcoût. |
 | Niveau gratuit (F0) | 5 h d'audio / mois | Possible en dev, limité en concurrence ; la ressource du projet est en **S0**. |
-| Engagement (*commitment tier*) | ex. 2 000 h ≈ 1 600 $ (~0,80 $/h) | Rentable au-delà de ~1 500 h/mois régulières. |
+| Engagement (*commitment tier*) | ex. 2 000 h ≈ 1 600 $ (~0,80 $/h) ; 50 000 h ≈ 25 000 $ (~0,50 $/h) | Rentable au-delà de ~1 500 h/mois régulières. |
 
 ### Coût marginal par heure d'audio
 
@@ -76,6 +79,7 @@ Speech), qui est le seul poste réellement proportionnel au volume d'audio.
 | Petite équipe (20 appels × 5 min / jour ouvré) | ~37 h | **~37 $** | ~7 $ |
 | Service client (200 appels × 10 min / jour ouvré) | ~730 h | **~730 $** | ~130 $ |
 | Centre de contact (2 000 h / mois) | 2 000 h | **~2 000 $** (≈ 1 600 $ avec engagement) | ~360 $ |
+| **Centre d'appel — hypothèse max** (5 M audios/an × DMT 7 min, voir [détail](#hypothèse-centre-dappel-dmt-7-min-5-m-audiosan)) | ~48 600 h | **~48 600 $** (≈ 25 000 $ avec engagement 50 000 h) | ~8 750 $ |
 
 > Au-delà de quelques centaines d'heures par mois, il est pertinent d'évaluer
 > un *commitment tier* ou un passage partiel en **Batch Transcription** (au prix
@@ -170,6 +174,91 @@ ajoute :
 > Azure Firewall (~900 $/mois et plus), Microsoft Sentinel, Defender for Storage
 > *malware scanning* (~0,15 $/Go analysé), multi-région / reprise d'activité.
 
+## Hypothèse centre d'appel (DMT 7 min, 5 M audios/an)
+
+Hypothèse **maximale** pour un usage de type **centre d'appel** : chaque appel
+enregistré est transcrit, avec une **durée moyenne de traitement (DMT) de
+7 minutes** et **5 millions d'audios par an**. Ce volume suppose la
+configuration de **production sécurisée** décrite ci-dessus.
+
+### Volumétrie
+
+| Indicateur | Calcul | Valeur |
+| --- | --- | ---: |
+| Audios / an | hypothèse | **5 000 000** |
+| Audios / mois | 5 000 000 ÷ 12 | ~416 700 |
+| Audios / jour ouvré | 5 000 000 ÷ ~250 jours | ~20 000 (≈ 2 000/h sur 10 h, ~35/min) |
+| Minutes d'audio / an | 5 000 000 × 7 min | 35 000 000 min |
+| **Heures d'audio / an** | 35 000 000 ÷ 60 | **~583 300 h** |
+| **Heures d'audio / mois** | 583 300 ÷ 12 | **~48 600 h** |
+| Volume MP3 ingéré / mois | ~416 700 × ~7 Mo | ~2,9 To (stock moyen ~100–200 Go grâce à la purge quotidienne) |
+
+### Coût Speech du centre d'appel
+
+| Mode | Prix unitaire | Coût par audio (7 min) | Coût / mois | Coût / an |
+| --- | ---: | ---: | ---: | ---: |
+| Fast Transcription, *pay-as-you-go* (actuel) | ~1,00 $/h | ~0,117 $ | **~48 600 $** | **~583 000 $** |
+| Fast Transcription + *commitment tier* 50 000 h/mois¹ | ~0,50 $/h (forfait ~25 000 $/mois) | ~0,058 $ | **~25 000 $** | **~300 000 $** |
+| Batch Transcription² | ~0,18 $/h | ~0,021 $ | **~8 750 $** | **~105 000 $** |
+
+¹ Le palier 50 000 h/mois couvre les ~48 600 h mensuelles ; les heures au-delà
+du forfait sont facturées au tarif de dépassement. Vérifier l'éligibilité de
+Fast Transcription au *commitment tier* et les conditions (engagement annuel,
+région) auprès de Microsoft.
+² Nécessite une évolution de l'architecture (soumission asynchrone + *polling*,
+latence de quelques minutes à quelques heures) — pertinent pour un traitement
+différé des appels.
+
+### Socle de production à cette échelle (hors Speech)
+
+À ce volume, les postes « négligeables à l'unité » ne le sont plus en cumulé.
+Ajustement du [socle de production sécurisée](#estimation-détaillée) :
+
+| Service | Hypothèse de charge | Coût approx. (USD/mois) |
+| --- | --- | ---: |
+| Azure Front Door Premium + WAF | Forfait + ~420 k uploads/mois (~2,9 To) + requêtes UI | ~400–650 |
+| Azure Container Apps (frontend + API) | Plusieurs réplicas en heures ouvrées (uploads ~7 Mo) | ~150–300 |
+| Azure Functions (Pro Code) | ~420 k exécutions/mois, chacune attend la réponse Speech (~30–90 s) | ~100–400 |
+| Azure Cosmos DB | ~420 k jobs/mois (créations + mises à jour de statut + requêtes UI) | ~10–50 |
+| Azure Blob Storage (2 comptes) | ~2,9 To écrits/mois, ~100–200 Go stockés, millions d'opérations | ~30–60 |
+| Private Endpoints | ~9 endpoints + ~6–9 To de données traitées (0,01 $/Go) | ~130–165 |
+| Log Analytics + Application Insights | ~50–150 Go/mois (traces par job), rétention 90 jours | ~150–400 |
+| Microsoft Defender for Cloud | Inchangé (hors *malware scanning*) | ~40–100 |
+| Autres (ACR Premium, NAT Gateway, Private DNS, Key Vault, Event Grid, purge) | Inchangé ; Event Grid ~1 M opérations/mois | ~90–100 |
+| **Total socle production (hors Speech)** | | **~1 100–2 300 USD/mois** |
+
+> Avec l'approche *Low Code* (Logic Apps Consumption, ~15–20 actions par
+> fichier), compter **~400–800 $/mois** supplémentaires pour la transcription ;
+> l'approche *Pro Code* (Functions) est recommandée à ce volume.
+>
+> Option : Defender for Storage *malware scanning* sur les uploads
+> (~2,9 To × 0,15 $/Go) ≈ **+440 $/mois**.
+
+### Total hypothèse centre d'appel
+
+| Option Speech | Total / mois (USD) | Total / an (USD) | Coût complet par audio |
+| --- | ---: | ---: | ---: |
+| Fast Transcription *pay-as-you-go* | **~49 700–50 900** | **~596 000–611 000** | ~0,12 $ |
+| Fast Transcription + engagement 50 000 h | **~26 100–27 300** | **~313 000–328 000** | ~0,065 $ |
+| Batch Transcription | **~9 850–11 050** | **~118 000–133 000** | ~0,025 $ |
+
+> Avec une DMT de 7 minutes et 5 M d'audios/an, **Speech représente ~85–97 %**
+> de la facture selon l'option : le choix du mode de facturation (engagement)
+> ou du mode de transcription (Batch) est le principal levier.
+
+### Prérequis de configuration
+
+- **Quotas de l'API** (`TranscriptionLimits`, appliqués globalement) : les
+  valeurs par défaut bloqueraient ce scénario. Relever `MaxDurationMinutes`
+  au-delà de la DMT (ex. **30 minutes**, la DMT étant une moyenne),
+  `MaxPerDay` (ex. **≥ 25 000**) et `MaxPerWeek` (ex. **≥ 120 000**).
+- **Quotas Azure AI Speech** : vérifier les limites de requêtes / de
+  concurrence de la ressource S0 pour ~35 transcriptions/min en pointe (et plus
+  lors des pics d'appels) et demander une augmentation si nécessaire.
+- **Ingestion** : à ce volume, l'alimentation est généralement automatisée
+  depuis la plateforme de téléphonie (appels à l'API `POST /jobs`) plutôt que
+  via l'interface web.
+
 ## Synthèse
 
 | Volume audio / mois | Non-production | Production sécurisée |
@@ -178,6 +267,7 @@ ajoute :
 | ~40 h | ~45–55 $ | ~690–1 040 $ |
 | ~730 h | ~735–745 $ | ~1 380–1 730 $ |
 | 2 000 h | ~2 005–2 015 $ | ~2 650–3 000 $ (≈ 2 250–2 600 $ avec engagement Speech) |
+| ~48 600 h (centre d'appel : 5 M audios/an × DMT 7 min) | — (volume de production) | ~49 700–50 900 $ (≈ 26 100–27 300 $ avec engagement 50 000 h ; ≈ 9 850–11 050 $ en Batch) |
 
 - En **non-production**, le coût fixe est minime (~10 $/mois) : la facture suit
   presque uniquement le volume transcrit (~1 $ par heure d'audio).
@@ -185,12 +275,17 @@ ajoute :
   (Front Door/WAF, Private Endpoints, ACR Premium, Defender, logs) tant que le
   volume audio reste inférieur à ~700 h/mois ; au-delà, **Speech** devient le
   premier poste.
+- Dans l'**hypothèse centre d'appel** (5 M audios/an, DMT 7 min), le budget
+  annuel varie de **~600 k$** (*pay-as-you-go*) à **~320 k$** (engagement
+  50 000 h) voire **~125 k$** (Batch Transcription).
 
 ## Leviers d'optimisation
 
 - **Speech** : conserver les quotas `TranscriptionLimits` comme garde-fou,
   souscrire un *commitment tier* pour un volume régulier élevé, ou basculer les
-  traitements non urgents en **Batch Transcription** (~0,18 $/h).
+  traitements non urgents en **Batch Transcription** (~0,18 $/h). Pour un
+  centre d'appel (~48 600 h/mois), le palier d'engagement 50 000 h divise
+  quasiment par deux la facture Speech, et le Batch la divise par ~5,5.
 - **Non-production** : garder le scale-to-zero, la purge quotidienne et Defender
   désactivé ; supprimer l'environnement (`azd down`) lorsqu'il n'est pas utilisé.
 - **Production** : mutualiser Front Door / Defender / Log Analytics avec
