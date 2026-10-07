@@ -5,7 +5,7 @@ l'industrialisation de **Transcrib-S2T** : la transcription automatique
 (MP3 → texte, avec identification des locuteurs) et l'analyse qualitative des
 conversations clients sur Azure.
 
-> 📽️ **Présentation associée** (14 slides) :
+> 📽️ **Présentation associée** (16 slides) :
 > [`presentations/transcrib-s2t.md`](presentations/transcrib-s2t.md) — générée
 > en HTML, PDF et PPTX par le workflow
 > [`presentation.yml`](../.github/workflows/presentation.yml).
@@ -458,3 +458,17 @@ frictions et des écarts de conformité, et coaching fondé sur des preuves.
 - Architecture détaillée : [architecture.md](architecture.md).
 - Estimation des coûts Azure : [pricing.md](pricing.md).
 - Présentation associée : [presentations/transcrib-s2t.md](presentations/transcrib-s2t.md).
+
+## Avertissement
+
+*Le contenu de la présente communication et de ses pièces jointes (le cas
+échéant) est fourni à titre d'information générale uniquement et ne constitue
+en aucun cas une offre ou une acceptation engageant Microsoft ou toute société
+affiliée du groupe Microsoft, sauf mention expresse en ce sens dans un document
+distinct signé par une personne dûment habilitée à cet effet. Ce contenu ne
+saurait être considéré comme complétant ou modifiant les termes d'un accord
+existant avec Microsoft ou toute société affiliée du groupe Microsoft. En
+outre, nous vous rappelons que ce contenu repose uniquement sur les
+informations limitées qui nous ont été communiquées à la date de la présente
+communication et qu'il est susceptible d'évoluer en fonction de changements
+ultérieurs.*

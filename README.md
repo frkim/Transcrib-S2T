@@ -10,6 +10,11 @@ terminés peuvent ensuite être sélectionnés dans l'espace **Analyse qualité*
 pour évaluer le discours, comparer jusqu'à cinq conversations et générer un
 plan de coaching et des rapports exportables.
 
+> ⚖️ **Avertissement** — Le contenu de ce dépôt est fourni à titre d'information
+> générale uniquement et ne constitue en aucun cas une offre ou une acceptation
+> engageant Microsoft ou toute société affiliée du groupe Microsoft. Voir
+> l'avertissement complet : [DISCLAIMER.md](DISCLAIMER.md).
+
 ## Architecture
 
 ```mermaid

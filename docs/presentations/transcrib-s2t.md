@@ -12,7 +12,7 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 
 <!-- _class: lead -->
 <!-- _paginate: false -->
-<!-- _footer: '' -->
+<!-- _footer: 'Document non contractuel · voir l’avertissement en fin de présentation' -->
 
 <span class="eyebrow">Proposition de solution · Octobre 2026</span>
 
@@ -399,4 +399,18 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 2 · Mise à disposition d'un échantillon d'enregistrements et d'un accès Azure<br/>
 3 · Commande P0 + P1, lancement sous 2 semaines<br/>
 4 · Go/No-Go en semaine 3 sur indicateurs mesurés
+</div>
+
+---
+
+<!-- _class: disclaimer -->
+<!-- _paginate: false -->
+<!-- _footer: '' -->
+
+# Avertissement
+
+<div class="legal">
+
+*Le contenu de la présente communication et de ses pièces jointes (le cas échéant) est fourni à titre d'information générale uniquement et ne constitue en aucun cas une offre ou une acceptation engageant Microsoft ou toute société affiliée du groupe Microsoft, sauf mention expresse en ce sens dans un document distinct signé par une personne dûment habilitée à cet effet. Ce contenu ne saurait être considéré comme complétant ou modifiant les termes d'un accord existant avec Microsoft ou toute société affiliée du groupe Microsoft. En outre, nous vous rappelons que ce contenu repose uniquement sur les informations limitées qui nous ont été communiquées à la date de la présente communication et qu'il est susceptible d'évoluer en fonction de changements ultérieurs.*
+
 </div>

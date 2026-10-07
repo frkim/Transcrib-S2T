@@ -148,6 +148,28 @@ section.lead .eyebrow {
   margin-bottom: 18px;
 }
 
+/* Disclaimer (closing legal notice) */
+section.disclaimer {
+  padding: 0 120px;
+  align-content: center;
+  background: var(--soft);
+}
+section.disclaimer h1 {
+  position: static;
+  font-size: 30px;
+  margin: 0 0 24px;
+}
+section.disclaimer .legal {
+  border-left: 5px solid var(--azure);
+  background: #fff;
+  padding: 24px 32px;
+  font-size: 19px;
+  line-height: 1.55;
+  color: var(--muted);
+  text-align: justify;
+}
+section.disclaimer .legal p { margin: 0; }
+
 /* Layout helpers */
 .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
 .cols-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
