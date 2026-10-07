@@ -277,7 +277,7 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 | P3 · Déploiement & adoption | 18,5 | 16 800 |
 | **Total forfait** | **125** | **114 725** |
 
-<div class="callout"><strong>Engagement par paliers</strong> : P0 + P1 commandables seuls (<strong>42 350 € HT</strong>). La suite est conditionnée au Go/No-Go de S3.</div>
+<div class="callout"><strong>Engagement par paliers</strong> : P0 + P1 commandables seuls (<strong>42&nbsp;350&nbsp;€&nbsp;HT</strong>). La suite est conditionnée au Go/No-Go de S3.</div>
 
 </div>
 <div>
