@@ -248,7 +248,7 @@ section.lead .eyebrow {
 /* Gantt */
 .gantt {
   display: grid;
-  grid-template-columns: 250px repeat(16, 1fr);
+  grid-template-columns: 250px repeat(var(--cols, 16), 1fr);
   row-gap: 10px;
   align-items: center;
   font-size: 16px;
