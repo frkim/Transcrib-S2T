@@ -430,3 +430,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Generated Marp presentation exports (built by .github/workflows/presentation.yml)
+docs/presentations/dist/

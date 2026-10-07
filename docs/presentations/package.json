@@ -1,0 +1,23 @@
+{
+  "name": "transcrib-s2t-presentations",
+  "private": true,
+  "description": "Build des présentations Marp de Transcrib-S2T (HTML, PDF, PPTX).",
+  "scripts": {
+    "build": "npm run build:html && npm run build:pdf && npm run build:pptx",
+    "build:html": "marp --config-file .marprc.yml transcrib-s2t.md -o dist/transcrib-s2t.html",
+    "build:pdf": "marp --config-file .marprc.yml transcrib-s2t.md --pdf -o dist/transcrib-s2t.pdf",
+    "build:pptx": "marp --config-file .marprc.yml transcrib-s2t.md --pptx -o dist/transcrib-s2t.pptx",
+    "preview": "marp --config-file .marprc.yml --preview transcrib-s2t.md"
+  },
+  "devDependencies": {
+    "@marp-team/marp-cli": "4.5.1"
+  },
+  "overrides": {
+    "@xmldom/xmldom": "0.9.12",
+    "basic-ftp": "6.2.2",
+    "katex": "0.19.0"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}
