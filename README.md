@@ -184,7 +184,11 @@ vers l'API.
   et valide les Bicep.
 - **Présentation** : `.github/workflows/presentation.yml` génère la présentation
   Marp (HTML, PDF, PPTX) à chaque modification de `docs/presentations/` et la
-  publie en artefact `transcrib-s2t-presentation`. En local :
+  publie en artefact `transcrib-s2t-presentation`. Sur `main` (push ou
+  déclenchement manuel), la version HTML est aussi déployée sur **GitHub Pages**
+  (`https://<owner>.github.io/<repo>/`, PDF et PPTX téléchargeables via
+  `transcrib-s2t.pdf` / `transcrib-s2t.pptx`). Prérequis unique : *Settings →
+  Pages → Source : GitHub Actions*. En local :
 
   ```bash
   cd docs/presentations
