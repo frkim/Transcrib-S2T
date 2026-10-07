@@ -52,6 +52,9 @@ Les **deux approches** de transcription (Functions *Pro Code* et Logic Apps
 > Documentation d'architecture détaillée : [docs/architecture.md](docs/architecture.md).
 > Estimation des coûts (non-production / production sécurisée, transcription,
 > hypothèse centre d'appel) : [docs/pricing.md](docs/pricing.md).
+> Dossier projet (expression de besoins, solution, offre financière, plan
+> projet estimatif) : [docs/dossier-projet.md](docs/dossier-projet.md), et sa
+> présentation Marp : [docs/presentations/](docs/presentations/transcrib-s2t.md).
 
 ## Contrats partagés
 
@@ -173,3 +176,12 @@ vers l'API.
   statuts, lien de téléchargement).
 - **CI** : `.github/workflows/ci.yml` construit et teste le .NET et le frontend,
   et valide les Bicep.
+- **Présentation** : `.github/workflows/presentation.yml` génère la présentation
+  Marp (HTML, PDF, PPTX) à chaque modification de `docs/presentations/` et la
+  publie en artefact `transcrib-s2t-presentation`. En local :
+
+  ```bash
+  cd docs/presentations
+  npm ci
+  npm run build    # dist/transcrib-s2t.{html,pdf,pptx} (Google Chrome requis)
+  ```

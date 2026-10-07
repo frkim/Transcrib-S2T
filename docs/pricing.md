@@ -298,6 +298,7 @@ Ajustement du [socle de production sécurisée](#estimation-détaillée) :
 ## Références
 
 - Architecture détaillée : [architecture.md](architecture.md).
+- Dossier projet et offre financière : [dossier-projet.md](dossier-projet.md).
 - Vue d'ensemble et déploiement : [../README.md](../README.md).
 - [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/).
 - [Tarifs Azure AI Speech](https://azure.microsoft.com/pricing/details/cognitive-services/speech-services/).

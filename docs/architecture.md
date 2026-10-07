@@ -329,3 +329,4 @@ services légèrement supérieurs).
 
 - Vue d'ensemble et guide de démarrage : [../README.md](../README.md).
 - Estimation des coûts : [pricing.md](pricing.md).
+- Dossier projet (besoins, offre, plan projet) : [dossier-projet.md](dossier-projet.md).
