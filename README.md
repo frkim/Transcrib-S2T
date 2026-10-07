@@ -130,8 +130,14 @@ Node.js 24, Docker.
 
 ```bash
 azd auth login
+azd env new <nom-environnement> --location francecentral
 azd up
 ```
+
+Région par défaut : **France Central** (`francecentral`). En cas
+d'indisponibilité d'un service ou d'un quota, utiliser **Sweden Central**
+(`swedencentral`), puis **North Europe** (`northeurope`) — voir
+[docs/pricing.md](docs/pricing.md#région-de-déploiement).
 
 `azd up` provisionne l'infrastructure (Bicep) puis déploie l'API, les Functions,
 les Logic Apps et le frontend. Variables optionnelles :

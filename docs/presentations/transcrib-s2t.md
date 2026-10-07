@@ -84,7 +84,7 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
   <div class="kpi"><div class="v">&lt; 2 <small>min</small></div><div class="l">pour transcrire un appel de 7 minutes (Fast Transcription)</div></div>
   <div class="kpi alt"><div class="v">100 <small>%</small></div><div class="l">des appels transcrits et analysables, plus d'échantillonnage</div></div>
   <div class="kpi warn"><div class="v">24 <small>h</small></div><div class="l">de conservation maximale : purge automatique J+1</div></div>
-  <div class="kpi dark"><div class="v">0,025 <small>$</small></div><div class="l">coût complet par appel en mode Batch (option A)</div></div>
+  <div class="kpi dark"><div class="v">0,023 <small>€</small></div><div class="l">coût complet par appel en mode Batch (option A)</div></div>
 </div>
 
 <div class="cols-3" style="margin-top:26px">
@@ -185,8 +185,8 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 
 | Brique | Choix | Pourquoi |
 | --- | --- | --- |
-| Transcription | **Azure AI Speech — Fast Transcription** | Synchrone, MP3 décodé côté service, diarization incluse, ~1 $/h d'audio |
-| Gros volumes | **Speech Batch** (option A) | ~0,18 $/h : **−80 %** sur le premier poste de coût |
+| Transcription | **Azure AI Speech — Fast Transcription** | Synchrone, MP3 décodé côté service, diarization incluse, ~0,92 €/h d'audio |
+| Gros volumes | **Speech Batch** (option A) | ~0,17 €/h : **−80 %** sur le premier poste de coût |
 | Orchestration | **Azure Functions** + Event Grid | Event-driven, intégration VNet, coût marginal à fort volume |
 | Application | **Next.js** + **ASP.NET Core** sur Container Apps | Scale-to-zero, conteneurs standard, zone redundancy |
 | Données | **Blob Storage** + **Cosmos DB** serverless | Stockage éphémère (J+1), métadonnées payées à la requête |
@@ -303,12 +303,12 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 | Poste | Coût / mois |
 | --- | ---: |
 | MCO / TMA (3 j·h) | 2 700 € HT |
-| Azure non-production | ~8–20 $ |
-| Azure production sécurisée (hors Speech) | ~650–1 000 $ |
-| Speech Fast Transcription | ~1 $ / h d'audio |
-| Speech Batch (option A) | ~0,18 $ / h d'audio |
+| Azure non-production | ~7–18 € |
+| Azure production sécurisée (hors Speech) | ~600–920 € |
+| Speech Fast Transcription | ~0,92 € / h d'audio |
+| Speech Batch (option A) | ~0,17 € / h d'audio |
 
-<p class="small">Consommation Azure facturée par Microsoft sur votre abonnement. Détail : docs/pricing.md.</p>
+<p class="small">Consommation Azure facturée par Microsoft sur votre abonnement. Montants HT, région France Central par défaut (alternatives : Sweden Central, puis North Europe). Détail : docs/pricing.md.</p>
 </div>
 <div>
   <h2>Options</h2>
@@ -331,9 +331,9 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 
 <h2 style="margin-top:26px">Coût Azure annuel — 5 M d'appels × 7 min (~48 600 h d'audio / mois)</h2>
 <div class="bars">
-  <div>Fast, pay-as-you-go</div><div class="track"><div class="fill red" style="width:100%"></div></div><div class="val">~600 k$</div>
-  <div>Fast + engagement 50 000 h</div><div class="track"><div class="fill amber" style="width:53%"></div></div><div class="val">~320 k$</div>
-  <div>Batch (option A)</div><div class="track"><div class="fill green" style="width:21%"></div></div><div class="val">~125 k$</div>
+  <div>Fast, pay-as-you-go</div><div class="track"><div class="fill red" style="width:100%"></div></div><div class="val">~555 k€</div>
+  <div>Fast + engagement 50 000 h</div><div class="track"><div class="fill amber" style="width:53%"></div></div><div class="val">~295 k€</div>
+  <div>Batch (option A)</div><div class="track"><div class="fill green" style="width:21%"></div></div><div class="val">~115 k€</div>
 </div>
 
 <p class="small" style="margin-top:14px">Hypothèses : 1 % des appels évalués aujourd'hui (50 000/an) ; run annuel Batch + MCO ≈ 141–154 k€ ; investissement 254 550 € HT. Gain net ≈ 221–234 k€/an. À affiner au cadrage.</p>
