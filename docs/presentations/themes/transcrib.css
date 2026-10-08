@@ -139,6 +139,26 @@ section.lead h3 {
 }
 section.lead strong { color: var(--amber); }
 section.lead .meta { font-size: 18px; color: #9fb6d1; }
+section.lead .keys {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin: 0 0 36px;
+}
+section.lead .keys > div {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-left: 5px solid var(--amber);
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #fff;
+}
+section.lead .keys b {
+  color: var(--amber);
+  margin-right: 10px;
+}
 section.lead .eyebrow {
   display: inline-block;
   font-size: 16px;
