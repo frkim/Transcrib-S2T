@@ -122,12 +122,11 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
     <path d="M330,183 H348"/>
     <path d="M485,160 H515 V105 H548"/>
     <path d="M485,205 H515 V265 H548"/>
-    <path d="M740,90 H803"/>
-    <path d="M880,120 V188"/>
-    <path d="M955,230 H988"/>
-    <path d="M805,215 H780 V130 H742"/>
-    <path d="M805,255 H742"/>
-    <path d="M1065,60 V42 H645 V58" stroke-dasharray="6 5"/>
+    <path d="M740,90 H798"/>
+    <path d="M883,120 V188"/>
+    <path d="M966,230 H993"/>
+    <path d="M800,215 H780 V130 H742"/>
+    <path d="M800,255 H742"/>
   </g>
   <g font-size="15" text-anchor="middle" fill="#0b1f3a">
     <rect x="12" y="70" width="126" height="70" rx="10" fill="#fff" stroke="#0078d4" stroke-width="2"/>
@@ -142,26 +141,24 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
     <rect x="350" y="140" width="135" height="86" rx="10" fill="#fff" stroke="#0078d4" stroke-width="2"/>
     <text x="417" y="170" font-weight="700">API jobs</text><text x="417" y="190" font-size="13" fill="#5b6577">ASP.NET Core</text><text x="417" y="208" font-size="12" fill="#0078d4">Container Apps</text>
     <rect x="195" y="300" width="290" height="50" rx="10" fill="#fff" stroke="#00a3ad" stroke-width="2"/>
-    <text x="340" y="330" font-weight="700">Microsoft Entra ID <tspan font-weight="400" fill="#5b6577">· SSO &amp; rôles</tspan></text>
+    <text x="340" y="330" font-weight="700">IDP <tspan font-weight="400" fill="#5b6577">· SSO &amp; rôles</tspan></text>
     <rect x="550" y="60" width="190" height="90" rx="10" fill="#fff" stroke="#00a3ad" stroke-width="2"/>
-    <text x="645" y="92" font-weight="700">Blob Storage</text><text x="645" y="112" font-size="13" fill="#5b6577">audio · transcripts</text><text x="645" y="132" font-size="12" fill="#00a3ad">purge J+1</text>
+    <text x="645" y="101" font-weight="700">Blob Storage</text><text x="645" y="121" font-size="13" fill="#5b6577">audio · transcripts</text>
     <rect x="550" y="220" width="190" height="90" rx="10" fill="#fff" stroke="#00a3ad" stroke-width="2"/>
     <text x="645" y="252" font-weight="700">Cosmos DB</text><text x="645" y="272" font-size="13" fill="#5b6577">jobs &amp; statuts</text><text x="645" y="292" font-size="12" fill="#00a3ad">serverless</text>
-    <rect x="805" y="60" width="150" height="60" rx="10" fill="#fff" stroke="#5b6577" stroke-width="2"/>
-    <text x="880" y="86" font-weight="700">Event Grid</text><text x="880" y="105" font-size="12" fill="#5b6577">blob créé</text>
-    <rect x="805" y="190" width="150" height="80" rx="10" fill="#fff" stroke="#0078d4" stroke-width="2"/>
-    <text x="880" y="222" font-weight="700">Azure Functions</text><text x="880" y="242" font-size="13" fill="#5b6577">Pro Code</text><text x="880" y="259" font-size="12" fill="#0078d4">Flex Consumption</text>
-    <rect x="990" y="180" width="150" height="100" rx="10" fill="#0078d4"/>
-    <text x="1065" y="215" font-weight="700" fill="#fff">Azure AI Speech</text><text x="1065" y="236" font-size="13" fill="#e7f1fb">Fast · Batch</text><text x="1065" y="256" font-size="12" fill="#cfe3f7">diarization</text>
-    <rect x="990" y="60" width="150" height="60" rx="10" fill="#fff" stroke="#5b6577" stroke-width="2" stroke-dasharray="5 4"/>
-    <text x="1065" y="86" font-weight="700">Purge quotidienne</text><text x="1065" y="105" font-size="12" fill="#5b6577">cycle de vie</text>
+    <rect x="800" y="60" width="166" height="60" rx="10" fill="#fff" stroke="#5b6577" stroke-width="2"/>
+    <text x="883" y="86" font-weight="700">Event Grid</text><text x="883" y="105" font-size="12" fill="#5b6577">blob créé</text>
+    <rect x="800" y="190" width="166" height="80" rx="10" fill="#fff" stroke="#0078d4" stroke-width="2"/>
+    <text x="883" y="222" font-weight="700" font-size="14">Azure Container Apps</text><text x="883" y="242" font-size="13" fill="#5b6577">Pro Code</text><text x="883" y="259" font-size="12" fill="#0078d4">Jobs · scale-to-zero</text>
+    <rect x="995" y="180" width="150" height="100" rx="10" fill="#0078d4"/>
+    <text x="1070" y="215" font-weight="700" fill="#fff">Azure AI Speech</text><text x="1070" y="236" font-size="13" fill="#e7f1fb">Fast · Batch</text><text x="1070" y="256" font-size="12" fill="#cfe3f7">diarization</text>
   </g>
   <g font-size="12" font-weight="700" text-anchor="middle" fill="#0b1f3a">
     <circle cx="168" cy="84" r="11" fill="#f2a900"/><text x="168" y="88">1</text>
     <circle cx="300" cy="255" r="11" fill="#f2a900"/><text x="300" y="259">1</text>
     <circle cx="515" cy="132" r="11" fill="#f2a900"/><text x="515" y="136">2</text>
     <circle cx="760" cy="90" r="11" fill="#f2a900"/><text x="760" y="94">3</text>
-    <circle cx="972" cy="212" r="11" fill="#f2a900"/><text x="972" y="216">4</text>
+    <circle cx="980" cy="212" r="11" fill="#f2a900"/><text x="980" y="216">4</text>
     <circle cx="762" cy="255" r="11" fill="#f2a900"/><text x="762" y="259">5</text>
     <circle cx="262" cy="118" r="11" fill="#f2a900"/><text x="262" y="122">6</text>
   </g>
@@ -187,7 +184,7 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 | --- | --- | --- |
 | Transcription | **Azure AI Speech — Fast Transcription** | Synchrone, MP3 décodé côté service, diarization incluse, ~0,92 €/h d'audio |
 | Gros volumes | **Speech Batch** (option A) | ~0,17 €/h : **−80 %** sur le premier poste de coût |
-| Orchestration | **Azure Functions** + Event Grid | Event-driven, intégration VNet, coût marginal à fort volume |
+| Orchestration | **Azure Container Apps** + Event Grid | Event-driven, intégration VNet, scale-to-zero |
 | Application | **Next.js** + **ASP.NET Core** sur Container Apps | Scale-to-zero, conteneurs standard, zone redundancy |
 | Données | **Blob Storage** + **Cosmos DB** serverless | Stockage éphémère (J+1), métadonnées payées à la requête |
 | Identité | **Entra ID** + **Managed Identity** | SSO, RBAC fin, aucun secret à gérer ni à faire tourner |
@@ -201,11 +198,140 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 # Sécurité & conformité RGPD
 
 <div class="cols">
-  <div class="card"><h3>Identité et accès</h3><ul><li>SSO Microsoft Entra ID, rôles applicatifs</li><li>Managed Identity entre services : <strong>aucun secret</strong></li><li>Déploiement GitHub Actions par OIDC</li></ul></div>
+  <div class="card"><h3>Identité et accès</h3><ul><li>SSO IDP, rôles applicatifs</li><li>Managed Identity entre services : <strong>aucun secret</strong></li><li>Déploiement GitHub Actions par OIDC</li></ul></div>
   <div class="card teal"><h3>Réseau</h3><ul><li>VNet dédié, Private Endpoints sur toutes les données</li><li>Front Door Premium + WAF (OWASP, bots)</li><li>NAT Gateway : sortie maîtrisée</li></ul></div>
   <div class="card green"><h3>Données personnelles</h3><ul><li>Hébergement <strong>France Central</strong>, chiffrement au repos et en transit</li><li><strong>Purge automatique à J+1</strong>, suppression à la demande</li><li>Analyse qualité exécutée dans le navigateur</li></ul></div>
   <div class="card amber"><h3>Détection et preuve</h3><ul><li>Defender for Cloud (Storage, Containers, Cosmos DB)</li><li>Traces Application Insights, journaux WAF</li><li>AIPD et registre accompagnés avec votre DPO</li></ul></div>
 </div>
+
+---
+
+# Coûts de fonctionnement & options
+
+<div class="cols">
+<div>
+  <h2>Run mensuel</h2>
+
+| Poste | Coût / mois |
+| --- | ---: |
+| MCO / TMA (3 j·h) | 2 700 € HT |
+| Azure non-production | ~7–18 € |
+| Azure production sécurisée (hors Speech) | ~600–920 € |
+| Speech Fast Transcription | ~0,92 € / h d'audio |
+| Speech Batch (option A) | ~0,17 € / h d'audio |
+
+<p class="small">Consommation Azure facturée par Microsoft sur votre abonnement. Montants HT, région France Central par défaut (alternatives : Sweden Central, puis North Europe). Détail : docs/pricing.md.</p>
+</div>
+<div>
+  <h2>Options</h2>
+  <div class="card teal" style="margin-bottom:12px"><h3>A · Batch Transcription — 25 100 € HT</h3><p>Traitement différé des gros volumes : −80 % sur le coût Speech. Rentabilisé en moins d'un mois à 5 M d'appels/an.</p></div>
+  <div class="card" style="margin-bottom:12px"><h3>B · Analyse IA générative — 37 100 € HT</h3><p>Synthèse, motifs d'appel et intentions via Microsoft Foundry (Responses API).</p></div>
+  <div class="card amber"><h3>C · Connecteur téléphonie avancé — 16 050 € HT</h3><p>Collecte planifiée depuis la plateforme d'enregistrement, métadonnées d'appel.</p></div>
+</div>
+</div>
+
+---
+
+# Valeur & retour sur investissement
+
+<div class="cols-4">
+  <div class="kpi"><div class="v">×100</div><div class="l">couverture qualité : de 1 % à 100 % des appels</div></div>
+  <div class="kpi alt"><div class="v">~8 300 <small>h</small></div><div class="l">de superviseur libérées par an (15 → 5 min par évaluation)</div></div>
+  <div class="kpi warn"><div class="v">~375 <small>k€</small></div><div class="l">de gain de productivité annuel (45 €/h chargé)</div></div>
+  <div class="kpi dark"><div class="v">7–8 <small>mois</small></div><div class="l">de retour sur investissement (build + option A)</div></div>
+</div>
+
+<h2 style="margin-top:26px">Coût Azure annuel — 5 M d'appels × 7 min (~48 600 h d'audio / mois)</h2>
+<div class="bars">
+  <div>Fast, pay-as-you-go</div><div class="track"><div class="fill red" style="width:100%"></div></div><div class="val">~555 k€</div>
+  <div>Fast + engagement 50 000 h</div><div class="track"><div class="fill amber" style="width:53%"></div></div><div class="val">~295 k€</div>
+  <div>Batch (option A)</div><div class="track"><div class="fill green" style="width:21%"></div></div><div class="val">~115 k€</div>
+</div>
+
+<p class="small" style="margin-top:14px">Hypothèses : 1 % des appels évalués aujourd'hui (50 000/an) ; run annuel Batch + MCO ≈ 141–154 k€ ; investissement 139 825 € HT (build 114 725 + option A 25 100). Gain net ≈ 221–234 k€/an. À affiner au cadrage.</p>
+
+---
+
+# Variante budgétaire : analyse échantillonnée
+
+<p class="kicker">Si la couverture exhaustive n'est pas requise, ne transcrire qu'un échantillon des appels réduit la facture Speech d'autant.</p>
+
+<div class="cols">
+<div>
+  <h2>Coût Azure annuel selon le taux</h2>
+
+| Taux | Batch (option A) |
+| ---: | ---: |
+| 5 % | ~12–17 k€ |
+| 10 % | ~17–22 k€ |
+| **15 %** | **~22–28 k€** |
+| 25 % | ~33–39 k€ |
+| 50 % | ~58–66 k€ |
+| 100 % (référence) | ~109–122 k€ |
+
+<div class="card red" style="margin-top:10px;padding:8px 16px"><p><strong>Fast (temps réel), pay-as-you-go</strong> ⇒ coût <strong>×3 à ×4</strong></p></div>
+
+<p class="small">Production sécurisée, 5 M d'appels/an × 7 min, échantillonnage à la source (téléphonie). Détail : docs/pricing.md.</p>
+</div>
+<div>
+  <h2>Quel taux retenir ?</h2>
+  <div class="card green" style="margin-bottom:12px"><h3>Pilotage global — 5 à 10 %</h3><p>Tendances, motifs d'appel, irritants : marge d'erreur inférieure à ±1 point.</p></div>
+  <div class="card teal" style="margin-bottom:12px"><h3>Coaching individuel — 15 à 25 %</h3><p>Ou un quota fixe de ~100–150 appels par conseiller et par mois (échantillonnage stratifié).</p></div>
+  <div class="card amber"><h3>Exhaustif — 100 %</h3><p>Conformité, litiges, détection systématique des signaux faibles.</p></div>
+</div>
+</div>
+
+<div class="callout">À <strong>15 % en Batch</strong>, retour sur investissement en <strong>~5 mois</strong> (au lieu de 7–8), gain de productivité préservé. En contrepartie, la couverture à 100 % est abandonnée : option budgétaire ou phase de montée en charge.</div>
+
+---
+
+# Risques maîtrisés
+
+| Risque | Niveau | Mitigation |
+| --- | :---: | --- |
+| Qualité de transcription (audio 8 kHz, bruit, accents) | <span class="pill hi">élevé</span> | Mesure du WER dès le pilote sur vos appels, Custom Speech si besoin, Go/No-Go S3 |
+| Données personnelles sensibles | <span class="pill hi">élevé</span> | AIPD au cadrage, purge J+1, réseau privé, accès Entra ID tracés |
+| Quotas Azure AI Speech en pointe | <span class="pill todo">moyen</span> | Tests de charge (pointe ×2), demande de quotas anticipée, reprise sur erreur |
+| Dérive des coûts de consommation | <span class="pill todo">moyen</span> | Quotas applicatifs, budgets et alertes Cost Management, option Batch |
+| Adoption par les superviseurs | <span class="pill todo">moyen</span> | Utilisateurs clés en revue de sprint, formation, grille calibrée sur vos pratiques |
+| Logic Apps incompatibles avec le réseau privé | <span class="pill ok">faible</span> | Pipeline Pro Code (Container Apps) et cycle de vie Blob en production |
+
+---
+
+<!-- _class: lead -->
+<!-- _paginate: false -->
+<!-- _footer: '' -->
+
+<span class="eyebrow">Prochaines étapes</span>
+
+# Démarrons par le pilote
+
+### Clés de réussite
+
+<div class="keys">
+  <div><b>1</b>Pilote / POC dans un environnement réel</div>
+  <div><b>2</b>Implication IT</div>
+  <div><b>3</b>Engagement partenaire</div>
+</div>
+
+<div class="meta">
+1 · Atelier de restitution avec le sponsor et la DSI (1 h 30)<br/>
+2 · Mise à disposition d'un échantillon d'enregistrements et d'un accès Azure<br/>
+3 · Commande P0 + P1, lancement sous 2 semaines<br/>
+4 · Go/No-Go en semaine 3 sur indicateurs mesurés
+</div>
+
+---
+
+<!-- _class: lead -->
+<!-- _paginate: false -->
+<!-- _footer: '' -->
+
+<span class="eyebrow">Pour aller plus loin</span>
+
+# Appendice
+
+### Plan projet · Organisation · Offre financière
 
 ---
 
@@ -290,115 +416,6 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
   </div>
   <p class="small" style="margin-top:18px">TJM : chef de projet 950 € · architecte 1 200 € · développeur 850 € · DevOps 950 € · QA 700 € · data/IA 1 000 € (TJM moyen ≈ 918 €). Offre valable 3 mois, hors frais de déplacement.</p>
 </div>
-</div>
-
----
-
-# Coûts de fonctionnement & options
-
-<div class="cols">
-<div>
-  <h2>Run mensuel</h2>
-
-| Poste | Coût / mois |
-| --- | ---: |
-| MCO / TMA (3 j·h) | 2 700 € HT |
-| Azure non-production | ~7–18 € |
-| Azure production sécurisée (hors Speech) | ~600–920 € |
-| Speech Fast Transcription | ~0,92 € / h d'audio |
-| Speech Batch (option A) | ~0,17 € / h d'audio |
-
-<p class="small">Consommation Azure facturée par Microsoft sur votre abonnement. Montants HT, région France Central par défaut (alternatives : Sweden Central, puis North Europe). Détail : docs/pricing.md.</p>
-</div>
-<div>
-  <h2>Options</h2>
-  <div class="card teal" style="margin-bottom:12px"><h3>A · Batch Transcription — 25 100 € HT</h3><p>Traitement différé des gros volumes : −80 % sur le coût Speech. Rentabilisé en moins d'un mois à 5 M d'appels/an.</p></div>
-  <div class="card" style="margin-bottom:12px"><h3>B · Analyse IA générative — 37 100 € HT</h3><p>Synthèse, motifs d'appel et intentions via Microsoft Foundry (Responses API).</p></div>
-  <div class="card amber"><h3>C · Connecteur téléphonie avancé — 16 050 € HT</h3><p>Collecte planifiée depuis la plateforme d'enregistrement, métadonnées d'appel.</p></div>
-</div>
-</div>
-
----
-
-# Valeur & retour sur investissement
-
-<div class="cols-4">
-  <div class="kpi"><div class="v">×100</div><div class="l">couverture qualité : de 1 % à 100 % des appels</div></div>
-  <div class="kpi alt"><div class="v">~8 300 <small>h</small></div><div class="l">de superviseur libérées par an (15 → 5 min par évaluation)</div></div>
-  <div class="kpi warn"><div class="v">~375 <small>k€</small></div><div class="l">de gain de productivité annuel (45 €/h chargé)</div></div>
-  <div class="kpi dark"><div class="v">7–8 <small>mois</small></div><div class="l">de retour sur investissement (build + option A)</div></div>
-</div>
-
-<h2 style="margin-top:26px">Coût Azure annuel — 5 M d'appels × 7 min (~48 600 h d'audio / mois)</h2>
-<div class="bars">
-  <div>Fast, pay-as-you-go</div><div class="track"><div class="fill red" style="width:100%"></div></div><div class="val">~555 k€</div>
-  <div>Fast + engagement 50 000 h</div><div class="track"><div class="fill amber" style="width:53%"></div></div><div class="val">~295 k€</div>
-  <div>Batch (option A)</div><div class="track"><div class="fill green" style="width:21%"></div></div><div class="val">~115 k€</div>
-</div>
-
-<p class="small" style="margin-top:14px">Hypothèses : 1 % des appels évalués aujourd'hui (50 000/an) ; run annuel Batch + MCO ≈ 141–154 k€ ; investissement 139 825 € HT (build 114 725 + option A 25 100). Gain net ≈ 221–234 k€/an. À affiner au cadrage.</p>
-
----
-
-# Variante budgétaire : analyse échantillonnée
-
-<p class="kicker">Si la couverture exhaustive n'est pas requise, ne transcrire qu'un échantillon des appels réduit la facture Speech d'autant.</p>
-
-<div class="cols">
-<div>
-  <h2>Coût Azure annuel selon le taux</h2>
-
-| Taux | Fast, pay-as-you-go | Batch (option A) |
-| ---: | ---: | ---: |
-| 5 % | ~34–39 k€ | ~12–17 k€ |
-| 10 % | ~61–66 k€ | ~17–22 k€ |
-| **15 %** | **~88–94 k€** | **~22–28 k€** |
-| 25 % | ~143–149 k€ | ~33–39 k€ |
-| 50 % | ~278–286 k€ | ~58–66 k€ |
-| 100 % (référence) | ~548–562 k€ | ~109–122 k€ |
-
-<p class="small">Production sécurisée, 5 M d'appels/an × 7 min, échantillonnage à la source (téléphonie). Détail : docs/pricing.md.</p>
-</div>
-<div>
-  <h2>Quel taux retenir ?</h2>
-  <div class="card green" style="margin-bottom:12px"><h3>Pilotage global — 5 à 10 %</h3><p>Tendances, motifs d'appel, irritants : marge d'erreur inférieure à ±1 point.</p></div>
-  <div class="card teal" style="margin-bottom:12px"><h3>Coaching individuel — 15 à 25 %</h3><p>Ou un quota fixe de ~100–150 appels par conseiller et par mois (échantillonnage stratifié).</p></div>
-  <div class="card amber"><h3>Exhaustif — 100 %</h3><p>Conformité, litiges, détection systématique des signaux faibles.</p></div>
-</div>
-</div>
-
-<div class="callout">À <strong>15 % en Batch</strong>, retour sur investissement en <strong>~5 mois</strong> (au lieu de 7–8), gain de productivité préservé. En contrepartie, la couverture à 100 % est abandonnée : option budgétaire ou phase de montée en charge.</div>
-
----
-
-# Risques maîtrisés
-
-| Risque | Niveau | Mitigation |
-| --- | :---: | --- |
-| Qualité de transcription (audio 8 kHz, bruit, accents) | <span class="pill hi">élevé</span> | Mesure du WER dès le pilote sur vos appels, Custom Speech si besoin, Go/No-Go S3 |
-| Données personnelles sensibles | <span class="pill hi">élevé</span> | AIPD au cadrage, purge J+1, réseau privé, accès Entra ID tracés |
-| Quotas Azure AI Speech en pointe | <span class="pill todo">moyen</span> | Tests de charge (pointe ×2), demande de quotas anticipée, reprise sur erreur |
-| Dérive des coûts de consommation | <span class="pill todo">moyen</span> | Quotas applicatifs, budgets et alertes Cost Management, option Batch |
-| Adoption par les superviseurs | <span class="pill todo">moyen</span> | Utilisateurs clés en revue de sprint, formation, grille calibrée sur vos pratiques |
-| Logic Apps incompatibles avec le réseau privé | <span class="pill ok">faible</span> | Pipeline Pro Code (Functions) et cycle de vie Blob en production |
-
----
-
-<!-- _class: lead -->
-<!-- _paginate: false -->
-<!-- _footer: '' -->
-
-<span class="eyebrow">Prochaines étapes</span>
-
-# Démarrons par le pilote
-
-### Une décision à risque maîtrisé : **42 350 € HT** pour prouver la valeur sur vos données en **3 semaines**
-
-<div class="meta">
-1 · Atelier de restitution avec le sponsor et la DSI (1 h 30)<br/>
-2 · Mise à disposition d'un échantillon d'enregistrements et d'un accès Azure<br/>
-3 · Commande P0 + P1, lancement sous 2 semaines<br/>
-4 · Go/No-Go en semaine 3 sur indicateurs mesurés
 </div>
 
 ---
