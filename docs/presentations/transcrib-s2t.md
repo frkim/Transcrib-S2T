@@ -32,13 +32,13 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
   <div class="kpi warn"><div class="v">1–2 <small>%</small></div><div class="l">des appels réellement écoutés par les équipes qualité</div></div>
   <div class="kpi"><div class="v">~15 <small>min</small></div><div class="l">par évaluation manuelle d'un appel de 7 minutes</div></div>
   <div class="kpi alt"><div class="v">5 <small>M</small></div><div class="l">d'appels par an dans l'hypothèse haute centre d'appel</div></div>
-  <div class="kpi dark"><div class="v">100 <small>%</small></div><div class="l">de couverture visée, à coût unitaire maîtrisé</div></div>
+  <div class="kpi dark"><div class="v">5→100 <small>%</small></div><div class="l">d'appels analysés : un curseur réglé selon l'objectif</div></div>
 </div>
 
 <div class="cols-3" style="margin-top:26px">
   <div class="card red"><h3>Constat</h3><p>Échantillonnage manuel, chronophage et subjectif. Les signaux faibles (insatisfaction, non-conformité, risque de départ) passent inaperçus.</p></div>
   <div class="card amber"><h3>Contraintes</h3><p>Données personnelles sensibles : hébergement en France, conservation minimale, accès tracés. Budget prévisible.</p></div>
-  <div class="card green"><h3>Ambition</h3><p>Transcrire tous les appels, objectiver l'évaluation et outiller un coaching fondé sur des preuves.</p></div>
+  <div class="card green"><h3>Ambition : couverture à la carte</h3><p>Analyser juste ce qu'il faut, selon l'objectif&nbsp;:</p><ul class="dial"><li><b>5–10 %</b> évaluation globale</li><li><b>15–25 %</b> coaching individuel</li><li><b>100 %</b> analyse intégrale</li></ul></div>
 </div>
 
 ---
@@ -54,8 +54,7 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
     <li>Transcription horodatée + identification des locuteurs <span class="pill ok">disponible</span></li>
     <li>Suivi des statuts et téléchargement <span class="pill ok">disponible</span></li>
     <li>Analyse qualité 7 étapes, comparaison, coaching 90 j, exports <span class="pill ok">disponible</span></li>
-    <li>Purge automatique J+1, suppression à la demande <span class="pill ok">disponible</span></li>
-    <li>Traitement Batch des gros volumes <span class="pill">option</span></li>
+    <li>Traitement Batch des gros volumes <span class="pill ok">disponible</span></li>
     <li>Analyse IA générative (Foundry) <span class="pill">option</span></li>
   </ul>
 </div>
@@ -63,8 +62,8 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
   <h3>Exigences non fonctionnelles</h3>
   <ul>
     <li><strong>Sécurité</strong> : SSO Entra ID, Managed Identity, zéro secret</li>
-    <li><strong>Conformité</strong> : France Central, conservation 24 h max.</li>
-    <li><strong>Performance</strong> : appel de 7 min transcrit en &lt; 2 min</li>
+    <li><strong>Conformité</strong> : hébergement France Central</li>
+    <li><strong>Performance</strong> : appel de 7 min transcrit en &lt; 2 min (mode Fast Transcription)</li>
     <li><strong>Disponibilité</strong> : 99,9 % en production</li>
     <li><strong>Scalabilité</strong> : serverless, pointe ~35 traitements/min</li>
     <li><strong>Observabilité</strong> : traces de bout en bout</li>
@@ -81,10 +80,10 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 <p class="kicker">Transcrib-S2T fonctionne déjà de bout en bout : le projet sécurise et met à l'échelle, sans repartir d'une page blanche.</p>
 
 <div class="cols-4">
-  <div class="kpi"><div class="v">&lt; 2 <small>min</small></div><div class="l">pour transcrire un appel de 7 minutes (Fast Transcription)</div></div>
-  <div class="kpi alt"><div class="v">100 <small>%</small></div><div class="l">des appels transcrits et analysables, plus d'échantillonnage</div></div>
-  <div class="kpi warn"><div class="v">24 <small>h</small></div><div class="l">de conservation maximale : purge automatique J+1</div></div>
-  <div class="kpi dark"><div class="v">0,023 <small>€</small></div><div class="l">coût complet par appel en mode Batch (option A)</div></div>
+  <div class="kpi"><div class="v">~0,03 <small>€</small></div><div class="l">coût complet par appel analysé (Batch, échantillon de 15 %)</div></div>
+  <div class="kpi alt"><div class="v">÷5,5</div><div class="l">sur la facture Speech grâce au mode Batch, retenu par défaut</div></div>
+  <div class="kpi warn"><div class="v">7 <small>étapes</small></div><div class="l">d'analyse qualité automatique, suivi de coaching sur 90 jours</div></div>
+  <div class="kpi dark"><div class="v">~4 <small>mois</small></div><div class="l">de retour sur investissement (15 % des appels, Batch)</div></div>
 </div>
 
 <div class="cols-3" style="margin-top:26px">
@@ -182,13 +181,13 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 
 | Brique | Choix | Pourquoi |
 | --- | --- | --- |
-| Transcription | **Azure AI Speech — Fast Transcription** | Synchrone, MP3 décodé côté service, diarization incluse, ~0,92 €/h d'audio |
-| Gros volumes | **Speech Batch** (option A) | ~0,17 €/h : **−80 %** sur le premier poste de coût |
+| Transcription | **Azure AI Speech — Batch** (par défaut) | Asynchrone, diarization incluse, ~0,17 €/h : **−80 %** sur le premier poste de coût |
+| Transcription rapide | **Fast Transcription** (à la demande) | Appel de 7 min en &lt; 2 min, ~0,92 €/h d'audio, pour les besoins urgents |
 | Orchestration | **Azure Container Apps** + Event Grid | Event-driven, intégration VNet, scale-to-zero |
 | Application | **Next.js** + **ASP.NET Core** sur Container Apps | Scale-to-zero, conteneurs standard, zone redundancy |
-| Données | **Blob Storage** + **Cosmos DB** serverless | Stockage éphémère (J+1), métadonnées payées à la requête |
+| Données | **Blob Storage** + **Cosmos DB** serverless | Stockage chiffré, métadonnées payées à la requête |
 | Identité | **Entra ID** + **Managed Identity** | SSO, RBAC fin, aucun secret à gérer ni à faire tourner |
-| IA générative | **Microsoft Foundry** (option B) | Responses API, hébergement UE, gouvernance Azure |
+| IA générative | **Microsoft Foundry** (option) | Responses API, hébergement UE, gouvernance Azure |
 | Industrialisation | **Bicep + azd**, **GitHub Actions** (OIDC) | Environnements reproductibles, déploiement sans secret |
 
 <p class="small">Alternatives écartées : Speech SDK temps réel (décodage audio local), Logic Apps Consumption en production (incompatibles avec les Private Endpoints), App Service (coût fixe à faible charge).</p>
@@ -198,15 +197,15 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 # Sécurité & conformité RGPD
 
 <div class="cols">
-  <div class="card"><h3>Identité et accès</h3><ul><li>SSO IDP, rôles applicatifs</li><li>Managed Identity entre services : <strong>aucun secret</strong></li><li>Déploiement GitHub Actions par OIDC</li></ul></div>
+  <div class="card"><h3>Identité et accès</h3><ul><li>SSO IDP, rôles applicatifs</li><li>Managed Identity entre services : <strong>aucun secret</strong></li></ul></div>
   <div class="card teal"><h3>Réseau</h3><ul><li>VNet dédié, Private Endpoints sur toutes les données</li><li>Front Door Premium + WAF (OWASP, bots)</li><li>NAT Gateway : sortie maîtrisée</li></ul></div>
-  <div class="card green"><h3>Données personnelles</h3><ul><li>Hébergement <strong>France Central</strong>, chiffrement au repos et en transit</li><li><strong>Purge automatique à J+1</strong>, suppression à la demande</li><li>Analyse qualité exécutée dans le navigateur</li></ul></div>
-  <div class="card amber"><h3>Détection et preuve</h3><ul><li>Defender for Cloud (Storage, Containers, Cosmos DB)</li><li>Traces Application Insights, journaux WAF</li><li>AIPD et registre accompagnés avec votre DPO</li></ul></div>
+  <div class="card green"><h3>Données personnelles</h3><ul><li>Hébergement <strong>France Central</strong>, chiffrement au repos et en transit</li><li>Analyse qualité exécutée dans le navigateur</li></ul></div>
+  <div class="card amber"><h3>Détection et preuve</h3><ul><li>Defender for Cloud (Storage, Containers, Cosmos DB)</li><li>Traces Application Insights, journaux WAF</li></ul></div>
 </div>
 
 ---
 
-# Coûts de fonctionnement & options
+# Coûts de fonctionnement
 
 <div class="cols">
 <div>
@@ -214,53 +213,42 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 
 | Poste | Coût / mois |
 | --- | ---: |
-| MCO / TMA (3 j·h) | 2 700 € HT |
+| MCO / TMA (1 j·h) | 900 € HT |
 | Azure non-production | ~7–18 € |
-| Azure production sécurisée (hors Speech) | ~600–920 € |
-| Speech Fast Transcription | ~0,92 € / h d'audio |
-| Speech Batch (option A) | ~0,17 € / h d'audio |
+| Azure production sécurisée (hors Speech) | ~660–1 100 € |
+| Speech Batch (par défaut) | ~0,17 € / h d'audio |
+| Speech Fast (à la demande) | ~0,92 € / h d'audio |
 
 <p class="small">Consommation Azure facturée par Microsoft sur votre abonnement. Montants HT, région France Central par défaut (alternatives : Sweden Central, puis North Europe). Détail : docs/pricing.md.</p>
 </div>
 <div>
-  <h2>Options</h2>
-  <div class="card teal" style="margin-bottom:12px"><h3>A · Batch Transcription — 25 100 € HT</h3><p>Traitement différé des gros volumes : −80 % sur le coût Speech. Rentabilisé en moins d'un mois à 5 M d'appels/an.</p></div>
-  <div class="card" style="margin-bottom:12px"><h3>B · Analyse IA générative — 37 100 € HT</h3><p>Synthèse, motifs d'appel et intentions via Microsoft Foundry (Responses API).</p></div>
-  <div class="card amber"><h3>C · Connecteur téléphonie avancé — 16 050 € HT</h3><p>Collecte planifiée depuis la plateforme d'enregistrement, métadonnées d'appel.</p></div>
+  <h2>Budget annuel · Speech Batch</h2>
+
+| Poste / an | 15 % des appels | 100 % des appels |
+| --- | ---: | ---: |
+| Azure socle production | ~8–13 k€ | ~12–25 k€ |
+| Speech Batch | ~14,5 k€ | ~96,6 k€ |
+| **Total Azure** | **~22–28 k€** | **~109–122 k€** |
+| MCO / TMA (12 j·h) | 10,8 k€ | 10,8 k€ |
+| **Total run annuel** | **~33–39 k€** | **~120–133 k€** |
+
+<p class="small">5 M d'appels/an × 7 min, production sécurisée. 15 % ≈ 750 000 appels transcrits/an (~7 300 h d'audio/mois).</p>
 </div>
 </div>
+
+<div class="callout">Avec l'échantillonnage à 15 % et le mode Batch, le run complet (Azure + MCO) coûte <strong>~3 k€ par mois</strong>.</div>
 
 ---
 
-# Valeur & retour sur investissement
+# Couverture modulable : le bon taux pour chaque objectif
 
-<div class="cols-4">
-  <div class="kpi"><div class="v">×100</div><div class="l">couverture qualité : de 1 % à 100 % des appels</div></div>
-  <div class="kpi alt"><div class="v">~8 300 <small>h</small></div><div class="l">de superviseur libérées par an (15 → 5 min par évaluation)</div></div>
-  <div class="kpi warn"><div class="v">~375 <small>k€</small></div><div class="l">de gain de productivité annuel (45 €/h chargé)</div></div>
-  <div class="kpi dark"><div class="v">7–8 <small>mois</small></div><div class="l">de retour sur investissement (build + option A)</div></div>
-</div>
-
-<h2 style="margin-top:26px">Coût Azure annuel — 5 M d'appels × 7 min (~48 600 h d'audio / mois)</h2>
-<div class="bars">
-  <div>Fast, pay-as-you-go</div><div class="track"><div class="fill red" style="width:100%"></div></div><div class="val">~555 k€</div>
-  <div>Fast + engagement 50 000 h</div><div class="track"><div class="fill amber" style="width:53%"></div></div><div class="val">~295 k€</div>
-  <div>Batch (option A)</div><div class="track"><div class="fill green" style="width:21%"></div></div><div class="val">~115 k€</div>
-</div>
-
-<p class="small" style="margin-top:14px">Hypothèses : 1 % des appels évalués aujourd'hui (50 000/an) ; run annuel Batch + MCO ≈ 141–154 k€ ; investissement 139 825 € HT (build 114 725 + option A 25 100). Gain net ≈ 221–234 k€/an. À affiner au cadrage.</p>
-
----
-
-# Variante budgétaire : analyse échantillonnée
-
-<p class="kicker">Si la couverture exhaustive n'est pas requise, ne transcrire qu'un échantillon des appels réduit la facture Speech d'autant.</p>
+<p class="kicker">Le coût Speech suit le volume transcrit : le taux d'analyse se règle selon l'objectif et peut évoluer dans le temps.</p>
 
 <div class="cols">
 <div>
   <h2>Coût Azure annuel selon le taux</h2>
 
-| Taux | Batch (option A) |
+| Taux | Batch (par défaut) |
 | ---: | ---: |
 | 5 % | ~12–17 k€ |
 | 10 % | ~17–22 k€ |
@@ -281,7 +269,7 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 </div>
 </div>
 
-<div class="callout">À <strong>15 % en Batch</strong>, retour sur investissement en <strong>~5 mois</strong> (au lieu de 7–8), gain de productivité préservé. En contrepartie, la couverture à 100 % est abandonnée : option budgétaire ou phase de montée en charge.</div>
+<div class="callout">Référence retenue : <strong>15 % en Batch</strong>, soit ~125 appels par conseiller et par mois pour <strong>~22–28 k€/an</strong> d'Azure. Le passage à 100 % reste possible à tout moment, sans évolution de l'API.</div>
 
 ---
 
@@ -290,11 +278,12 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 | Risque | Niveau | Mitigation |
 | --- | :---: | --- |
 | Qualité de transcription (audio 8 kHz, bruit, accents) | <span class="pill hi">élevé</span> | Mesure du WER dès le pilote sur vos appels, Custom Speech si besoin, Go/No-Go S3 |
-| Données personnelles sensibles | <span class="pill hi">élevé</span> | AIPD au cadrage, purge J+1, réseau privé, accès Entra ID tracés |
-| Quotas Azure AI Speech en pointe | <span class="pill todo">moyen</span> | Tests de charge (pointe ×2), demande de quotas anticipée, reprise sur erreur |
-| Dérive des coûts de consommation | <span class="pill todo">moyen</span> | Quotas applicatifs, budgets et alertes Cost Management, option Batch |
+| Données personnelles sensibles | <span class="pill hi">élevé</span> | AIPD au cadrage, durée de conservation fixée avec le DPO, réseau privé, accès tracés |
+| Intégration à la téléphonie (ingestion à réaliser) | <span class="pill todo">moyen</span> | Connecteur cadré dès P0, API de dépôt déjà disponible, dépôt web en repli |
+| Représentativité de l'échantillon | <span class="pill todo">moyen</span> | Échantillonnage stratifié (quota par conseiller), taux tracé pour redresser les indicateurs |
+| Dérive des coûts de consommation | <span class="pill todo">moyen</span> | Batch par défaut, taux d'échantillonnage paramétrable, budgets et alertes Cost Management |
 | Adoption par les superviseurs | <span class="pill todo">moyen</span> | Utilisateurs clés en revue de sprint, formation, grille calibrée sur vos pratiques |
-| Logic Apps incompatibles avec le réseau privé | <span class="pill ok">faible</span> | Pipeline Pro Code (Container Apps) et cycle de vie Blob en production |
+| Délai de restitution du Batch (asynchrone) | <span class="pill ok">faible</span> | Fast Transcription à la demande pour les appels urgents, délai cible fixé au cadrage |
 
 ---
 
@@ -314,13 +303,6 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
   <div><b>3</b>Engagement partenaire</div>
 </div>
 
-<div class="meta">
-1 · Atelier de restitution avec le sponsor et la DSI (1 h 30)<br/>
-2 · Mise à disposition d'un échantillon d'enregistrements et d'un accès Azure<br/>
-3 · Commande P0 + P1, lancement sous 2 semaines<br/>
-4 · Go/No-Go en semaine 3 sur indicateurs mesurés
-</div>
-
 ---
 
 <!-- _class: lead -->
@@ -331,7 +313,7 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
 
 # Appendice
 
-### Plan projet · Organisation · Offre financière
+### Plan projet · Organisation · Offre financière · Valeur & ROI
 
 ---
 
@@ -417,6 +399,26 @@ footer: 'Transcrib-S2T · Proposition de solution · Chiffres indicatifs, hors t
   <p class="small" style="margin-top:18px">TJM : chef de projet 950 € · architecte 1 200 € · développeur 850 € · DevOps 950 € · QA 700 € · data/IA 1 000 € (TJM moyen ≈ 918 €). Offre valable 3 mois, hors frais de déplacement.</p>
 </div>
 </div>
+
+---
+
+# Valeur & retour sur investissement — 15 % des appels, Batch
+
+<div class="cols-4">
+  <div class="kpi"><div class="v">×15</div><div class="l">couverture qualité : de 1 % à 15 % des appels analysés</div></div>
+  <div class="kpi alt"><div class="v">~8 300 <small>h</small></div><div class="l">de superviseur libérées par an (15 → 5 min par évaluation)</div></div>
+  <div class="kpi warn"><div class="v">~375 <small>k€</small></div><div class="l">de gain de productivité annuel (45 €/h chargé)</div></div>
+  <div class="kpi dark"><div class="v">~4 <small>mois</small></div><div class="l">de retour sur investissement (build, Batch inclus)</div></div>
+</div>
+
+<h2 style="margin-top:26px">Coût annuel de fonctionnement — 15 % des appels (~7 300 h d'audio / mois)</h2>
+<div class="bars">
+  <div>Fast, pay-as-you-go (Azure)</div><div class="track"><div class="fill red" style="width:100%"></div></div><div class="val">~88–94 k€</div>
+  <div>Batch + MCO / TMA</div><div class="track"><div class="fill teal" style="width:40%"></div></div><div class="val">~33–39 k€</div>
+  <div>Batch (Azure seul)</div><div class="track"><div class="fill green" style="width:27%"></div></div><div class="val">~22–28 k€</div>
+</div>
+
+<p class="small" style="margin-top:14px">Hypothèses : 5 M d'appels/an × 7 min, 15 % transcrits (~750 000/an) ; 1 % des appels évalués aujourd'hui (50 000/an), inclus dans l'échantillon ; MCO 10,8 k€/an ; investissement 114 725 € HT (build). Gain net ≈ 336–342 k€/an. À affiner au cadrage.</p>
 
 ---
 
