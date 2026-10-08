@@ -230,5 +230,5 @@ vers l'API.
   ```bash
   cd docs/presentations
   npm ci
-  npm run build    # dist/transcrib-s2t.{html,pdf,pptx} (Google Chrome requis)
+  npm run build    # dist/transcrib-s2t.{html,pdf,pptx} (navigateur basé sur Chromium requis)
   ```

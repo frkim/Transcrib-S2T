@@ -44,7 +44,7 @@ jobs:
       - name: Install Marp CLI
         run: npm ci
 
-      # Marp CLI renders PDF and PPTX with the Google Chrome preinstalled on the runner.
+      # Marp CLI renders PDF and PPTX with the Chromium-based browser preinstalled on the runner.
       - name: Build presentation
         run: npm run build
 
