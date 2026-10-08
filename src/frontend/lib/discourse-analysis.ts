@@ -125,7 +125,7 @@ export const STEPS: StepDefinition[] = [
     name: "1. Accueil / ouverture",
     shortName: "Accueil",
     weight: 11,
-    positiveTerms: ["bonjour", "service technique", "darty", "fnac", "je m appelle", "comment puis-je vous aider"],
+    positiveTerms: ["bonjour", "service technique", "service client", "je m appelle", "comment puis-je vous aider"],
     required: ["présentation personnelle", "accueil de la demande"],
     coachingPhrase: "Bonjour, je vais reprendre votre demande avec vous et voir comment vous aider concrètement.",
     training: "Accueil / ouverture",
