@@ -121,7 +121,7 @@ avec **diarization** activée (`maxSpeakers = 10`).
 | Option | Mode | Retenu ? |
 | --- | --- | --- |
 | **Fast Transcription** | REST **synchrone**, plus rapide que le temps réel | ✅ |
-| Batch Transcription | Asynchrone (soumission + *polling*, URLs de blob) | ❌ surdimensionné, latence et orchestration inutiles |
+| Batch Transcription | Asynchrone (soumission + *polling*, URLs de blob) | 🟡 option (`Speech__Mode=Batch`) pour les gros volumes différés ; Fast par défaut |
 | Speech SDK temps réel | Streaming continu | ❌ nécessite un décodage audio local (GStreamer) pour le MP3 |
 
 ### Pourquoi Fast Transcription
@@ -139,6 +139,27 @@ avec **diarization** activée (`maxSpeakers = 10`).
    une action HTTP Logic App.
 5. **Cohérence Pro Code / Low Code** — la même API REST est invoquée par la
    Function et par le workflow Logic App, garantissant des résultats équivalents.
+
+### Mode Batch Transcription (optionnel)
+
+Le paramètre d'application `Speech__Mode` (`SPEECH_MODE` côté `azd`, paramètre
+Bicep `speechMode`) choisit le moteur du pipeline **Functions** :
+
+| Valeur | Moteur |
+| --- | --- |
+| `Fast` (défaut) | Fast Transcription, synchrone. |
+| `Batch` | Batch Transcription (`POST {speechEndpoint}/speechtotext/transcriptions?api-version=2024-11-15`), asynchrone, ~0,17 €/h. |
+
+En mode `Batch`, la Function : (1) génère une URL SAS **user delegation** en
+lecture seule sur `audio/{jobId}.mp3` (rôle *Storage Blob Delegator* de la
+Managed Identity, aucune clé de stockage) ; (2) soumet la transcription avec la
+diarization activée ; (3) interroge son statut (`Speech__BatchPollingSeconds`,
+15 s par défaut, jusqu'à `Speech__BatchTimeoutMinutes`, 60 min par défaut) ;
+(4) télécharge le résultat et écrit le **même format de transcript** ; (5)
+supprime la transcription côté Speech. Un dépassement du délai ou un échec du
+service passe le job en `Failed`.
+
+> Le workflow Logic App low-code continue d'utiliser Fast Transcription.
 
 ### Format du transcript
 

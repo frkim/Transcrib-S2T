@@ -90,6 +90,21 @@ resource queueRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01
   }
 ]
 
+// Storage Blob Delegator role (user delegation SAS so Batch Transcription can read the audio without keys).
+var blobDelegatorRoleId = 'db58b8e5-c6ad-4a2a-8342-4190687cbf4a'
+
+resource blobDelegatorRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
+  for principalId in contributorPrincipalIds: {
+    name: guid(storageAccount.id, principalId, blobDelegatorRoleId)
+    scope: storageAccount
+    properties: {
+      principalId: principalId
+      roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', blobDelegatorRoleId)
+      principalType: 'ServicePrincipal'
+    }
+  }
+]
+
 output storageAccountName string = storageAccount.name
 output blobEndpoint string = storageAccount.properties.primaryEndpoints.blob
 output storageAccountId string = storageAccount.id

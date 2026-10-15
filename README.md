@@ -183,7 +183,16 @@ les Logic Apps et le frontend. Variables optionnelles :
 azd env set AZURE_AD_TENANT_ID <tenant-id>
 azd env set AZURE_AD_CLIENT_ID <client-id>
 azd env set SPEECH_LANGUAGE fr-FR
+azd env set SPEECH_MODE Batch   # Fast (défaut) ou Batch
 ```
+
+`SPEECH_MODE=Batch` fait transcrire le pipeline **Functions** via l'API Azure AI
+Speech **Batch Transcription** (asynchrone, ~80 % moins cher, adaptée aux gros
+volumes différés) au lieu de Fast Transcription. L'audio est lu par le service
+via une URL SAS *user delegation* de courte durée (aucune clé de stockage). Le
+délai d'attente se règle via les paramètres d'application `Speech__BatchTimeoutMinutes`
+(60 par défaut) et `Speech__BatchPollingSeconds` (15 par défaut). Détails dans
+[docs/architecture.md](docs/architecture.md#mode-batch-transcription-optionnel).
 
 ## Développement local
 

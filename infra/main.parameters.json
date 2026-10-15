@@ -16,6 +16,9 @@
     },
     "speechLanguage": {
       "value": "${SPEECH_LANGUAGE=fr-FR}"
+    },
+    "speechMode": {
+      "value": "${SPEECH_MODE=Fast}"
     }
   }
 }

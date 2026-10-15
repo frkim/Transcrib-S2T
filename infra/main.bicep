@@ -18,6 +18,10 @@ param azureAdClientId string = ''
 @description('Speech recognition language.')
 param speechLanguage string = 'fr-FR'
 
+@description('Speech transcription engine used by the Functions pipeline: Fast (synchronous) or Batch (asynchronous, cheaper for large volumes).')
+@allowed(['Fast', 'Batch'])
+param speechMode string = 'Fast'
+
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 var tags = {
   'azd-env-name': environmentName
@@ -169,6 +173,7 @@ module functions 'modules/functions.bicep' = {
     cosmosContainer: cosmos.outputs.containerName
     speechEndpoint: speech.outputs.speechEndpoint
     speechLanguage: speechLanguage
+    speechMode: speechMode
   }
 }
 
@@ -223,3 +228,4 @@ output APPLICATIONINSIGHTS_CONNECTION_STRING string = monitoring.outputs.applica
 // Managed identity resource id (retained for reference by external tooling).
 output AZURE_MANAGED_IDENTITY_RESOURCE_ID string = identity.outputs.identityId
 output SPEECH_LANGUAGE string = speechLanguage
+output SPEECH_MODE string = speechMode

@@ -110,10 +110,7 @@ public class AzureSpeechTranscriptionService : ITranscriptionService
                     ? d.GetInt64()
                     : 0L;
 
-                var start = FormatTimestamp(offset);
-                var end = FormatTimestamp(offset + duration);
-
-                transcript.AppendLine($"[{start} → {end}] Speaker {speaker}: {text}");
+                transcript.AppendLine(FormatLine(offset, duration, speaker, text));
             }
         }
         else if (root.TryGetProperty("combinedPhrases", out var combined) && combined.ValueKind == JsonValueKind.Array)
@@ -130,6 +127,13 @@ public class AzureSpeechTranscriptionService : ITranscriptionService
 
         return transcript.ToString().TrimEnd();
     }
+
+    /// <summary>
+    /// Formats one diarized phrase as <c>[start → end] Speaker N: text</c>. Shared with
+    /// the Batch Transcription implementation so both modes produce the same output.
+    /// </summary>
+    internal static string FormatLine(long offsetMilliseconds, long durationMilliseconds, string speaker, string text) =>
+        $"[{FormatTimestamp(offsetMilliseconds)} → {FormatTimestamp(offsetMilliseconds + durationMilliseconds)}] Speaker {speaker}: {text}";
 
     /// <summary>
     /// Formats a millisecond offset as an <c>hh:mm:ss</c> timestamp.

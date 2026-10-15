@@ -23,6 +23,20 @@ public class TranscriptionProcessorTests
         }
     }
 
+    private sealed class BlobAwareTranscriptionService : ITranscriptionService
+    {
+        public string? BlobName { get; private set; }
+
+        public Task<TranscriptionResult> TranscribeAsync(Stream audio, string fileName, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<TranscriptionResult> TranscribeBlobAsync(string audioBlobName, Stream audio, string fileName, CancellationToken cancellationToken = default)
+        {
+            BlobName = audioBlobName;
+            return Task.FromResult(new TranscriptionResult("batch text"));
+        }
+    }
+
     private static async Task<TranscriptionJob> SeedJobAsync(InMemoryJobRepository jobs)
     {
         var job = new TranscriptionJob
@@ -79,5 +93,21 @@ public class TranscriptionProcessorTests
         var result = await processor.ProcessAsync("does-not-exist.mp3", new MemoryStream(new byte[] { 1 }));
 
         Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task ProcessAsync_PassesAudioBlobNameToTranscriptionService()
+    {
+        var jobs = new InMemoryJobRepository();
+        var blobs = new InMemoryBlobStorageService();
+        var job = await SeedJobAsync(jobs);
+        var transcriber = new BlobAwareTranscriptionService();
+        var processor = new TranscriptionProcessor(jobs, transcriber, blobs, NullLogger<TranscriptionProcessor>.Instance);
+
+        var result = await processor.ProcessAsync($"{job.Id}.mp3", new MemoryStream(new byte[] { 1 }));
+
+        Assert.Equal(JobStatus.Completed, result!.Status);
+        Assert.Equal($"{job.Id}.mp3", transcriber.BlobName);
+        Assert.Equal("batch text", blobs.Transcripts[$"{job.Id}.txt"]);
     }
 }
