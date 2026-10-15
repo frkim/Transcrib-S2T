@@ -14,6 +14,10 @@ param cosmosContainer string
 param speechEndpoint string
 param speechLanguage string = 'fr-FR'
 
+@description('Speech transcription engine: Fast (synchronous) or Batch (asynchronous, cheaper for large volumes).')
+@allowed(['Fast', 'Batch'])
+param speechMode string = 'Fast'
+
 // Always-ready instances kept warm to eliminate cold starts on the blob
 // (Event Grid) trigger. 0 = pure pay-per-use (cold starts); >=1 = warm baseline.
 @description('Number of always-ready instances for the blob trigger scale group.')
@@ -125,6 +129,7 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
         { name: 'Storage__BlobEndpoint', value: dataBlobEndpoint }
         { name: 'Speech__Endpoint', value: speechEndpoint }
         { name: 'Speech__Language', value: speechLanguage }
+        { name: 'Speech__Mode', value: speechMode }
       ]
     }
   }

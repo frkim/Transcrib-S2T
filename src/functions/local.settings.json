@@ -9,6 +9,7 @@
     "Cosmos__Container": "jobs",
     "Storage__BlobEndpoint": "",
     "Speech__Endpoint": "",
-    "Speech__Language": "fr-FR"
+    "Speech__Language": "fr-FR",
+    "Speech__Mode": "Fast"
   }
 }

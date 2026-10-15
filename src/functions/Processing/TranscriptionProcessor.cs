@@ -59,7 +59,7 @@ public class TranscriptionProcessor
                     audio.Position = 0;
                 }
 
-                var result = await _transcription.TranscribeAsync(audio, job.FileName, cancellationToken);
+                var result = await _transcription.TranscribeBlobAsync(blobName, audio, job.FileName, cancellationToken);
 
                 var transcriptBlobName = $"{job.Id}.txt";
                 var upload = await _blobs.UploadTranscriptAsync(transcriptBlobName, result.Text, cancellationToken);

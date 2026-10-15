@@ -45,11 +45,33 @@ builder.Services.AddSingleton(_ =>
 builder.Services.AddSingleton<IBlobStorageService, AzureBlobStorageService>();
 
 // Azure AI Speech (diarization enabled) — authenticated via Managed Identity.
+// Speech__Mode selects the engine: "Fast" (default, synchronous Fast Transcription) or
+// "Batch" (asynchronous Batch Transcription, cheaper for large non-urgent volumes).
 builder.Services.AddSingleton<ITranscriptionService>(sp =>
 {
     var endpoint = configuration["Speech__Endpoint"] ?? configuration["Speech:Endpoint"]
         ?? throw new InvalidOperationException("Speech endpoint is not configured.");
     var language = configuration["Speech__Language"] ?? configuration["Speech:Language"] ?? "fr-FR";
+    var mode = configuration["Speech__Mode"] ?? configuration["Speech:Mode"] ?? "Fast";
+
+    if (string.Equals(mode, "Batch", StringComparison.OrdinalIgnoreCase))
+    {
+        var pollSeconds = int.TryParse(configuration["Speech__BatchPollingSeconds"] ?? configuration["Speech:BatchPollingSeconds"], out var p) && p > 0 ? p : 15;
+        var timeoutMinutes = int.TryParse(configuration["Speech__BatchTimeoutMinutes"] ?? configuration["Speech:BatchTimeoutMinutes"], out var t) && t > 0 ? t : 60;
+        var timeout = TimeSpan.FromMinutes(timeoutMinutes);
+
+        // The SAS must outlive the whole batch job (queue time included).
+        var audioUrls = new BlobAudioSasUrlProvider(sp.GetRequiredService<BlobServiceClient>(), timeout + TimeSpan.FromHours(1));
+        return new AzureSpeechBatchTranscriptionService(
+            endpoint, credential, language, audioUrls, TimeSpan.FromSeconds(pollSeconds), timeout,
+            sp.GetRequiredService<ILogger<AzureSpeechBatchTranscriptionService>>());
+    }
+
+    if (!string.Equals(mode, "Fast", StringComparison.OrdinalIgnoreCase))
+    {
+        throw new InvalidOperationException($"Unsupported Speech mode '{mode}'. Expected 'Fast' or 'Batch'.");
+    }
+
     var logger = sp.GetRequiredService<ILogger<AzureSpeechTranscriptionService>>();
     return new AzureSpeechTranscriptionService(endpoint, credential, language, logger);
 });
