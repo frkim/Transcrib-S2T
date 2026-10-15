@@ -6,6 +6,7 @@ param hostingPlanName string
 param functionStorageName string
 param identityId string
 param identityClientId string
+param identityPrincipalId string
 param applicationInsightsConnectionString string
 param dataBlobEndpoint string
 param cosmosEndpoint string
@@ -35,6 +36,8 @@ resource functionStorage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   properties: {
     minimumTlsVersion: 'TLS1_2'
     supportsHttpsTrafficOnly: true
+    allowSharedKeyAccess: false
+    publicNetworkAccess: 'Enabled'
   }
 }
 
@@ -67,10 +70,29 @@ resource hostingPlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   }
 }
 
-var storageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${functionStorage.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${functionStorage.listKeys().keys[0].value}'
+// Shared-key access is disabled on the storage account: the Functions host and the
+// deployment package use the user-assigned managed identity.
+var functionStorageRoleIds = [
+  'b7e6dc6d-f1e8-4753-8033-0f276bb0955b' // Storage Blob Data Owner
+  '974c5e8b-45b9-4653-ba55-5f855dd0fb88' // Storage Queue Data Contributor
+  '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3' // Storage Table Data Contributor
+]
+
+resource functionStorageRoles 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
+  for roleId in functionStorageRoleIds: {
+    name: guid(functionStorage.id, identityPrincipalId, roleId)
+    scope: functionStorage
+    properties: {
+      principalId: identityPrincipalId
+      principalType: 'ServicePrincipal'
+      roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleId)
+    }
+  }
+]
 
 resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
   name: functionAppName
+  dependsOn: [functionStorageRoles]
   location: location
   tags: union(tags, { 'azd-service-name': 'functions' })
   kind: 'functionapp,linux'
@@ -89,8 +111,8 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
           type: 'blobContainer'
           value: '${functionStorage.properties.primaryEndpoints.blob}${deploymentContainer.name}'
           authentication: {
-            type: 'StorageAccountConnectionString'
-            storageAccountConnectionStringName: 'DEPLOYMENT_STORAGE_CONNECTION_STRING'
+            type: 'UserAssignedIdentity'
+            userAssignedIdentityResourceId: identityId
           }
         }
       }
@@ -114,8 +136,9 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
       appSettings: [
-        { name: 'AzureWebJobsStorage', value: storageConnectionString }
-        { name: 'DEPLOYMENT_STORAGE_CONNECTION_STRING', value: storageConnectionString }
+        { name: 'AzureWebJobsStorage__accountName', value: functionStorage.name }
+        { name: 'AzureWebJobsStorage__credential', value: 'managedidentity' }
+        { name: 'AzureWebJobsStorage__clientId', value: identityClientId }
         { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', value: applicationInsightsConnectionString }
         { name: 'AZURE_CLIENT_ID', value: identityClientId }
         // Identity-based blob trigger connection for the shared data storage.

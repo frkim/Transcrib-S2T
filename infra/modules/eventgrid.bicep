@@ -13,6 +13,9 @@ param functionAppHostName string
 @description('Name of the function that handles the Event Grid blob trigger.')
 param functionName string = 'TranscribeFunction'
 
+@description('Create the webhook subscription in Bicep. It requires a running Function host, so a fresh environment creates it in the azd postdeploy hook instead.')
+param deploySubscription bool = false
+
 // The blobs extension system key authorizes Event Grid -> function delivery.
 // It only exists once the function code (with an Event Grid blob trigger) has been deployed.
 var blobsExtensionKey = listKeys(resourceId('Microsoft.Web/sites/host', functionAppName, 'default'), '2023-12-01').systemKeys.blobs_extension
@@ -28,7 +31,7 @@ resource systemTopic 'Microsoft.EventGrid/systemTopics@2024-06-01-preview' = {
   }
 }
 
-resource blobCreatedSubscription 'Microsoft.EventGrid/systemTopics/eventSubscriptions@2024-06-01-preview' = {
+resource blobCreatedSubscription 'Microsoft.EventGrid/systemTopics/eventSubscriptions@2024-06-01-preview' = if (deploySubscription) {
   parent: systemTopic
   name: 'audio-mp3-created'
   properties: {

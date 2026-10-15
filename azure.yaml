@@ -9,6 +9,14 @@ infra:
   path: infra
   module: main
 
+hooks:
+  postprovision:
+    shell: pwsh
+    run: ./infra/hooks/postprovision.ps1
+  postdeploy:
+    shell: pwsh
+    run: ./infra/hooks/postdeploy.ps1
+
 services:
   api:
     project: ./src/api

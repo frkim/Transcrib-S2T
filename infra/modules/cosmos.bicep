@@ -25,6 +25,7 @@ resource account 'Microsoft.DocumentDB/databaseAccounts@2024-11-15' = {
       }
     ]
     disableLocalAuth: true
+    publicNetworkAccess: 'Enabled'
     capabilities: [
       {
         name: 'EnableServerless'

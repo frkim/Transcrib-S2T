@@ -22,6 +22,9 @@ param speechLanguage string = 'fr-FR'
 @allowed(['Fast', 'Batch'])
 param speechMode string = 'Fast'
 
+@description('Create the Event Grid webhook subscription during provisioning (only valid once the Function code is deployed). Otherwise the azd postdeploy hook creates it.')
+param deployEventSubscription string = 'false'
+
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 var tags = {
   'azd-env-name': environmentName
@@ -166,6 +169,7 @@ module functions 'modules/functions.bicep' = {
     functionStorageName: 'stfunc${resourceToken}'
     identityId: identity.outputs.identityId
     identityClientId: identity.outputs.identityClientId
+    identityPrincipalId: identity.outputs.identityPrincipalId
     applicationInsightsConnectionString: monitoring.outputs.applicationInsightsConnectionString
     dataBlobEndpoint: storage.outputs.blobEndpoint
     cosmosEndpoint: cosmos.outputs.endpoint
@@ -187,6 +191,7 @@ module eventGrid 'modules/eventgrid.bicep' = {
     storageAccountId: storage.outputs.storageAccountId
     functionAppName: functions.outputs.functionAppName
     functionAppHostName: functions.outputs.functionAppHostName
+    deploySubscription: toLower(deployEventSubscription) == 'true'
   }
 }
 

@@ -308,10 +308,14 @@ azd up
 `azd up` provisionne l'infrastructure puis déploie l'API, les Functions, les
 Logic Apps et le frontend.
 
-> Note d'exploitation : lors d'une recréation à neuf, la souscription Event
-> Grid nécessite que le code de la Function soit déjà déployé (le webhook du
-> déclencheur blob doit exister). Exécuter `azd deploy functions` avant
-> `azd provision` pour éviter l'échec de validation du webhook.
+> Note d'exploitation : la souscription Event Grid nécessite que le code de la
+> Function soit déjà déployé (validation du webhook). Elle n'est donc plus créée
+> par Bicep (`deployEventSubscription=false`) mais par le hook `postdeploy`
+> (`infra/hooks/postdeploy.ps1`, requiert Azure CLI connecté). Le hook
+> `postprovision` réactive l'accès réseau public de Storage/Cosmos DB, qu'une
+> politique de gouvernance peut repasser en `Disabled`, puis redémarre la Function.
+> Le workflow `azure-dev.yml` (déploiement applicatif) s'authentifie avec le
+> secret GitHub `AZURE_CREDENTIALS` (service principal).
 
 ## Coût approximatif (France Central)
 

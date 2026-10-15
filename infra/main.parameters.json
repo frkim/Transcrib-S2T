@@ -17,6 +17,9 @@
     "speechLanguage": {
       "value": "${SPEECH_LANGUAGE=fr-FR}"
     },
+    "deployEventSubscription": {
+      "value": "${DEPLOY_EVENT_SUBSCRIPTION=false}"
+    },
     "speechMode": {
       "value": "${SPEECH_MODE=Fast}"
     }
